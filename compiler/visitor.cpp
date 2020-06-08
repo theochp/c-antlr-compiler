@@ -63,7 +63,7 @@ antlrcpp::Any Visitor::visitVarExpr(ifccParser::VarExprContext *ctx) {
 	} catch (const out_of_range& ex) {
 		cout << "Use of undefined variable " + name << endl;
 		errorCount++;
-		return "";
+		return string("");
 	}
 }
 
@@ -81,7 +81,7 @@ antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 	} catch (const out_of_range& ex) {
 		cout << "Use of undefined variable " + name << endl;
 		errorCount++;
-		return "";
+		return string("");
 	}
 }
 
