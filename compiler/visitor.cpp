@@ -10,9 +10,10 @@ antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
-	for (auto it = ctx->statement().begin(); it != ctx->statement().end() ; ++it) {
-		visit(*it);
-	}
+	for (int i = 0; i < ctx->statement().size(); ++i) {
+		visit(ctx->statement(i));
+    }
+
 	/*int retval = stoi(ctx->CONST()->getText());
 	std::cout<<".globl	main\n"
 		" main: \n"
