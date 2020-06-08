@@ -3,71 +3,97 @@
 
 #include "visitor.h"
 
+#define INDENT "\t"
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	return visitChildren(ctx);
+	return visit(ctx->prog()).as<string>();
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
+	stringstream result;
+	result << ".globl  main" << endl;
+	result << "main:" << endl;
+	result << INDENT << "pushq   %rbp" << endl;
+	result << INDENT << "movq    %rsp, %rbp" << endl;
 	for (int i = 0; i < ctx->statement().size(); ++i) {
-		visit(ctx->statement(i));
+		result << INDENT << visit(ctx->statement(i)).as<string>() << endl;
     }
-
-	/*int retval = stoi(ctx->CONST()->getText());
-	std::cout<<".globl	main\n"
-		" main: \n"
-		" 	movl	$"<<retval<<", %eax\n"
-		" 	ret\n";*/
 	
-	return 0;
+	return result.str();
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
-	return visit(ctx->expr());
+	return visit(ctx->expr()).as<string>();
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	return visit(ctx->declaration());
+	return visit(ctx->declaration()).as<string>();
 }
 
 antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
-	return visit(ctx->ret());
+	return visit(ctx->ret()).as<string>();
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	if (symbolTable.find(name) != symbolTable.end()) {
+	if (this->symbolTable.find(name) != this->symbolTable.end()) {
 		cout << "This variable already exists" << endl;
+		errorCount++;
 	} else {
-		symbolTable.emplace(name, lastOffset -= 4);
-		cout << "variable " << name << " declared" << endl;
-
+		int offset = this->lastOffset -= 4;
+		this->symbolTable.emplace(name, offset);
+	
 		if (ctx->CONST() != nullptr) {
-			cout << "variable " << name << " has value " << ctx->CONST()->getText() << endl;
+			return "movl    $" + ctx->CONST()->getText() + ", " + to_string(offset) + "(%rbp)";
 		}
 	}
-	return "";
+	return string("");
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	return ctx->CONST()->getText();
+	return "movl   $" + ctx->CONST()->getText() + ", %eax";
 }
 
 antlrcpp::Any Visitor::visitVarExpr(ifccParser::VarExprContext *ctx) {
-	return "valeur de " + ctx->NAME()->getText();
+	string name = ctx->NAME()->getText(); 
+	try {
+		int offset = this->symbolTable.at(name);
+		return "movl   " + to_string(offset) + "(%rbp), %eax";
+	} catch (const out_of_range& ex) {
+		cout << "Use of undefined variable " + name << endl;
+		errorCount++;
+		return "";
+	}
 }
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 	string name = ctx->NAME()->getText();
-	int offset = this->symbolTable.at(name); //TODO: check if it exists
-	string expr = visit(ctx->expr()).as<string>();
-	cout<< "Affectation de (resultat de l'expr) dans la variable à l'offset " << offset << endl;
-	
-	return expr;
+
+	try {
+		stringstream result;
+		int offset = this->symbolTable.at(name);
+		string exprAsm = visit(ctx->expr()).as<string>();
+		result << exprAsm << endl;
+		result << "movl   %eax, " << to_string(offset) << "(%rbp)";
+
+		return result.str();
+	} catch (const out_of_range& ex) {
+		cout << "Use of undefined variable " + name << endl;
+		errorCount++;
+		return "";
+	}
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	cout << "RETURN" << endl;
+	stringstream result;
+
+	if (ctx->expr() != nullptr) {
+		result << visit(ctx->expr()).as<string>() << endl;
+	}
+
+	result << "popq    %rbp" << endl << "ret";
+
+	return result.str();
 }
 

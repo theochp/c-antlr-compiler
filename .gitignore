@@ -3,3 +3,7 @@ compiler/antlr4-generated
 compiler/output
 compiler/ifcc
 .vscode
+*.a
+*.s
+*.o
+*.out

@@ -32,8 +32,13 @@ public:
     virtual antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
+
+    int getErrCount() {
+        return errorCount;
+    }
 private:
 	map<string, int> symbolTable;
 	int lastOffset  = 0;
+    int errorCount = 0;
 };
 

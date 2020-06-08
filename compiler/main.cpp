@@ -39,7 +39,13 @@ int main(int argn, const char **argv) {
 	}
 	
   Visitor visitor;
-  visitor.visit(tree);
+  string res = visitor.visit(tree).as<string>();
+
+  if (visitor.getErrCount() == 0)  {
+    ofstream out("output.s");
+    out << res << endl;
+    out.close();
+  }
 
   return 0;
 }
