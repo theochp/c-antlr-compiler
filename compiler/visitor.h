@@ -6,6 +6,7 @@
 #include <map>
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
+#include "ir/instruction.h"
 
 using namespace std;
 
@@ -36,12 +37,25 @@ public:
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
+    string allocateTempVar();
+
     int getErrCount() {
         return errorCount;
     }
+
+    vector<instruction *> getInstructions() {
+        return instructions;
+    }
+
+    ~Visitor() {
+        for (auto it = instructions.begin(); it != instructions.end(); ++it) {
+            delete *it;
+        }
+    }
 private:
 	map<string, int> symbolTable;
-	int lastOffset  = 0;
+    vector<instruction *> instructions;
+	int stackOffset  = 0;
     int errorCount = 0;
 };
 
