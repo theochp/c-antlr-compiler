@@ -75,7 +75,7 @@ antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 		int offset = this->symbolTable.at(name);
 		string exprAsm = visit(ctx->expr()).as<string>();
 		result << exprAsm << endl;
-		result << "movl   %eax, " << to_string(offset) << "(%rbp)";
+		result << INDENT << "movl   %eax, " << to_string(offset) << "(%rbp)";
 
 		return result.str();
 	} catch (const out_of_range& ex) {
@@ -89,10 +89,11 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 	stringstream result;
 
 	if (ctx->expr() != nullptr) {
-		result << visit(ctx->expr()).as<string>() << endl;
+		result << visit(ctx->expr()).as<string>() << endl << INDENT;
 	}
 
-	result << "popq    %rbp" << endl << "ret";
+	result << "popq    %rbp" << endl 
+		   << INDENT << "ret";
 
 	return result.str();
 }

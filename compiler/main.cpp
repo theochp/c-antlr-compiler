@@ -42,10 +42,12 @@ int main(int argn, const char **argv) {
   string res = visitor.visit(tree).as<string>();
 
   if (visitor.getErrCount() == 0)  {
+    cout << res << endl;
     ofstream out("output.s");
     out << res << endl;
     out.close();
+    return 0;
   }
 
-  return 0;
+  return 1;
 }
