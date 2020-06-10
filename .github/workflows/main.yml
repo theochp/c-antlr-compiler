@@ -1,0 +1,21 @@
+name: CI
+on: [push]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    container: eguerin/antlr4cpp
+    steps:
+        - name: Checkout Project
+          uses: actions/checkout@v1
+
+        - name: Build
+          run: | 
+            cd compiler
+            make ANTLR4_INCDIR=/usr/include/antlr4-runtime ANTLR4_BINDIR=/bin ANTLR4_LIBDIR=/lib/x86_64-linux-gnu
+
+        - name: Test
+          run: | 
+            chmod 755 compiler/ifcc
+            cd tests/
+            chmod 755 pld-wrapper.sh
+            python3 pld-test.py tests/
