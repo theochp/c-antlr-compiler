@@ -25,7 +25,9 @@ public:
 
     virtual antlrcpp::Any visitDeclaration(ifccParser::DeclarationContext *ctx) override;
 
-    virtual antlrcpp::Any visitVarExpr(ifccParser::VarExprContext *ctx) override;
+	virtual antlrcpp::Any visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) override;
+
+	virtual antlrcpp::Any visitVarExpr(ifccParser::VarExprContext *ctx) override;
 
     virtual antlrcpp::Any visitConstExpr(ifccParser::ConstExprContext *ctx) override;
 
