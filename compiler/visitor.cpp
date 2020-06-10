@@ -2,13 +2,12 @@
 
 
 #include "visitor.h"
-#include <string>
 
 #define INDENT "\t"
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	return visit(ctx->prog());
+	return visit(ctx->prog()).as<string>();
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
