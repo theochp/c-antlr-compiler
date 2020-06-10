@@ -52,7 +52,7 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		int offset = this->lastOffset -= 4;
 		this->symbolTable.emplace(name, offset);
 
-		if (ctx->CONST() != 0) { // if a const is given, we affect that in memory to variable
+		if (ctx->CONST() != nullptr) { // if a const is given, we affect that in memory to variable
 			string affectation(INDENT);
 			affectation.append("movl $" + ctx->CONST()->getText() + ", " + to_string(offset) + "(%rbp)\n");
 		    return affectation;
