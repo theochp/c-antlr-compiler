@@ -3,8 +3,9 @@ grammar ifcc;
 axiom : prog       
       ;
 
-prog : 'int' 'main' '(' ')' '{' statement* '}' ;
+prog : 'int' 'main' '(' ')' bloc ;
 
+bloc: '{' statement* '}';
 
 statement: instruction ';'    # instructionStatement
          | declaration # declStatement
