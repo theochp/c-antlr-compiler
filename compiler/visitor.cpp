@@ -44,6 +44,14 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
+    string eventualInits("");
+	for (int i=0; i<ctx->individualDeclaration().size(); i++){
+        eventualInits.append(visit(ctx->individualDeclaration(i)).as<string>());
+	}
+	return eventualInits;
+}
+
+antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
 	if (this->symbolTable.find(name) != this->symbolTable.end()) {
 		cout << "This variable already exists" << endl;
@@ -51,16 +59,19 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	} else {
 		int offset = this->lastOffset -= 4;
 		this->symbolTable.emplace(name, offset);
-	
-		if (ctx->CONST() != nullptr) {
-			return "movl    $" + ctx->CONST()->getText() + ", " + to_string(offset) + "(%rbp)";
+
+		if (ctx->CONST() != nullptr) { // if a const is given, we affect that in memory to variable
+			string affectation(INDENT);
+			affectation.append("movl $" + ctx->CONST()->getText() + ", " + to_string(offset) + "(%rbp)\n");
+		    return affectation;
 		}
 	}
 	return string("");
 }
 
+
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	return "movl    $" + ctx->CONST()->getText() + ", %eax";
+	return string("movl   $" + ctx->CONST()->getText() + ", %eax");
 }
 
 antlrcpp::Any Visitor::visitVarExpr(ifccParser::VarExprContext *ctx) {
