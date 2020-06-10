@@ -11,7 +11,9 @@ statement: expr ';'    # exprStatement
          | ret         # retStatement
          ;
 
-declaration: 'int' NAME ('=' CONST)? ';';
+declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
+
+individualDeclaration: NAME ('=' CONST)? ;
 
 expr: NAME          # varExpr
     | CONST         # constExpr
