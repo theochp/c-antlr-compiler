@@ -43,6 +43,10 @@ public:
         return errorCount;
     }
 
+    map<string, int> getSymbolTable() {
+        return symbolTable;
+    }
+
     vector<instruction *> getInstructions() {
         return instructions;
     }
