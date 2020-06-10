@@ -171,10 +171,10 @@ for jobname in jobs:
     os.chdir(jobname)
     
     ## JEDI compiler, aka GCC
-    gccstatus=command("gcc -S -o asm-gcc.s input.c", "gcc-compile.txt")
+    gccstatus=command("gcc -Werror -S -o asm-gcc.s input.c", "gcc-compile.txt")
     if gccstatus == 0:
         # test-case is a valid program. we should run it
-        ldstatus=command("gcc -o exe-gcc asm-gcc.s", "gcc-link.txt")
+        ldstatus=command("gcc -Werror -o exe-gcc asm-gcc.s", "gcc-link.txt")
         if ldstatus:
             print("unexpected error: linker failed to produce exe-gcc !")
             errors = errors + 1
