@@ -7,7 +7,7 @@ prog : 'int' 'main' '(' ')' bloc ;
 
 bloc: '{' statement* '}';
 
-statement: expr ';'    # exprStatement
+statement: instruction ';'    # instructionStatement
          | declaration # declStatement
          | ret         # retStatement
          ;
@@ -16,12 +16,23 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' CONST)? ;
 
-expr: NAME          # varExpr
-    | CONST         # constExpr
-    | NAME '=' expr # affectExpr
+instruction: NAME ('=' NAME)* '=' intValue # affectExpr
     ;
 
-ret: RETURN expr? ';';
+intValue: NAME
+	| CONST
+	| operande
+	| fonction
+	;
+
+operande : intValue '+' intValue
+	| intValue '-' intValue
+	| intValue '/' intValue
+	| intValue '*' intValue
+	;
+
+
+ret: RETURN intValue? ';';
 
 RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
