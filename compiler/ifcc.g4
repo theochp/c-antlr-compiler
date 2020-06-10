@@ -12,7 +12,7 @@ statement: instruction ';'    # instructionStatement
          | ret         # retStatement
          | for
          | while
-         | ifElse
+         | if
          | doWhile
          ;
 
@@ -25,8 +25,8 @@ for: 'for('(individualDeclaration*|declaration|)';'(condition|)';'(instruction(,
 
 while: 'while('condition')'(';'|bloc|statement) ;
 
-ifElse: 'if('condition')' (bloc|statement) # if
-	| 'if('condition')' (bloc|statement) 'else' (bloc|statement) # else
+if: 'if('condition')' (bloc|statement) # if
+	| 'if('condition')' (bloc|statement) 'else' (bloc|statement|if) # else
 	;
 
 else: (bloc|statement) ;
