@@ -16,7 +16,7 @@ statement: instruction ';'    # instructionStatement
          | doWhile
          ;
 
-for: 'for('(instruction|declaration|)';'(condition|)';'(instruction(,instruction)*|)')'(bloc|statement|';') ;
+for: 'for('(instruction|declaration|)';'(condition|)';'(instruction(','instruction)*|)')'(bloc|statement|';') ;
 
 while: 'while('condition')'(';'|bloc|statement) ;
 
@@ -24,12 +24,14 @@ if: 'if('condition')' (bloc|statement) # if
 	| 'if('condition')' (bloc|statement) 'else' (bloc|statement|if) # else
 	;
 
-else: (bloc|statement) ;
-
 doWhile : 'do' bloc 'while('condition');' ;
 
 condition: intValue '==' intValue  # egalite
-	| intValue '!=' intValue #inegalite
+	| intValue '!=' intValue # inegalite
+	| intValue '<' intValue # inf
+	| intValue '<=' intValue # infEgal
+	| intValue '>' intValue # sup
+	| intValue '>=' intValue # supEgal
 	| condition '&&' condition # and
 	| condition '||' condition # or
 	| '('condition')' #parCond
