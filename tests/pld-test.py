@@ -163,7 +163,7 @@ if args.debug:
 
 ######################################################################################
 ## TEST step: actually compile all test-cases with both compilers
-
+errors = 0
 for jobname in jobs:
     os.chdir(orig_cwd)
 
@@ -177,6 +177,7 @@ for jobname in jobs:
         ldstatus=command("gcc -o exe-gcc asm-gcc.s", "gcc-link.txt")
         if ldstatus:
             print("unexpected error: linker failed to produce exe-gcc !")
+            errors = errors + 1
             continue
         exegccstatus=command("./exe-gcc", "gcc-execute.txt")
         if args.verbose >=2:
@@ -191,10 +192,12 @@ for jobname in jobs:
         continue
     elif gccstatus != 0 and pldstatus == 0:
         ## padawan wrongly accepts invalid program -> error
+        errors = errors + 1
         print("TEST FAIL (your compiler accepts an invalid program)")
         continue
     elif gccstatus == 0 and pldstatus != 0:
         ## padawan wrongly rejects valid program -> error
+        errors = errors + 1
         print("TEST FAIL (your compiler rejects a valid program)")
         if args.verbose:
             dumpfile("pld-compile.txt")
@@ -203,6 +206,7 @@ for jobname in jobs:
         ## padawan accepts to compile valid program -> let's link it
         ldstatus=command("gcc -o exe-pld asm-pld.s", "pld-link.txt")
         if ldstatus:
+            errors = errors + 1
             print("TEST FAIL (your compiler produces incorrect assembly)")
             if args.verbose:
                 dumpfile("pld-link.txt")
@@ -213,6 +217,7 @@ for jobname in jobs:
         
     exepldstatus=command("./exe-pld","pld-execute.txt")
     if open("gcc-execute.txt").read() != open("pld-execute.txt").read() :
+        errors = errors + 1
         print("TEST FAIL (different results at execution)")
         if args.verbose:
             print("GCC:")
@@ -223,3 +228,6 @@ for jobname in jobs:
 
     ## last but not least
     print("TEST OK")
+
+if errors > 0:
+    sys.exit(1)

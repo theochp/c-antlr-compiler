@@ -17,6 +17,7 @@ class  Visitor : public ifccVisitor {
 public:
 	virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override;
 	virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
+    virtual antlrcpp::Any visitBloc(ifccParser::BlocContext *ctx) override;
 	virtual antlrcpp::Any visitExprStatement(ifccParser::ExprStatementContext *ctx) override;
 
     virtual antlrcpp::Any visitDeclStatement(ifccParser::DeclStatementContext *ctx) override;
