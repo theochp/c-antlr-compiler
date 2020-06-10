@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
+#include <time.h>
 
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccLexer.h"
@@ -14,6 +15,7 @@ using namespace std;
 
 
 int main(int argn, const char **argv) {
+  srand(time(NULL));
   stringstream in;
   if (argn==2) {
      ifstream lecture(argv[1]);
@@ -46,6 +48,11 @@ int main(int argn, const char **argv) {
     ofstream out("output.s");
     out << res << endl;
     out.close();
+    cout << endl << endl;
+    auto inst = visitor.getInstructions();
+    for (auto it = inst.begin(); it != inst.end(); ++it ) {
+      cout << **it << endl;
+    }
     return 0;
   }
 
