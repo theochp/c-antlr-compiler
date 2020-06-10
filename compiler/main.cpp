@@ -9,6 +9,7 @@
 #include "antlr4-generated/ifccParser.h"
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
+#include "generator/generator.h"
 
 using namespace antlr4;
 using namespace std;
@@ -41,18 +42,16 @@ int main(int argn, const char **argv) {
 	}
 	
   Visitor visitor;
-  string res = visitor.visit(tree).as<string>();
+  visitor.visit(tree);
 
   if (visitor.getErrCount() == 0)  {
-    cout << res << endl;
+    generator gen(visitor.getInstructions(), visitor.getSymbolTable());
+  
     ofstream out("output.s");
-    out << res << endl;
+    gen.generate(cout);
+    gen.generate(out);
     out.close();
-    cout << endl << endl;
-    auto inst = visitor.getInstructions();
-    for (auto it = inst.begin(); it != inst.end(); ++it ) {
-      cout << **it << endl;
-    }
+
     return 0;
   }
 

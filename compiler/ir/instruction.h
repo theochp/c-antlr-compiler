@@ -12,9 +12,9 @@ typedef enum {
 class instruction {
     private: 
         inst_type _op;
-        string _source; // can be a constant or a symbol name
-        string _dest;
-        string _operand;
+        string _source = ""; // can be a constant or a symbol name
+        string _dest = "";
+        string _operand = "";
 
     public:
         instruction(inst_type opType);
