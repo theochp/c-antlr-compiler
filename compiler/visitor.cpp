@@ -2,12 +2,13 @@
 
 
 #include "visitor.h"
+#include <string>
 
 #define INDENT "\t"
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	return visit(ctx->prog()).as<string>();
+	return visit(ctx->prog());
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
@@ -16,11 +17,18 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
 	result << "main:" << endl;
 	result << INDENT << "pushq   %rbp" << endl;
 	result << INDENT << "movq    %rsp, %rbp" << endl;
+	
+	result << visit(ctx->bloc()).as<string>() << endl;
+	
+	return result.str();
+}
+
+antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx){
+	stringstream result;
 	for (int i = 0; i < ctx->statement().size(); ++i) {
 		result << INDENT << visit(ctx->statement(i)).as<string>() << endl;
     }
-	
-	return result.str();
+    return result.str();
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
@@ -52,14 +60,14 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	return "movl   $" + ctx->CONST()->getText() + ", %eax";
+	return "movl    $" + ctx->CONST()->getText() + ", %eax";
 }
 
 antlrcpp::Any Visitor::visitVarExpr(ifccParser::VarExprContext *ctx) {
 	string name = ctx->NAME()->getText(); 
 	try {
 		int offset = this->symbolTable.at(name);
-		return "movl   " + to_string(offset) + "(%rbp), %eax";
+		return "movl    " + to_string(offset) + "(%rbp), %eax";
 	} catch (const out_of_range& ex) {
 		cout << "Use of undefined variable " + name << endl;
 		errorCount++;
@@ -75,7 +83,7 @@ antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 		int offset = this->symbolTable.at(name);
 		string exprAsm = visit(ctx->expr()).as<string>();
 		result << exprAsm << endl;
-		result << "movl   %eax, " << to_string(offset) << "(%rbp)";
+		result << "movl    %eax, " << to_string(offset) << "(%rbp)";
 
 		return result.str();
 	} catch (const out_of_range& ex) {
@@ -92,7 +100,7 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 		result << visit(ctx->expr()).as<string>() << endl;
 	}
 
-	result << "popq    %rbp" << endl << "ret";
+	result << INDENT << "popq    %rbp" << endl << INDENT << "ret";
 
 	return result.str();
 }
