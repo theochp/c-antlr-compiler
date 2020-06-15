@@ -21,7 +21,7 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' CONST)? ;
 
-for: 'for('(individualDeclaration*|declaration|)';'(condition|)';'(instruction(,instruction)*|)')'(bloc|statement|';') ;
+for: 'for('(individualDeclaration*|declaration|)';'(condition|)';'(instruction(','instruction)*|)')'(bloc|statement|';') ;
 
 while: 'while('condition')'(';'|bloc|statement) ;
 
