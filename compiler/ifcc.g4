@@ -50,7 +50,6 @@ instruction: NAME ('=' NAME)* '=' intValue # affectExpr
 intValue: NAME
 	| CONST
 	| operande
-	| fonction
 	;
 
 operande : intValue '/' intValue 	# div
