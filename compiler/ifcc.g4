@@ -16,16 +16,12 @@ statement: instruction ';'    # instructionStatement
          | doWhile
          ;
 
-<<<<<<< HEAD
 
 declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' CONST)? ;
 
 for: 'for('(individualDeclaration*|declaration|)';'(condition|)';'(instruction(,instruction)*|)')'(bloc|statement|';') ;
-=======
-for: 'for('(instruction|declaration|)';'(condition|)';'(instruction(','instruction)*|)')'(bloc|statement|';') ;
->>>>>>> ajout condition > et <
 
 while: 'while('condition')'(';'|bloc|statement) ;
 
@@ -35,15 +31,6 @@ if: 'if('condition')' (bloc|statement) # if
 
 doWhile : 'do' bloc 'while('condition');' ;
 
-<<<<<<< HEAD
-condition: intValue '==' intValue  		# egalite
-	| intValue '!=' intValue 			# inegalite
-	| condition '&&' condition 			# and
-	| condition '||' condition 			# or
-	| '('condition')' 					# parCond
-	| 'true' 							# true
-	| 'false' 							# false
-=======
 condition: intValue '==' intValue  # egalite
 	| intValue '!=' intValue # inegalite
 	| intValue '<' intValue # inf
@@ -55,7 +42,6 @@ condition: intValue '==' intValue  # egalite
 	| '('condition')' #parCond
 	| 'true' #true
 	| 'false' #false
->>>>>>> ajout condition > et <
 	;
 
 instruction: NAME ('=' NAME)* '=' intValue # affectExpr
