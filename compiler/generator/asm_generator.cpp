@@ -31,6 +31,15 @@ void AsmGenerator::generate(ostream& os) {
             case ret:
                 os << TAB << generate_ret(inst) << endl;
                 break;
+            case add:
+                os << TAB << generate_add(inst) << endl;
+                break;
+            case sub:
+                os << TAB << generate_sub(inst) << endl;
+                break;
+            case mul:
+                os << TAB << generate_mul(inst) << endl;
+                break;
         }
     }
 }
@@ -72,6 +81,47 @@ string AsmGenerator::generate_ret(instruction& inst) {
     return res.str();
 }
 
+string AsmGenerator::generate_add(instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffsetRegister(inst.source());
+    string op2 = getOffsetRegister(inst.operand());
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "movl " + op2 + ", %ebx" << endl << TAB;
+    res << "addl %ebx, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_sub(instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffsetRegister(inst.source());
+    string op2 = getOffsetRegister(inst.operand());
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "movl " + op2 + ", %ebx" << endl << TAB;
+    res << "subl %ebx, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_mul(instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffsetRegister(inst.source());
+    string op2 = getOffsetRegister(inst.operand());
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "movl " + op2 + ", %ebx" << endl << TAB;
+    res << "imull %ebx, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
 
 string AsmGenerator::getOffsetRegister(string symbolName) {
     int offset = symbolTable.at(symbolName);
