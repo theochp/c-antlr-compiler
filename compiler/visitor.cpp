@@ -8,6 +8,7 @@
 #include "ir/instruction.h"
 #include "ast/symbol.h"
 #include "ast/expression.h"
+#include "ast/affectation.h"
 
 #define INDENT "\t"
 
@@ -73,9 +74,10 @@ antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 
 antlrcpp::Any Visitor::visitAffectation(ifccParser::AffectationContext *ctx) {
 	string name = ctx->NAME(0)->getText();
-	pair<string, Expression *> affectation;
-	affectation.first = name;
-	affectation.second = visit(ctx->expr());
+	Affectation *affectation = new Affectation();
+
+	affectation->addAffectation(name, visit(ctx->expr()));
+
 	return affectation;
 }
 
