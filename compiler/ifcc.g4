@@ -7,13 +7,13 @@ prog : 'int' 'main' '(' ')' bloc ;
 
 bloc: '{' statement* '}';
 
-statement: instruction ';'    # instructionStatement
-         | declaration # declStatement
-         | ret         # retStatement
-         | for
-         | while
-         | if
-         | doWhile
+statement: instruction ';'    	# instructionStatement
+         | declaration 			# declStatement
+         | ret         			# retStatement
+         | for					# for
+         | while				# while
+         | if					# if
+         | doWhile				# doWhile
          ;
 
 
@@ -31,17 +31,17 @@ if: 'if('condition')' (bloc|statement) # if
 
 doWhile : 'do' bloc 'while('condition');' ;
 
-condition: intValue '==' intValue  # egalite
-	| intValue '!=' intValue # inegalite
-	| intValue '<' intValue # inf
-	| intValue '<=' intValue # infEgal
-	| intValue '>' intValue # sup
-	| intValue '>=' intValue # supEgal
-	| condition '&&' condition # and
-	| condition '||' condition # or
-	| '('condition')' #parCond
-	| 'true' #true
-	| 'false' #false
+condition: intValue '==' intValue  	# egalite
+	| intValue '!=' intValue 		# inegalite
+	| intValue '<' intValue 		# inf
+	| intValue '<=' intValue 		# infEgal
+	| intValue '>' intValue 		# sup
+	| intValue '>=' intValue 		# supEgal
+	| condition '&&' condition 		# and
+	| condition '||' condition 		# or
+	| '('condition')' 				# parCond
+	| 'true' 						# true
+	| 'false' 						# false
 	;
 
 instruction: NAME ('=' NAME)* '=' intValue # affectExpr
