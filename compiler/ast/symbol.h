@@ -8,4 +8,7 @@ using namespace std;
 
 class Symbol : public Node {
     string name;
+
+public:
+    Symbol(string name);
 };

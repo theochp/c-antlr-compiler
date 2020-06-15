@@ -1,7 +1,10 @@
 // Copied from a file generated from ifcc.g4 by ANTLR 4.7.2
+#include <map>
 
 #include "visitor.h"
 #include "ast/block.h"
+#include "ast/constant.h"
+#include "ast/declaration.h"
 #include "ir/instruction.h"
 
 #define INDENT "\t"
@@ -24,69 +27,46 @@ antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
-	visit(ctx->expr());
-	return "";
+	return visit(ctx->expr());
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	visit(ctx->declaration());
-	return "";
+	return visit(ctx->declaration());
 }
 
 antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
-	visit(ctx->ret());
-	return "";
+	return visit(ctx->ret());
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
-	instruction* inst = nullptr;
-	for (int i = 0; i<ctx->individualDeclaration().size(); i++){
-        auto retInst = visit(ctx->individualDeclaration(i));
-		if (retInst != nullptr) {
-			inst = retInst;
-		}
+	Declaration *declaration = new Declaration();
+	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
+        auto symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
+		declaration->addSymbol(symbol.first, symbol.second);
 	}
-	return inst;
+	return declaration;
 }
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	if (this->symbolTable.find(name) != this->symbolTable.end()) {
-		cout << "This variable already exists" << endl;
-		errorCount++;
+	pair<string, Constant*> declaration;
+	declaration.first = name;
+ 	
+	if (ctx->CONST() != nullptr) {
+		declaration.second = new Constant(stoi(ctx->CONST()->getText()));
 	} else {
-		int offset = this->stackOffset -= 4;
-		this->symbolTable.emplace(name, offset);
-		if (ctx->CONST() != nullptr) { // if a const is given, we affect that in memory to variable
-			auto inst = new instruction(cst, ctx->CONST()->getText(), name);
-			instructions.push_back(inst);
-			return inst;
-		}
+		declaration.second = nullptr;
 	}
-	return nullptr;
+	
+	return declaration;
 }
 
-
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	string addr = allocateTempVar();
-	auto inst = new instruction(cst, ctx->CONST()->getText(), addr);
-	instructions.push_back(inst);
-	return inst; // do we need a return ?
+	return new Constant(stoi(ctx->CONST()->getText()));
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
-	string name = ctx->NAME()->getText(); 
-	try {
-		int offset = this->symbolTable.at(name); // on laisse cette ligne pour check si la variable existe
-		string addr = allocateTempVar();
-		auto inst = new instruction(load, name, addr);
-		instructions.push_back(inst);
-		return inst;
-	} catch (const out_of_range& ex) {
-		cout << "Use of undefined variable " + name << endl;
-		errorCount++;
-		return nullptr;
-	}
+	return new Symbol(ctx->NAME()->getText());
 }
 
 antlrcpp::Any Visitor::visitAffectation(ifccParser::AffectationContext *ctx) {
@@ -124,7 +104,7 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	if (ctx->expr() != nullptr) {
+	/*if (ctx->expr() != nullptr) {
 		visit(ctx->expr());
 		string source = instructions.back()->dest();
 		auto inst = new instruction(ret, source);
@@ -134,7 +114,7 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 		auto inst = new instruction(ret);
 		instructions.push_back(inst);
 		return inst;
-	}
+	}*/
 }
 
 string Visitor::allocateTempVar() {

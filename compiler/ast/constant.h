@@ -4,4 +4,6 @@
 
 class Constant : public Node {
     int value;
+public:
+    Constant(int value);
 };
