@@ -13,19 +13,18 @@ LDARGS=-g
 
 all: ifcc
 
-ifcc: dirs antlr  main.cpp visitor.cpp visitor.h ir/instruction.h ir/instruction.cpp generator/generator.h generator/generator.cpp
-	$(CC) $(CCARGS) main.cpp  -o $(OUTPUT)/main.o 
+ifcc: dirs antlr  main.o visitor.o ir/instruction.o generator/generator.o ast/block.o ast/constant.o ast/expression.o ast/node.o ast/operator.o ast/symbol.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccBaseVisitor.cpp -o $(OUTPUT)/ifccBaseVisitor.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccLexer.cpp -o $(OUTPUT)/ifccLexer.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccVisitor.cpp -o $(OUTPUT)/ifccVisitor.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccParser.cpp -o $(OUTPUT)/ifccParser.o 
-	$(CC) $(CCARGS) ir/instruction.cpp -o $(OUTPUT)/ir/instruction.o
-	$(CC) $(CCARGS) generator/generator.cpp -o $(OUTPUT)/generator/generator.o
-	$(CC) $(CCARGS) visitor.cpp -o $(OUTPUT)/visitor.o 
-	$(CC) $(LDARGS) $(OUTPUT)/main.o $(OUTPUT)/ifccBaseVisitor.o $(OUTPUT)/ifccLexer.o $(OUTPUT)/ifccVisitor.o $(OUTPUT)/ifccParser.o $(OUTPUT)/visitor.o $(OUTPUT)/ir/instruction.o $(OUTPUT)/generator/generator.o $(ANTLR4_LIBDIR)/libantlr4-runtime.a -o ifcc
+	$(CC) $(LDARGS) $^ $(OUTPUT)/ifccBaseVisitor.o $(OUTPUT)/ifccLexer.o $(OUTPUT)/ifccVisitor.o $(OUTPUT)/ifccParser.o $(ANTLR4_LIBDIR)/libantlr4-runtime.a -o ifcc
 
 antlr: $(GRAMMAR)
 	$(ANTLR4_BINDIR)/antlr4 -visitor -no-listener -Dlanguage=Cpp -o $(GENERATED) $(GRAMMAR)
+
+%.o : %.cpp
+	$(CC) $(LDARGS) -o $@ -c $< $(CFLAGS)
 
 dirs:
 	mkdir -p $(GENERATED) 
