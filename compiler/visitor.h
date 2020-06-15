@@ -29,11 +29,19 @@ public:
 
 	virtual antlrcpp::Any visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) override;
 
-	virtual antlrcpp::Any visitVarExpr(ifccParser::VarExprContext *ctx) override;
+	virtual antlrcpp::Any visitNameExpr(ifccParser::NameExprContext *ctx) override;
 
     virtual antlrcpp::Any visitConstExpr(ifccParser::ConstExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
+    virtual antlrcpp::Any visitMultExpr(ifccParser::MultExprContext *ctx) override;
+
+    virtual antlrcpp::Any visitAddExpr(ifccParser::AddExprContext *ctx) override;
+
+    virtual antlrcpp::Any visitParExpr(ifccParser::ParExprContext *ctx) override;
+
+    virtual antlrcpp::Any visitAffectation(ifccParser::AffectationContext *ctx) override;
+
+    virtual antlrcpp::Any visitAffectStatement(ifccParser::AffectStatementContext *ctx) override;
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 

@@ -7,10 +7,10 @@ prog : 'int' 'main' '(' ')' bloc ;
 
 bloc: '{' statement* '}';
 
-statement: expr ';'    	# exprStatement
-		 | affectation  # affectStatement
-         | declaration 	# declStatement
-         | ret         	# retStatement
+statement: expr ';'         # exprStatement
+		 | affectation ';'  # affectStatement
+         | declaration 	    # declStatement
+         | ret         	    # retStatement
          ;
 
 
