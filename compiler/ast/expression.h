@@ -11,4 +11,5 @@ class Expression : public Statement {
 public:
     Expression(Operator op, Statement *left, Statement *right);
     ~Expression();
+    virtual std::string print();
 };

@@ -8,3 +8,7 @@ Assignement::~Assignement() {
     delete lvalue;
     delete rvalue;
 }
+
+std::string Assignement::print() {
+    return Expression::print();
+}

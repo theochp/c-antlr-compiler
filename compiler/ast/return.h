@@ -8,4 +8,5 @@ class Return : public Statement {
 public:
     Return();
     Return(Statement* statement);
+    virtual std::string print();
 };

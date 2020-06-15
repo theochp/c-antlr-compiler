@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 typedef enum {
     MULT,
@@ -15,4 +16,5 @@ public:
     Operator (const OpType& opType);
     Operator& operator=(const OpType& opType);
     bool operator ==(const OpType &opType) const;
+    virtual std::string print();
 };

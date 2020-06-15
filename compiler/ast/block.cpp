@@ -9,3 +9,14 @@ Block::~Block() {
         delete *it;
     }
 }
+
+std::string Block::print() {
+    std::string res("{");
+    for (auto st = statements.begin(); st != statements.end(); ++st) {
+        res.append("\t");
+        res.append((*st)->print());
+        res.append("\n");
+    }
+    res.append("}");
+    return res;
+}

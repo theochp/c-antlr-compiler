@@ -3,3 +3,7 @@
 Node::~Node() {
     
 }
+
+std::string Node::print() {
+    return "";
+}

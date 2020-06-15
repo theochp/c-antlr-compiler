@@ -4,9 +4,13 @@
 
 #define TAB "\t"
 
-generator::generator(vector<instruction*> instructions, map<string, int> symbolTable)
-    : instructions(instructions), symbolTable(symbolTable) {
-    
+generator::generator(Node *ast, map<string, int> symbolTable)
+    : ast(ast), symbolTable(symbolTable) {
+    dfs(ast);
+}
+
+string generator::dfs(Node *node) {
+    node->print();
 }
 
 void generator::generate(ostream& os) {

@@ -2,11 +2,13 @@
 #include <vector>
 #include <map>
 #include "../ir/instruction.h"
+#include "../ast/node.h"
 
 using namespace std;
 
 class generator {
 
+    Node *ast;
     vector<instruction*> instructions;
     map<string, int> symbolTable;
 
@@ -19,7 +21,8 @@ class generator {
 
 public:
     // constructor
-    generator(vector<instruction*> instructions, map<string, int> symbolTable);
+    generator(Node* ast, map<string, int> symbolTable);
 
     void generate(ostream& os);
+    string dfs(Node *node);
 };

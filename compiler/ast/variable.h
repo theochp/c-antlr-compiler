@@ -11,4 +11,5 @@ class Variable : public Statement {
 
 public:
     Variable(string name);
+    virtual std::string print();
 };

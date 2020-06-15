@@ -42,15 +42,15 @@ int main(int argn, const char **argv) {
 	}
 	
   Visitor visitor;
-  visitor.visit(tree);
+  cout << visitor.visit(tree).as<Node*>()->print() << endl;
 
   if (visitor.getErrCount() == 0)  {
-    generator gen(visitor.getInstructions(), visitor.getSymbolTable());
+    /*generator gen(visitor.getInstructions(), visitor.getSymbolTable());
   
     ofstream out("output.s");
     gen.generate(cout);
     gen.generate(out);
-    out.close();
+    out.close();*/
 
     return 0;
   }

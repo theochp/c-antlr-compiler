@@ -13,4 +13,5 @@ class Block : public Node {
 public:
     void addStatement(Statement* statement);
     virtual ~Block();
+    virtual std::string print();
 };

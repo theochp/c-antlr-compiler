@@ -10,4 +10,5 @@ class Assignement : public Expression {
 public:
     Assignement(Variable *lvalue, Statement *rvalue);
     ~Assignement();
+    virtual std::string print();
 };

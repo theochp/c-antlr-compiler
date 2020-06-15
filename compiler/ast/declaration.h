@@ -13,4 +13,5 @@ class Declaration : public Statement {
 public:
     void addSymbol(string, Constant *);
     virtual ~Declaration();
+    virtual std::string print();
 };
