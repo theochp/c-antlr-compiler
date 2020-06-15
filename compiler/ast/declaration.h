@@ -12,6 +12,7 @@ class Declaration : public Statement {
 
 public:
     void addSymbol(string, Constant *);
+    const map<string, Constant *>& getSymbols() const;
     virtual ~Declaration();
     virtual std::string print();
 };

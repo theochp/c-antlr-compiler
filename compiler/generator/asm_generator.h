@@ -6,9 +6,8 @@
 
 using namespace std;
 
-class generator {
+class AsmGenerator {
 
-    Node *ast;
     vector<instruction*> instructions;
     map<string, int> symbolTable;
 
@@ -21,8 +20,7 @@ class generator {
 
 public:
     // constructor
-    generator(Node* ast, map<string, int> symbolTable);
+    AsmGenerator(vector<instruction*> instructions, map<string, int> symbolTable);
 
     void generate(ostream& os);
-    string dfs(Node *node);
 };

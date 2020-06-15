@@ -11,5 +11,8 @@ class Expression : public Statement {
 public:
     Expression(Operator op, Statement *left, Statement *right);
     ~Expression();
+    const Statement *getLeft() const;
+    const Statement *getRight() const;
+    const Operator& getOp() const;
     virtual std::string print();
 };

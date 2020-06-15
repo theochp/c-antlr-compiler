@@ -22,16 +22,16 @@ instruction::instruction(inst_type opType, std::string source, std::string dest,
     _operand = operand;
 }
 
-inst_type instruction::op() {
+inst_type instruction::op() const {
     return _op;
 }
-string instruction::source() {
+string instruction::source() const {
     return _source;
 }
-string instruction::dest() {
+string instruction::dest() const {
     return _dest;
 }
-string instruction::operand() {
+string instruction::operand() const {
     return _operand;
 }
 

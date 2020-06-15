@@ -12,6 +12,7 @@ class Block : public Node {
     
 public:
     void addStatement(Statement* statement);
+    const vector<Statement *>& getStatements() const;
     virtual ~Block();
     virtual std::string print();
 };

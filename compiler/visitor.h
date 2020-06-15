@@ -53,6 +53,10 @@ public:
         return symbolTable;
     }
 
+    int getStackOffset() {
+        return stackOffset;
+    }
+
     vector<instruction *> getInstructions() {
         return instructions;
     }

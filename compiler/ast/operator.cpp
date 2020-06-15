@@ -5,6 +5,10 @@ Operator::Operator (const OpType& opType)
 
 }
 
+const OpType& Operator::type() const {
+    return opType;
+}
+
 std::string Operator::print() {
     switch(opType) {
         case ADD:

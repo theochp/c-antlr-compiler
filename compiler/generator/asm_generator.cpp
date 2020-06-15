@@ -1,19 +1,14 @@
 #include <sstream>
 
-#include "generator.h"
+#include "asm_generator.h"
 
 #define TAB "\t"
 
-generator::generator(Node *ast, map<string, int> symbolTable)
-    : ast(ast), symbolTable(symbolTable) {
-    dfs(ast);
+AsmGenerator::AsmGenerator(vector<instruction*> instructions, map<string, int> symbolTable)
+    : instructions(instructions), symbolTable(symbolTable) {
 }
 
-string generator::dfs(Node *node) {
-    node->print();
-}
-
-void generator::generate(ostream& os) {
+void AsmGenerator::generate(ostream& os) {
     // main setup
     os << ".global main" << endl;
     os << "main:" << endl;
@@ -40,12 +35,12 @@ void generator::generate(ostream& os) {
     }
 }
 
-string generator::generate_cst(instruction& inst) {
+string AsmGenerator::generate_cst(instruction& inst) {
     string dest = getOffsetRegister(inst.dest());
     return "movl $" + inst.source() + ", " + dest;
 }
 
-string generator::generate_load(instruction& inst) {
+string AsmGenerator::generate_load(instruction& inst) {
     string source = getOffsetRegister(inst.source());
     string dest = getOffsetRegister(inst.dest());
     stringstream res;
@@ -55,7 +50,7 @@ string generator::generate_load(instruction& inst) {
 }
 
 // Todo: refactor (same behavior twice)
-string generator::generate_store(instruction& inst) {
+string AsmGenerator::generate_store(instruction& inst) {
     string source = getOffsetRegister(inst.source());
     string dest = getOffsetRegister(inst.dest());
     stringstream res;
@@ -64,7 +59,7 @@ string generator::generate_store(instruction& inst) {
     return res.str();
 }
 
-string generator::generate_ret(instruction& inst) {
+string AsmGenerator::generate_ret(instruction& inst) {
     stringstream res;
     if (inst.source() != "") {
         string source = getOffsetRegister(inst.source());
@@ -78,7 +73,7 @@ string generator::generate_ret(instruction& inst) {
 }
 
 
-string generator::getOffsetRegister(string symbolName) {
+string AsmGenerator::getOffsetRegister(string symbolName) {
     int offset = symbolTable.at(symbolName);
     return to_string(offset) + "(%rbp)";
 }

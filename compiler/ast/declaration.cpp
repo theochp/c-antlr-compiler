@@ -10,6 +10,10 @@ Declaration::~Declaration() {
     }
 }
 
+const map<string, Constant *>& Declaration::getSymbols() const {
+    return symbols;
+}
+
 std::string Declaration::print() {
     std::string res("(");
     for (auto it = symbols.begin(); it != symbols.end(); ++it) {

@@ -9,6 +9,10 @@ Return::Return(Statement* statement)
 
 }
 
+const Statement *Return::getStatement() const {
+    return statement;
+}
+
 std::string Return::print() {
     std::string res("return(");
     res.append(statement->print());

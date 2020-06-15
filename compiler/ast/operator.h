@@ -14,6 +14,7 @@ class Operator {
 
 public:
     Operator (const OpType& opType);
+    const OpType& type() const;
     Operator& operator=(const OpType& opType);
     bool operator ==(const OpType &opType) const;
     virtual std::string print();

@@ -10,6 +10,10 @@ Block::~Block() {
     }
 }
 
+const vector<Statement *>& Block::getStatements() const {
+    return statements;
+}
+
 std::string Block::print() {
     std::string res("{");
     for (auto st = statements.begin(); st != statements.end(); ++st) {

@@ -6,6 +6,18 @@ Expression::Expression(Operator op, Statement *left, Statement *right)
 
 }
 
+const Statement *Expression::getLeft() const {
+    return left;
+}
+
+const Statement *Expression::getRight() const {
+    return right;
+}
+
+const Operator& Expression::getOp() const {
+    return op;
+}
+
 std::string Expression::print() {
     std::string res("(");
     res.append(left->print());
