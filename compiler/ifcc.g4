@@ -26,17 +26,17 @@ if: 'if('condition')' (bloc|statement) # if
 
 doWhile : 'do' bloc 'while('condition');' ;
 
-condition: intValue '==' intValue  # egalite
-	| intValue '!=' intValue # inegalite
-	| intValue '<' intValue # inf
-	| intValue '<=' intValue # infEgal
-	| intValue '>' intValue # sup
-	| intValue '>=' intValue # supEgal
-	| condition '&&' condition # and
-	| condition '||' condition # or
-	| '('condition')' #parCond
-	| 'true' #true
-	| 'false' #false
+condition: intValue '==' intValue  	# egalite
+	| intValue '!=' intValue 		# inegalite
+	| intValue '<' intValue 		# inf
+	| intValue '<=' intValue 		# infEgal
+	| intValue '>' intValue 		# sup
+	| intValue '>=' intValue 		# supEgal
+	| condition '&&' condition 		# and
+	| condition '||' condition 		# or
+	| '('condition')' 				# parCond
+	| 'true' 						# true
+	| 'false' 						# false
 	;
 
 
