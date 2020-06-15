@@ -7,13 +7,10 @@ prog : 'int' 'main' '(' ')' bloc ;
 
 bloc: '{' statement* '}';
 
-statement: instruction ';'    	# instructionStatement
-         | declaration 			# declStatement
-         | ret         			# retStatement
-         | for					# for
-         | while				# while
-         | if					# if
-         | doWhile				# doWhile
+statement: expr ';'    	# exprStatement
+		 | affectation  # affectStatement
+         | declaration 	# declStatement
+         | ret         	# retStatement
          ;
 
 
@@ -21,48 +18,21 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' CONST)? ;
 
-for: 'for('(individualDeclaration*|declaration|)';'(condition|)';'(instruction(','instruction)*|)')'(bloc|statement|';') ;
+affectation: NAME ('=' NAME)* '=' expr;
 
-while: 'while('condition')'(';'|bloc|statement) ;
-
-if: 'if('condition')' (bloc|statement) # if
-	| 'if('condition')' (bloc|statement) 'else' (bloc|statement|if) # else
+expr: '('expr')'		 # parExpr
+	| expr MULTDIV expr  # multExpr
+	| expr ADDMINUS expr # addExpr
+	| NAME				 # nameExpr
+	| CONST				 # constExpr
 	;
 
-doWhile : 'do' bloc 'while('condition');' ;
-
-condition: intValue '==' intValue  	# egalite
-	| intValue '!=' intValue 		# inegalite
-	| intValue '<' intValue 		# inf
-	| intValue '<=' intValue 		# infEgal
-	| intValue '>' intValue 		# sup
-	| intValue '>=' intValue 		# supEgal
-	| condition '&&' condition 		# and
-	| condition '||' condition 		# or
-	| '('condition')' 				# parCond
-	| 'true' 						# true
-	| 'false' 						# false
-	;
-
-instruction: NAME ('=' NAME)* '=' intValue # affectExpr
-    ;
-
-intValue: NAME
-	| CONST
-	| operande
-	;
-
-operande : intValue '/' intValue 	# div
-	| intValue '*' intValue 		# mult
-	| '('operande')' 				# parOpe
-	| intValue '+' intValue 		# add
-	| intValue '-' intValue 		# minus
-	;
-
-ret: RETURN intValue? ';';
+ret: RETURN expr? ';';
 
 RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
+MULTDIV : ('*'|'/');
+ADDMINUS : ('+'|'-');
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
