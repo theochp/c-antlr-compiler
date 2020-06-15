@@ -7,9 +7,9 @@
 #include "ast/declaration.h"
 #include "ir/instruction.h"
 #include "ast/operator.h"
-#include "ast/symbol.h"
-#include "ast/expression.h"
 #include "ast/affectation.h"
+#include "ast/assignement.h"
+#include "ast/expression.h"
 
 #define INDENT "\t"
 
@@ -53,16 +53,24 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	pair<string, Constant*> declaration;
-	declaration.first = name;
- 	
-	if (ctx->CONST() != nullptr) {
-		declaration.second = new Constant(stoi(ctx->CONST()->getText()));
+
+	if (symbolTable.find(name) == symbolTable.end()) {
+		pair<string, Constant*> declaration;
+		declaration.first = name;
+		
+		if (ctx->CONST() != nullptr) {
+			declaration.second = new Constant(stoi(ctx->CONST()->getText()));
+		} else {
+			declaration.second = nullptr;
+		}
+		
+		return declaration;
 	} else {
-		declaration.second = nullptr;
+		errorCount++;
+		cerr << "ERR: Déclaration d'une variable qui existe déjà" << endl;
 	}
-	
-	return declaration;
+
+	return nullptr;
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
@@ -70,47 +78,47 @@ antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
-	return new Symbol(ctx->NAME()->getText());
+	return new Variable(ctx->NAME()->getText());
 }
 
-antlrcpp::Any Visitor::visitAffectation(ifccParser::AffectationContext *ctx) {
-	string name = ctx->NAME(0)->getText();
-	Affectation *affectation = new Affectation();
-
-	affectation->addAffectation(name, visit(ctx->expr()));
-
-	return affectation;
-}
-
-antlrcpp::Any Visitor::visitAffectStatement(ifccParser::AffectStatementContext *ctx) {
-	return visit(ctx->affectation());
+antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
+	string name = ctx->NAME()->getText();
+	if (symbolTable.find(name) != symbolTable.end()) {
+		return new Assignement(new Variable(name), visit(ctx->expr()));
+	} else {
+		cerr << "ERR: Use of undefined variable " + name << endl;
+		errorCount++;
+	}
+	
+	return nullptr;
 }
 
 antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
-	// mult div
-	OpType opType = OpType::mult;
-	if (ctx->MULTDIV()->getText() == "/"){
-		opType = OpType::div;
+	Operator opType = MULT;
+	if (ctx->MULTDIV()->getText() == "/") {
+		opType = DIV;
 	}
-	Node* leftExpr = (Node*) visit(ctx->expr(0));
-	Node* rightExpr = (Node*) visit(ctx->expr(1));
-	Operator op(opType);
-	return new Expression(leftExpr, rightExpr, op);
+
+	Expression* leftExpr = (Expression*) visit(ctx->expr(0));
+	Expression* rightExpr = (Expression*) visit(ctx->expr(1));
+
+	return new Expression(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
-    OpType opType = OpType::add;
-    if (ctx->ADDMINUS()->getText() == "-"){
-        OpType opType = OpType::minus;
+	Operator opType = ADD;
+	if (ctx->ADDMINUS()->getText() == "-") {
+		opType = MINUS;
 	}
-    Node* leftExpr = (Node*) visit(ctx->expr(0));
-    Node* rightExpr = (Node*) visit(ctx->expr(1));
-    Operator op(opType);
-    return new Expression(leftExpr, rightExpr, op);
+
+	Expression* leftExpr = (Expression*) visit(ctx->expr(0));
+    Expression* rightExpr = (Expression*) visit(ctx->expr(1));
+
+	return new Expression(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
-	return nullptr;
+	return visit(ctx->expr());
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
@@ -125,6 +133,7 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 		instructions.push_back(inst);
 		return inst;
 	}*/
+	return nullptr;
 }
 
 string Visitor::allocateTempVar() {

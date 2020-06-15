@@ -1,8 +1,8 @@
 #pragma once
 
-#include "node.h"
+#include "expression.h"
 
-class Constant : public Node {
+class Constant : public Expression {
     int value;
 public:
     Constant(int value);

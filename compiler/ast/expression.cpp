@@ -1,22 +1,9 @@
 #include "expression.h"
 
-Expression::Expression(Node *nodeLeft, Node *nodeRight, Operator ope) : op(ope) {
-    left = nodeLeft;
-    right = nodeRight;
-}
+Expression::Expression(Operator op, Expression *left, Expression *right)
+    : op(op), left(left), right(right) {
 
-void Expression::addLeftNode(Node *node) {
-    left = node;
 }
-
-void Expression::addRightNode(Node *node) {
-    right = node;
-}
-
-void Expression::addOperator(Operator ope) {
-    op = ope;
-}
-
 Expression::~Expression() {
     delete left;
     delete right;

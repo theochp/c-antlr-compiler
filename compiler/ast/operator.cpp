@@ -1,9 +1,14 @@
 #include "operator.h"
 
-Operator::Operator(OpType o) {
-    opType = o;
+Operator::Operator (const OpType& opType) 
+    : opType(opType) {
+
 }
 
-OpType Operator::getType() {
-    return opType;
+Operator& Operator::operator=(const OpType& opType) {
+    this->opType = opType;
+}
+
+bool Operator::operator ==(const OpType &opType) const {
+    return this->opType == opType;
 }

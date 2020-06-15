@@ -1,15 +1,17 @@
 #pragma once
 
 typedef enum {
-    mult,
-    div,
-    add,
-    minus,
+    MULT,
+    DIV,
+    ADD,
+    MINUS,
 } OpType;
 
 class Operator {
     OpType opType;
+
 public:
-    Operator(OpType o);
-    OpType getType();
+    Operator (const OpType& opType);
+    Operator& operator=(const OpType& opType);
+    bool operator ==(const OpType &opType) const;
 };

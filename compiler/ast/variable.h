@@ -6,9 +6,9 @@
 
 using namespace std;
 
-class Symbol : public Node {
+class Variable : public Node {
     string name;
 
 public:
-    Symbol(string name);
+    Variable(string name);
 };
