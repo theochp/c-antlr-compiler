@@ -25,14 +25,10 @@ antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
 
 antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 	Block *block = new Block();
-	cout << "begin block" << endl;
 	for (int i = 0; i < ctx->statement().size(); ++i) {
-		cout << "etape" << endl;
 		auto statement = visit(ctx->statement(i)).as<Statement*>();
 		block->addStatement(statement);
-		cout << "fin etape" << endl;
     }
-	cout << "block" << endl;
     return (Node*) block;
 }
 
@@ -41,9 +37,7 @@ antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx)
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	cout << "begin decl statement" << endl;
 	auto decl = visit(ctx->declaration()).as<Declaration*>();
-	cout << "end decl statement" << endl;
 	return (Statement*) decl;
 }
 
@@ -52,19 +46,16 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
-	cout << "begin decl" << endl;
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
         auto symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
 		declaration->addSymbol(symbol.first, symbol.second);
 	}
-	cout << "end decl" << endl;
 	return declaration;
 }
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	cout << "begin individual decl" << endl;
 	if (symbolTable.find(name) == symbolTable.end()) {
 		pair<string, Constant*> declaration;
 		declaration.first = name;
@@ -81,12 +72,10 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		errorCount++;
 		cerr << "ERR: Déclaration d'une variable qui existe déjà" << endl;
 	}
-	cout << "endl individual" << endl;
 	return nullptr;
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	cout << ctx->CONST()->getText() << endl;
 	return (Statement*) new Constant(stoi(ctx->CONST()->getText()));
 }
 
@@ -95,11 +84,9 @@ antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
-	cout << "affectation" << endl;
 	string name = ctx->NAME()->getText();
 	if (symbolTable.find(name) != symbolTable.end()) {
 		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
-		cout << "fin affectation" << endl;
 		return statement;
 	} else {
 		cerr << "ERR: Use of undefined variable " + name << endl;
@@ -113,21 +100,22 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
 	if (ctx->MULTDIV()->getText() == "/") {
 		opType = DIV;
 	}
+	auto leftExpr = visit(ctx->expr(0));
+	auto rightExpr = visit(ctx->expr(1));
 
-	Expression* leftExpr = (Expression*) visit(ctx->expr(0));
-	Expression* rightExpr = (Expression*) visit(ctx->expr(1));
-
-	return new Expression(opType, leftExpr, rightExpr);
+	return (Statement*) new Expression(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
+	string opStr = ctx->ADDMINUS()->getText();
+	
 	Operator opType = ADD;
-	if (ctx->ADDMINUS()->getText() == "-") {
+	if (opStr == "-") {
 		opType = MINUS;
 	}
 
-	Expression* leftExpr = (Expression*) visit(ctx->expr(0));
-    Expression* rightExpr = (Expression*) visit(ctx->expr(1));
+	auto leftExpr = visit(ctx->expr(0));
+	auto rightExpr = visit(ctx->expr(1));
 
 	return new Expression(opType, leftExpr, rightExpr);
 }
@@ -137,7 +125,6 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	cout << "return " << endl;
 	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
 }
 
