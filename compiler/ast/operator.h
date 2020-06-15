@@ -9,4 +9,6 @@ typedef enum {
 
 class Operator {
     OpType opType;
+public:
+    Operator(OpType o);
 };
