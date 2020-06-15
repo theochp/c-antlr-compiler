@@ -53,11 +53,11 @@ intValue: NAME
 	| fonction
 	;
 
-operande : intValue '+' intValue 	# add
-	| intValue '-' intValue 		# minus
-	| intValue '/' intValue 		# div
+operande : intValue '/' intValue 	# div
 	| intValue '*' intValue 		# mult
 	| '('operande')' 				# parOpe
+	| intValue '+' intValue 		# add
+	| intValue '-' intValue 		# minus
 	;
 
 ret: RETURN intValue? ';';
