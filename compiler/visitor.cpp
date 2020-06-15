@@ -74,29 +74,28 @@ antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitAffectation(ifccParser::AffectationContext *ctx) {
-	/*
-	string name = ctx->NAME()->getText();
-	try {
-		int offset = this->symbolTable.at(name);  // on laisse cette ligne pour check si la variable existe
-		visit(ctx->expr());
-		string source = instructions.back()->dest(); // on récupère la destination de la précédente instruction
-		auto inst = new instruction(store, source, name);
-		instructions.push_back(inst);
-		return inst;
-	} catch (const out_of_range& ex) {
-		cout << "Use of undefined variable " + name << endl;
-		errorCount++;
-	}
-	*/
-	return nullptr;
+	string name = ctx->NAME(0)->getText();
+	Affectation *affectation = new Affectation();
+
+	affectation->addAffectation(name, visit(ctx->expr()));
+
+	return affectation;
 }
 
 antlrcpp::Any Visitor::visitAffectStatement(ifccParser::AffectStatementContext *ctx) {
-	return nullptr;
+	return visit(ctx->affectation());
 }
 
 antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
-	return nullptr;
+	// mult div
+	OpType opType = OpType::mult;
+	if (ctx->MULTDIV()->getText() == "/"){
+		opType = OpType::div;
+	}
+	Node* leftExpr = (Node*) visit(ctx->expr(0));
+	Node* rightExpr = (Node*) visit(ctx->expr(1));
+	Operator op(opType);
+	return new Expression(leftExpr, rightExpr, op);
 }
 
 antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
