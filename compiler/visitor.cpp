@@ -6,6 +6,7 @@
 #include "ast/constant.h"
 #include "ast/declaration.h"
 #include "ir/instruction.h"
+#include "ast/operator.h"
 #include "ast/symbol.h"
 #include "ast/expression.h"
 #include "ast/affectation.h"
@@ -86,7 +87,15 @@ antlrcpp::Any Visitor::visitAffectStatement(ifccParser::AffectStatementContext *
 }
 
 antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
-	return nullptr;
+	// mult div
+	OpType opType = OpType::mult;
+	if (ctx->MULTDIV()->getText() == "/"){
+		opType = OpType::div;
+	}
+	Node* leftExpr = (Node*) visit(ctx->expr(0));
+	Node* rightExpr = (Node*) visit(ctx->expr(1));
+	Operator op(opType);
+	return new Expression(leftExpr, rightExpr, op);
 }
 
 antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
