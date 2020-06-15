@@ -1,6 +1,7 @@
 // Copied from a file generated from ifcc.g4 by ANTLR 4.7.2
 
 #include "visitor.h"
+#include "ast/block.h"
 #include "ir/instruction.h"
 
 #define INDENT "\t"
@@ -11,22 +12,15 @@ antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
-	stringstream result;
-	result << ".globl  main" << endl;
-	result << "main:" << endl;
-	result << INDENT << "pushq   %rbp" << endl;
-	result << INDENT << "movq    %rsp, %rbp" << endl;
-	
-	visit(ctx->bloc());
-	
-	return result.str();
+	return visit(ctx->bloc());
 }
 
-antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx){
+antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
+	Block *block = new Block();
 	for (int i = 0; i < ctx->statement().size(); ++i) {
-		visit(ctx->statement(i));
+		block->addNode(visit(ctx->statement(i)));
     }
-    return "";
+    return block;
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
