@@ -57,7 +57,7 @@ operande : intValue '+' intValue 	# add
 	| intValue '-' intValue 		# minus
 	| intValue '/' intValue 		# div
 	| intValue '*' intValue 		# mult
-	| '('operande')'' 				# parOpe
+	| '('operande')' 				# parOpe
 	;
 
 ret: RETURN intValue? ';';
