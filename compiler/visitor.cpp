@@ -6,6 +6,10 @@
 #include "ast/constant.h"
 #include "ast/declaration.h"
 #include "ir/instruction.h"
+#include "ast/operator.h"
+#include "ast/symbol.h"
+#include "ast/expression.h"
+#include "ast/affectation.h"
 
 #define INDENT "\t"
 
@@ -96,7 +100,14 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
-	return nullptr;
+    OpType opType = OpType::add;
+    if (ctx->ADDMINUS()->getText() == "-"){
+        OpType opType = OpType::minus;
+	}
+    Node* leftExpr = (Node*) visit(ctx->expr(0));
+    Node* rightExpr = (Node*) visit(ctx->expr(1));
+    Operator op(opType);
+    return new Expression(leftExpr, rightExpr, op);
 }
 
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
