@@ -80,7 +80,7 @@ antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 	return inst; // do we need a return ?
 }
 
-antlrcpp::Any Visitor::visitVarExpr(ifccParser::VarExprContext *ctx) {
+antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 	string name = ctx->NAME()->getText(); 
 	try {
 		int offset = this->symbolTable.at(name); // on laisse cette ligne pour check si la variable existe
@@ -95,7 +95,8 @@ antlrcpp::Any Visitor::visitVarExpr(ifccParser::VarExprContext *ctx) {
 	}
 }
 
-antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
+antlrcpp::Any Visitor::visitAffectation(ifccParser::AffectationContext *ctx) {
+	/*
 	string name = ctx->NAME()->getText();
 	try {
 		int offset = this->symbolTable.at(name);  // on laisse cette ligne pour check si la variable existe
@@ -108,7 +109,23 @@ antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 		cout << "Use of undefined variable " + name << endl;
 		errorCount++;
 	}
+	*/
+	return nullptr;
+}
 
+antlrcpp::Any Visitor::visitAffectStatement(ifccParser::AffectStatementContext *ctx) {
+	return nullptr;
+}
+
+antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
+	return nullptr;
+}
+
+antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
+	return nullptr;
+}
+
+antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return nullptr;
 }
 
