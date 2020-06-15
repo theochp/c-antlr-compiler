@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "node.h"
+#include "statement.h"
 
 using namespace std;
 
-class Variable : public Node {
+class Variable : public Statement {
     string name;
 
 public:

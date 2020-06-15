@@ -1,8 +1,8 @@
 #pragma once
 
-#include "expression.h"
+#include "statement.h"
 
-class Constant : public Expression {
+class Constant : public Statement {
     int value;
 public:
     Constant(int value);

@@ -1,9 +1,9 @@
 #include "assignement.h"
 
-Assignement::Assignement(Variable *lvalue, Expression *rvalue) 
-    : lvalue(lvalue), rvalue(rvalue) {
-
+Assignement::Assignement(Variable *lvalue, Statement *rvalue) 
+    : Expression(ASSIGN, lvalue, rvalue) {
 }
+
 Assignement::~Assignement() {
     delete lvalue;
     delete rvalue;

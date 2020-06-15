@@ -5,6 +5,7 @@ typedef enum {
     DIV,
     ADD,
     MINUS,
+    ASSIGN,
 } OpType;
 
 class Operator {

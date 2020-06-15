@@ -1,11 +1,11 @@
 #include "block.h"
 
-void Block::addNode(Node *node) {
-    nodes.push_back(node);
+void Block::addStatement(Statement *statement) {
+    statements.push_back(statement);
 }
 
 Block::~Block() {
-    for (auto it = nodes.begin(); it != nodes.end() ; ++it) {
+    for (auto it = statements.begin(); it != statements.end() ; ++it) {
         delete *it;
     }
 }

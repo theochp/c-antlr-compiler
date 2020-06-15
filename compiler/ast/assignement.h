@@ -5,9 +5,9 @@
 
 class Assignement : public Expression {
     Variable *lvalue;
-    Expression *rvalue;
+    Statement *rvalue;
 
 public:
-    Assignement(Variable *lvalue, Expression *rvalue);
+    Assignement(Variable *lvalue, Statement *rvalue);
     ~Assignement();
 };

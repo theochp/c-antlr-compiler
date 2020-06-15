@@ -10,54 +10,66 @@
 #include "ast/affectation.h"
 #include "ast/assignement.h"
 #include "ast/expression.h"
+#include "ast/return.h"
 
 #define INDENT "\t"
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	return visit(ctx->prog());
+	return visit(ctx->prog()).as<Node*>();
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
-	return visit(ctx->bloc());
+	return visit(ctx->bloc()).as<Node*>();
 }
 
 antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 	Block *block = new Block();
+	cout << "begin block" << endl;
 	for (int i = 0; i < ctx->statement().size(); ++i) {
-		block->addNode(visit(ctx->statement(i)));
+		cout << "etape" << endl;
+		auto statement = visit(ctx->statement(i)).as<Statement*>();
+		block->addStatement(statement);
+		cout << "fin etape" << endl;
     }
-    return block;
+	cout << "block" << endl;
+    return (Node*) block;
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
-	return visit(ctx->expr());
+	return visit(ctx->expr()).as<Statement*>();
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	return visit(ctx->declaration());
+	cout << "begin decl statement" << endl;
+	auto decl = visit(ctx->declaration()).as<Declaration*>();
+	cout << "end decl statement" << endl;
+	return (Statement*) decl;
 }
 
 antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
-	return visit(ctx->ret());
+	return visit(ctx->ret()).as<Statement*>();
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
+	cout << "begin decl" << endl;
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
         auto symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
 		declaration->addSymbol(symbol.first, symbol.second);
 	}
+	cout << "end decl" << endl;
 	return declaration;
 }
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-
+	cout << "begin individual decl" << endl;
 	if (symbolTable.find(name) == symbolTable.end()) {
 		pair<string, Constant*> declaration;
 		declaration.first = name;
-		
+		int offset = stackOffset -= 4;
+		symbolTable.emplace(name, offset);
 		if (ctx->CONST() != nullptr) {
 			declaration.second = new Constant(stoi(ctx->CONST()->getText()));
 		} else {
@@ -69,28 +81,31 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		errorCount++;
 		cerr << "ERR: Déclaration d'une variable qui existe déjà" << endl;
 	}
-
+	cout << "endl individual" << endl;
 	return nullptr;
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	return new Constant(stoi(ctx->CONST()->getText()));
+	cout << ctx->CONST()->getText() << endl;
+	return (Statement*) new Constant(stoi(ctx->CONST()->getText()));
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
-	return new Variable(ctx->NAME()->getText());
+	return (Statement*) new Variable(ctx->NAME()->getText());
 }
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
+	cout << "affectation" << endl;
 	string name = ctx->NAME()->getText();
 	if (symbolTable.find(name) != symbolTable.end()) {
-		return new Assignement(new Variable(name), visit(ctx->expr()));
+		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
+		cout << "fin affectation" << endl;
+		return statement;
 	} else {
 		cerr << "ERR: Use of undefined variable " + name << endl;
 		errorCount++;
+		return (Statement*) nullptr;
 	}
-	
-	return nullptr;
 }
 
 antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
@@ -122,18 +137,8 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	/*if (ctx->expr() != nullptr) {
-		visit(ctx->expr());
-		string source = instructions.back()->dest();
-		auto inst = new instruction(ret, source);
-		instructions.push_back(inst);
-		return inst;
-	} else {
-		auto inst = new instruction(ret);
-		instructions.push_back(inst);
-		return inst;
-	}*/
-	return nullptr;
+	cout << "return " << endl;
+	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
 }
 
 string Visitor::allocateTempVar() {

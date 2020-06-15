@@ -1,14 +1,14 @@
 #pragma once
 
-#include "node.h"
+#include "statement.h"
 #include "operator.h"
 
-class Expression : public Node {
-    Expression *left;
-    Expression *right;
+class Expression : public Statement {
+    Statement *left;
+    Statement *right;
     Operator op;
 
 public:
-    Expression(Operator op, Expression *left, Expression *right);
+    Expression(Operator op, Statement *left, Statement *right);
     ~Expression();
 };

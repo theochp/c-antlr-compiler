@@ -2,12 +2,12 @@
 
 #include <map>
 
-#include "node.h"
+#include "statement.h"
 #include "constant.h"
 
 using namespace std;
 
-class Declaration : public Node {
+class Declaration : public Statement {
     map<string, Constant *> symbols;
 
 public:

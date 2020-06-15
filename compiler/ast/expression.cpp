@@ -1,6 +1,6 @@
 #include "expression.h"
 
-Expression::Expression(Operator op, Expression *left, Expression *right)
+Expression::Expression(Operator op, Statement *left, Statement *right)
     : op(op), left(left), right(right) {
 
 }

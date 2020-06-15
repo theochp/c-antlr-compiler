@@ -7,6 +7,8 @@ Operator::Operator (const OpType& opType)
 
 Operator& Operator::operator=(const OpType& opType) {
     this->opType = opType;
+
+    return *this;
 }
 
 bool Operator::operator ==(const OpType &opType) const {
