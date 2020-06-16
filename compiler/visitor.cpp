@@ -117,7 +117,7 @@ antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
 	auto leftExpr = visit(ctx->expr(0));
 	auto rightExpr = visit(ctx->expr(1));
 
-	return new Expression(opType, leftExpr, rightExpr);
+	return (Statement*) new Expression(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
