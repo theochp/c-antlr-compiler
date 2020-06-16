@@ -35,6 +35,7 @@ const instruction *IRGenerator::generateStatement(const Statement *statement) {
     else if (const Variable *el = dynamic_cast<const Variable *>(statement)) {
       return generateVariable(el);
     }
+    return nullptr;
 }
 
 const instruction *IRGenerator::generateConstant(const Constant *constant) {

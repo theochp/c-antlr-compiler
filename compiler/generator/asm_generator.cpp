@@ -19,26 +19,30 @@ void AsmGenerator::generate(ostream& os) {
         instruction& inst = **it;
 
         switch (inst.op()) {
-            case cst:
+            case inst_type::cst:
                 os << TAB << generate_cst(inst) << endl;
                 break;
-            case load:
+            case inst_type::load:
                 os << TAB << generate_load(inst) << endl;
                 break;
-            case store:
+            case inst_type::store:
                 os << TAB << generate_store(inst) << endl;
                 break;
-            case ret:
+            case inst_type::ret:
                 os << TAB << generate_ret(inst) << endl;
                 break;
-            case add:
+            case inst_type::add:
                 os << TAB << generate_add(inst) << endl;
                 break;
-            case sub:
+            case inst_type::sub:
                 os << TAB << generate_sub(inst) << endl;
                 break;
-            case mul:
+            case inst_type::mul:
                 os << TAB << generate_mul(inst) << endl;
+                break;
+            case inst_type::div:
+                os << endl;
+                // TODO
                 break;
         }
     }

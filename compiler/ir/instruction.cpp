@@ -38,7 +38,7 @@ string instruction::operand() const {
 
 std::ostream& operator<<(std::ostream& os, const instruction& obj)
 {
-    switch (obj._op) {
+    /*switch (obj._op) {
         case cst:
             os << "movl $" << obj._source << ", %" << obj._dest;
             break;
@@ -51,6 +51,6 @@ std::ostream& operator<<(std::ostream& os, const instruction& obj)
         case ret:
             os << "movl %" << obj._source << ", %eax";
             break;
-    }
+    }*/
     return os;
 }
