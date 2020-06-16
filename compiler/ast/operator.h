@@ -1,15 +1,21 @@
 #pragma once
+#include <string>
 
 typedef enum {
-    mult,
-    div,
-    add,
-    minus,
+    MULT,
+    DIV,
+    ADD,
+    MINUS,
+    ASSIGN,
 } OpType;
 
 class Operator {
     OpType opType;
+
 public:
-    Operator(OpType o);
-    OpType getType();
+    Operator (const OpType& opType);
+    const OpType& type() const;
+    Operator& operator=(const OpType& opType);
+    bool operator ==(const OpType &opType) const;
+    virtual std::string print();
 };

@@ -7,6 +7,10 @@ typedef enum {
     store,
     load,
     ret,
+    add,
+    sub,
+    mul,
+    div,
 } inst_type;
 
 class instruction {
@@ -21,10 +25,10 @@ class instruction {
         instruction(inst_type opType, string source);
         instruction(inst_type opType, string source, string dest);
         instruction(inst_type opType, string source, string dest, string operand);
-        inst_type op();
-        string source();
-        string dest();
-        string operand();
+        inst_type op() const;
+        string source() const;
+        string dest() const;
+        string operand() const;
 
         friend std::ostream& operator<<(std::ostream& os, const instruction& obj);
 };

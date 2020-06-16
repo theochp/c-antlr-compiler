@@ -7,39 +7,42 @@
 #include "ast/declaration.h"
 #include "ir/instruction.h"
 #include "ast/operator.h"
-#include "ast/symbol.h"
-#include "ast/expression.h"
 #include "ast/affectation.h"
+#include "ast/assignement.h"
+#include "ast/expression.h"
+#include "ast/return.h"
 
 #define INDENT "\t"
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	return visit(ctx->prog());
+	return visit(ctx->prog()).as<Node*>();
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
-	return visit(ctx->bloc());
+	return visit(ctx->bloc()).as<Node*>();
 }
 
 antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 	Block *block = new Block();
 	for (int i = 0; i < ctx->statement().size(); ++i) {
-		block->addNode(visit(ctx->statement(i)));
+		auto statement = visit(ctx->statement(i)).as<Statement*>();
+		block->addStatement(statement);
     }
-    return block;
+    return (Node*) block;
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
-	return visit(ctx->expr());
+	return visit(ctx->expr()).as<Statement*>();
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	return visit(ctx->declaration());
+	auto decl = visit(ctx->declaration()).as<Declaration*>();
+	return (Statement*) decl;
 }
 
 antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
-	return visit(ctx->ret());
+	return visit(ctx->ret()).as<Statement*>();
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
@@ -53,78 +56,76 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	pair<string, Constant*> declaration;
-	declaration.first = name;
- 	
-	if (ctx->CONST() != nullptr) {
-		declaration.second = new Constant(stoi(ctx->CONST()->getText()));
+	if (symbolTable.find(name) == symbolTable.end()) {
+		pair<string, Constant*> declaration;
+		declaration.first = name;
+		int offset = stackOffset -= 4;
+		symbolTable.emplace(name, offset);
+		if (ctx->CONST() != nullptr) {
+			declaration.second = new Constant(stoi(ctx->CONST()->getText()));
+		} else {
+			declaration.second = nullptr;
+		}
+		
+		return declaration;
 	} else {
-		declaration.second = nullptr;
+		errorCount++;
+		cerr << "ERR: Déclaration d'une variable qui existe déjà" << endl;
 	}
-	
-	return declaration;
-}
-
-antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	return new Constant(stoi(ctx->CONST()->getText()));
-}
-
-antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
-	return new Symbol(ctx->NAME()->getText());
-}
-
-antlrcpp::Any Visitor::visitAffectation(ifccParser::AffectationContext *ctx) {
-	string name = ctx->NAME(0)->getText();
-	Affectation *affectation = new Affectation();
-
-	affectation->addAffectation(name, visit(ctx->expr()));
-
-	return affectation;
-}
-
-antlrcpp::Any Visitor::visitAffectStatement(ifccParser::AffectStatementContext *ctx) {
-	return visit(ctx->affectation());
-}
-
-antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
-	// mult div
-	OpType opType = OpType::mult;
-	if (ctx->MULTDIV()->getText() == "/"){
-		opType = OpType::div;
-	}
-	Node* leftExpr = (Node*) visit(ctx->expr(0));
-	Node* rightExpr = (Node*) visit(ctx->expr(1));
-	Operator op(opType);
-	return new Expression(leftExpr, rightExpr, op);
-}
-
-antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
-    OpType opType = OpType::add;
-    if (ctx->ADDMINUS()->getText() == "-"){
-        OpType opType = OpType::minus;
-	}
-    Node* leftExpr = (Node*) visit(ctx->expr(0));
-    Node* rightExpr = (Node*) visit(ctx->expr(1));
-    Operator op(opType);
-    return new Expression(leftExpr, rightExpr, op);
-}
-
-antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return nullptr;
 }
 
-antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	/*if (ctx->expr() != nullptr) {
-		visit(ctx->expr());
-		string source = instructions.back()->dest();
-		auto inst = new instruction(ret, source);
-		instructions.push_back(inst);
-		return inst;
+antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
+	return (Statement*) new Constant(stoi(ctx->CONST()->getText()));
+}
+
+antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
+	return (Statement*) new Variable(ctx->NAME()->getText());
+}
+
+antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
+	string name = ctx->NAME()->getText();
+	if (symbolTable.find(name) != symbolTable.end()) {
+		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
+		return statement;
 	} else {
-		auto inst = new instruction(ret);
-		instructions.push_back(inst);
-		return inst;
-	}*/
+		cerr << "ERR: Use of undefined variable " + name << endl;
+		errorCount++;
+		return (Statement*) nullptr;
+	}
+}
+
+antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
+	Operator opType = MULT;
+	if (ctx->MULTDIV()->getText() == "/") {
+		opType = DIV;
+	}
+	auto leftExpr = visit(ctx->expr(0));
+	auto rightExpr = visit(ctx->expr(1));
+
+	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+}
+
+antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
+	string opStr = ctx->ADDMINUS()->getText();
+	
+	Operator opType = ADD;
+	if (opStr == "-") {
+		opType = MINUS;
+	}
+
+	auto leftExpr = visit(ctx->expr(0));
+	auto rightExpr = visit(ctx->expr(1));
+
+	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+}
+
+antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
+	return visit(ctx->expr());
+}
+
+antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
+	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
 }
 
 string Visitor::allocateTempVar() {

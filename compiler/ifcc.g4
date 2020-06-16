@@ -8,7 +8,6 @@ prog : 'int' 'main' '(' ')' bloc ;
 bloc: '{' statement* '}';
 
 statement: expr ';'         # exprStatement
-		 | affectation ';'  # affectStatement
          | declaration 	    # declStatement
          | ret         	    # retStatement
          ;
@@ -18,11 +17,10 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' CONST)? ;
 
-affectation: NAME ('=' NAME)* '=' expr;
-
 expr: '('expr')'		 # parExpr
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
+	| NAME '=' expr		 # affectExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
 	;

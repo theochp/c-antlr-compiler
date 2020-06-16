@@ -9,7 +9,8 @@
 #include "antlr4-generated/ifccParser.h"
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
-#include "generator/generator.h"
+#include "generator/ir_generator.h"
+#include "generator/asm_generator.h"
 
 using namespace antlr4;
 using namespace std;
@@ -42,18 +43,23 @@ int main(int argn, const char **argv) {
 	}
 	
   Visitor visitor;
-  visitor.visit(tree);
+  Node *ast = visitor.visit(tree).as<Node*>();
 
   if (visitor.getErrCount() == 0)  {
-    generator gen(visitor.getInstructions(), visitor.getSymbolTable());
-  
+    IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
+    irGen.generate();
+    AsmGenerator asmGen(irGen.getInstructions(), irGen.getSymbolTable());
+
+    asmGen.generate(cout);
+
     ofstream out("output.s");
-    gen.generate(cout);
-    gen.generate(out);
+    asmGen.generate(out);
     out.close();
 
     return 0;
   }
+
+  //delete ast;
 
   return 1;
 }
