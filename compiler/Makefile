@@ -29,7 +29,7 @@ antlr: $(GRAMMAR)
 	$(CC) $(CCARGS) $< -o $(OUTPUT)/$@
 
 dirs:
-	mkdir -p $(GENERATED) 
+	mkdir -p $(GENERATED)
 	mkdir -p $(OUTPUT)/ir
 	mkdir -p $(OUTPUT)/generator
 	mkdir -p $(OUTPUT)/ast
