@@ -1,5 +1,9 @@
 #include "node.h"
 
-Node::~Node(){
+Node::~Node() {
     
+}
+
+std::string Node::print() {
+    return "";
 }

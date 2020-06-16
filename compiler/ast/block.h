@@ -3,14 +3,16 @@
 #include <vector>
 
 #include "node.h"
+#include "statement.h"
 
 using namespace std;
 
 class Block : public Node {
-    vector<Node *> nodes;
+    vector<Statement *> statements;
     
 public:
-    void addNode(Node* node);
-
+    void addStatement(Statement* statement);
+    const vector<Statement *>& getStatements() const;
     virtual ~Block();
+    virtual std::string print();
 };

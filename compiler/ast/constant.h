@@ -1,7 +1,11 @@
 #pragma once
 
-#include "node.h"
+#include "statement.h"
 
-class Constant : public Node {
+class Constant : public Statement {
     int value;
+public:
+    Constant(int value);
+    int getValue() const;
+    virtual std::string print();
 };

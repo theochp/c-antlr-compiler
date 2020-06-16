@@ -1,7 +1,8 @@
 #pragma once
-#include <string>
-class Node {
+
+#include "node.h"
+
+class Statement : public Node {
 public:
     virtual std::string print();
-    virtual ~Node();
 };

@@ -39,9 +39,7 @@ public:
 
     virtual antlrcpp::Any visitParExpr(ifccParser::ParExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitAffectation(ifccParser::AffectationContext *ctx) override;
-
-    virtual antlrcpp::Any visitAffectStatement(ifccParser::AffectStatementContext *ctx) override;
+    virtual antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
@@ -53,6 +51,10 @@ public:
 
     map<string, int> getSymbolTable() {
         return symbolTable;
+    }
+
+    int getStackOffset() {
+        return stackOffset;
     }
 
     vector<instruction *> getInstructions() {

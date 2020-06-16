@@ -8,3 +8,5 @@ tests/pld-test-output
 *.s
 *.o
 *.out
+.idea
+*.iml
