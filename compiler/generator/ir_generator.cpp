@@ -1,4 +1,5 @@
 #include "ir_generator.h"
+#include <assert.h>
 
 IRGenerator::IRGenerator(Node *ast, map<string, int> symbolTable, int stackOffset)
     : ast(ast), symbolTable(symbolTable), stackOffset() {
@@ -65,34 +66,46 @@ const instruction *IRGenerator::generateDeclaration(const Declaration *declarati
 }
 
 const instruction *IRGenerator::generateExpression(const Expression *expression) {
-    // TODO: handle ASSIGN differentl
-    auto leftInstr = generateStatement(expression->getLeft());
-    auto rightInstr = generateStatement(expression->getRight());
-    string op1 = leftInstr->dest();
-    string op2 = rightInstr->dest();
-    string dest = newTempVar();
-    
-    instruction *inst;
-    switch(expression->getOp().type()) {
-        case ADD:
-            inst = new instruction(inst_type::add, op1, dest, op2);
-            break;
-        case MINUS:
-            inst = new instruction(inst_type::sub, op1, dest, op2);
-            break;
-        case MULT:
-            inst = new instruction(inst_type::mul, op1, dest, op2);
-            break;
-        case DIV:
-            inst = new instruction(inst_type::div, op1, dest, op2);
-        case ASSIGN:
-            // TODO
-            break;
+    if (expression->getOp().type() == ASSIGN) {
+        if(const Variable *dest = dynamic_cast<const Variable *>(expression->getLeft())) {
+            string destName = dest->getName();
+            auto rightInstr = generateStatement(expression->getRight());
+            auto instr = new instruction(inst_type::store, rightInstr->dest(), destName);
+            instructions.push_back(instr);
+            return instr;
+        } else {
+            assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici");
+            return nullptr;
+        }
+    } else {
+        auto leftInstr = generateStatement(expression->getLeft());
+        auto rightInstr = generateStatement(expression->getRight());
+        string op1 = leftInstr->dest();
+        string op2 = rightInstr->dest();
+        string dest = newTempVar();
+        
+        instruction *inst;
+        switch(expression->getOp().type()) {
+            case ADD:
+                inst = new instruction(inst_type::add, op1, dest, op2);
+                break;
+            case MINUS:
+                inst = new instruction(inst_type::sub, op1, dest, op2);
+                break;
+            case MULT:
+                inst = new instruction(inst_type::mul, op1, dest, op2);
+                break;
+            case DIV:
+                inst = new instruction(inst_type::div, op1, dest, op2);
+            case ASSIGN:
+                assert("Le cas ASSIGN doit être géré d'une autre manière");
+                break;
+        }
+
+        instructions.push_back(inst);
+
+        return inst;
     }
-
-    instructions.push_back(inst);
-
-    return inst;
 }
 
 const instruction *IRGenerator::generateReturn(const Return *ret) {
