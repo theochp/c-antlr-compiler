@@ -8,6 +8,7 @@
 #include "antlr4-generated/ifccVisitor.h"
 #include "ir/instruction.h"
 #include "static-analysis/doubleDeclaration.h"
+#include "static-analysis/warning.h"
 
 using namespace std;
 
@@ -50,6 +51,10 @@ public:
         return errorCount;
     }
 
+    vector<error*> getErrors(){
+        return errors;
+    }
+
     int getWarningCount() {
         return warningCount;
     }
@@ -80,6 +85,7 @@ private:
     vector<instruction *> instructions;
 	int stackOffset  = 0;
     int errorCount = 0;
+    vector<error *> errors;
     int warningCount = 0;
     vector<warning *> warnings;
 };

@@ -45,23 +45,28 @@ int main(int argn, const char **argv) {
   Visitor visitor;
   Node *ast = visitor.visit(tree).as<Node*>();
 
-  for (int i=0; i<visitor.getWarnings().size(); i++){
-    cout << visitor.getWarnings().at(i)->getMessage() << endl;
-  }
 
-  if (visitor.getErrCount() == 0)  {
-    IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
-    irGen.generate();
-    AsmGenerator asmGen(irGen.getInstructions(), irGen.getSymbolTable());
+    for (int i=0; i<visitor.getErrors().size(); i++){
+        cout << visitor.getErrors().at(i)->getMessage() << endl;
+    }
 
-    asmGen.generate(cout);
+    for (int i=0; i<visitor.getWarnings().size(); i++){
+        cout << visitor.getWarnings().at(i)->getMessage() << endl;
+    }
 
-    ofstream out("output.s");
-    asmGen.generate(out);
-    out.close();
+    if (visitor.getErrCount() == 0)  {
+        IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
+        irGen.generate();
+        AsmGenerator asmGen(irGen.getInstructions(), irGen.getSymbolTable());
 
-    return 0;
-  }
+        asmGen.generate(cout);
+
+        ofstream out("output.s");
+        asmGen.generate(out);
+        out.close();
+
+        return 0;
+    }
 
   //delete ast;
 

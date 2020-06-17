@@ -70,8 +70,8 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		}
 	} else {
 		warningCount++;
-		doubleDeclaration* warning = new doubleDeclaration(name);
-		warnings.push_back(warning);
+		doubleDeclaration* error = new doubleDeclaration(name);
+		errors.push_back(error);
 		declaration.first = "";
 		declaration.second = nullptr;
 	}

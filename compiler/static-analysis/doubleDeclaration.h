@@ -1,9 +1,9 @@
 #include <exception>
 using namespace std;
 
-#include "warning.h"
+#include "error.h"
 
-class doubleDeclaration : public warning {
+class doubleDeclaration : public error {
 
 public:
     doubleDeclaration(string nomVar, int lineNb=0);
