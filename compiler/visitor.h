@@ -59,18 +59,8 @@ public:
         return stackOffset;
     }
 
-    vector<instruction *> getInstructions() {
-        return instructions;
-    }
-
-    ~Visitor() {
-        for (auto it = instructions.begin(); it != instructions.end(); ++it) {
-            delete *it;
-        }
-    }
 private:
 	map<string, int> symbolTable;
-    vector<instruction *> instructions;
 	int stackOffset  = 0;
     int errorCount = 0;
 };
