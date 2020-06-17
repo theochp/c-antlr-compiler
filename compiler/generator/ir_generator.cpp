@@ -1,5 +1,6 @@
-#include "ir_generator.h"
 #include <assert.h>
+
+#include "ir_generator.h"
 
 IRGenerator::IRGenerator(Node *ast, map<string, int> symbolTable, int stackOffset)
     : ast(ast), symbolTable(symbolTable), stackOffset() {
@@ -22,19 +23,23 @@ const instruction *IRGenerator::generateBlock(const Block *block) {
 
 const instruction *IRGenerator::generateStatement(const Statement *statement) {
     if (const Constant *el = dynamic_cast<const Constant *>(statement)) {
-      return generateConstant(el);
+        return generateConstant(el);
     }
     else if (const Declaration *el = dynamic_cast<const Declaration *>(statement)) {
-      return generateDeclaration(el);
+        return generateDeclaration(el);
     }
     else if (const Expression *el = dynamic_cast<const Expression *>(statement)) {
-      return generateExpression(el);
+        return generateExpression(el);
     }
     else if (const Return *el = dynamic_cast<const Return *>(statement)) {
-     return generateReturn(el);
+        return generateReturn(el);
     }
     else if (const Variable *el = dynamic_cast<const Variable *>(statement)) {
-      return generateVariable(el);
+        return generateVariable(el);
+    } else if(const UnExpression *el = dynamic_cast<const UnExpression *>(statement)) {
+        return generateUnExpression(el);
+    } else {
+        assert("Need to handle new types");
     }
     return nullptr;
 }
@@ -66,7 +71,7 @@ const instruction *IRGenerator::generateDeclaration(const Declaration *declarati
 }
 
 const instruction *IRGenerator::generateExpression(const Expression *expression) {
-    if (expression->getOp().type() == ASSIGN) {
+    if (expression->getOp().type() == OpType::ASSIGN) {
         if(const Variable *dest = dynamic_cast<const Variable *>(expression->getLeft())) {
             string destName = dest->getName();
             auto rightInstr = generateStatement(expression->getRight());
@@ -86,19 +91,22 @@ const instruction *IRGenerator::generateExpression(const Expression *expression)
         
         instruction *inst;
         switch(expression->getOp().type()) {
-            case ADD:
+            case OpType::ADD:
                 inst = new instruction(inst_type::add, op1, dest, op2);
                 break;
-            case MINUS:
+            case OpType::MINUS:
                 inst = new instruction(inst_type::sub, op1, dest, op2);
                 break;
-            case MULT:
+            case OpType::MULT:
                 inst = new instruction(inst_type::mul, op1, dest, op2);
                 break;
-            case DIV:
+            case OpType::DIV:
                 inst = new instruction(inst_type::div, op1, dest, op2);
-            case ASSIGN:
+            case OpType::ASSIGN:
                 assert("Le cas ASSIGN doit être géré d'une autre manière");
+                break;
+            default:
+                assert("Missing type");
                 break;
         }
 
@@ -106,6 +114,34 @@ const instruction *IRGenerator::generateExpression(const Expression *expression)
 
         return inst;
     }
+}
+
+const instruction *IRGenerator::generateUnExpression(const UnExpression *expression) {
+    auto instr = generateStatement(expression->getExpr());
+
+    if (expression->getOp().type() == UnOpType::UN_PLUS) {
+        return instr;
+    }
+
+    string op1 = instr->dest();
+    string dest = newTempVar();
+    
+    instruction *inst;
+    switch(expression->getOp().type()) {
+        case UnOpType::UN_PLUS:
+            // nothing has to be done
+            break;
+        case UnOpType::UN_MINUS:
+            inst = new instruction(inst_type::neg, op1, dest);
+            break;
+        default:
+            assert("Missing type");
+            break;
+    }
+
+    instructions.push_back(inst);
+
+    return inst;
 }
 
 const instruction *IRGenerator::generateReturn(const Return *ret) {

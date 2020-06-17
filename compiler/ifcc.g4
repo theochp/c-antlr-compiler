@@ -17,10 +17,11 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' CONST)? ;
 
-expr: '('expr')'		 # parExpr
+expr: ADDMINUS expr 	 # unOp
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
 	| NAME '=' expr		 # affectExpr
+	| '('expr')'		 # parExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
 	;
