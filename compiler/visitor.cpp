@@ -13,12 +13,20 @@
 #include "ast/return.h"
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
+#include "static-analysis/unusedVariable.h"
 
 #define INDENT "\t"
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	return visit(ctx->prog()).as<Node*>();
+	antlrcpp::Any res = visit(ctx->prog()).as<Node*>();
+    for (tuple<string, int, pair<int, int>> varData : countUseVar){
+        if (get<1>(varData) == 0){
+            warnings.push_back(new UnusedVariable(get<0>(varData), get<2>(varData).first, get<2>(varData).second));
+            warningCount++;
+        }
+    }
+    return res;
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
@@ -65,6 +73,8 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		declaration.first = name;
 		int offset = stackOffset -= 4;
 		symbolTable.emplace(name, offset);
+		pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		countUseVar.push_back(make_tuple(name, 0, positionPair));
 		if (ctx->CONST() != nullptr) {
 			declaration.second = new Constant(stoi(ctx->CONST()->getText()));
 		} else {
@@ -85,7 +95,12 @@ antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
-	return (Statement*) new Variable(ctx->NAME()->getText());
+	string name = ctx->NAME()->getText();
+	vector<tuple<string, int, pair<int, int>>>::iterator it =
+			std::find_if(countUseVar.begin(), countUseVar.end(), [name](const std::tuple<string, int, pair<int, int>>& e) {return std::get<0>(e) == name;});
+	if (it != countUseVar.end())
+		get<1>(*it)++;
+	return (Statement*) new Variable(name);
 }
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
