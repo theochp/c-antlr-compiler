@@ -11,9 +11,7 @@ class AsmGenerator {
     vector<Instruction*> instructions;
     map<string, int> symbolTable;
 
-
-    string generate_cst(Instruction& inst);
-    string generate_load(Instruction& inst);
+    string generate_ldcst(Instruction& inst);
     string generate_store(Instruction& inst);
     string generate_ret(Instruction& inst);
     string generate_add(Instruction& inst);

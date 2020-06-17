@@ -23,7 +23,6 @@ class IRGenerator {
     int tempVarCount = 0;
     int stackOffset;
 
-
     const Instruction *generateBlock(const Block *block);
     const Instruction *generateStatement(const Statement *statement);
     const Instruction *generateConstant(const Constant *constant);

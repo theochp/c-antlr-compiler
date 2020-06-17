@@ -46,7 +46,7 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement) {
 
 const Instruction *IRGenerator::generateConstant(const Constant *constant) {
     string dest = newTempVar();
-    auto instr = new Instruction(cst, to_string(constant->getValue()), dest);
+    auto instr = new Instruction(IROp::ldcst, dest, {to_string(constant->getValue())});
     instructions.push_back(instr);
     return instr;
 }
@@ -62,7 +62,7 @@ const Instruction *IRGenerator::generateDeclaration(const Declaration *declarati
         if (value != nullptr) {
             auto assignStmnt = generateStatement(value);
             string dest = newTempVar();
-            instr = new Instruction(load, assignStmnt->dest(), name);
+            instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
             instructions.push_back(instr);
         }
     }
@@ -75,7 +75,7 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression)
         if(const Variable *dest = dynamic_cast<const Variable *>(expression->getLeft())) {
             string destName = dest->getName();
             auto rightInstr = generateStatement(expression->getRight());
-            auto instr = new Instruction(inst_type::store, rightInstr->dest(), destName);
+            auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()});
             instructions.push_back(instr);
             return instr;
         } else {
@@ -92,16 +92,16 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression)
         Instruction *inst;
         switch(expression->getOp().type()) {
             case OpType::ADD:
-                inst = new Instruction(inst_type::add, op1, dest, op2);
+                inst = new Instruction(IROp::add, dest, {op1, op2});
                 break;
             case OpType::MINUS:
-                inst = new Instruction(inst_type::sub, op1, dest, op2);
+                inst = new Instruction(IROp::sub, dest, {op1, op2});
                 break;
             case OpType::MULT:
-                inst = new Instruction(inst_type::mul, op1, dest, op2);
+                inst = new Instruction(IROp::mul, dest, {op1, op2});
                 break;
             case OpType::DIV:
-                inst = new Instruction(inst_type::div, op1, dest, op2);
+                inst = new Instruction(IROp::div, dest, {op1, op2});
             case OpType::ASSIGN:
                 assert("Le cas ASSIGN doit être géré d'une autre manière");
                 break;
@@ -132,7 +132,7 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
             // nothing has to be done
             break;
         case UnOpType::UN_MINUS:
-            inst = new Instruction(inst_type::neg, op1, dest);
+            inst = new Instruction(IROp::neg, dest, {op1});
             break;
         default:
             assert("Missing type");
@@ -146,14 +146,14 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
 
 const Instruction *IRGenerator::generateReturn(const Return *ret) {
     auto lastInstr = generateStatement(ret->getStatement());
-    auto instr = new Instruction(inst_type::ret, lastInstr->dest());
+    auto instr = new Instruction(IROp::ret, string(""), {lastInstr->dest()});
     instructions.push_back(instr);
     return instr;
 }
 
 const Instruction *IRGenerator::generateVariable(const Variable *variable) {
     string dest = newTempVar();
-    auto instr = new Instruction(load, variable->getName(), dest);
+    auto instr = new Instruction(IROp::store, dest, {variable->getName()});
     instructions.push_back(instr);
     return instr;
 }
