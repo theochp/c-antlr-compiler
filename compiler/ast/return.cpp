@@ -9,6 +9,10 @@ Return::Return(Statement* statement)
 
 }
 
+Return::~Return() {
+    delete statement;
+}
+
 const Statement *Return::getStatement() const {
     return statement;
 }

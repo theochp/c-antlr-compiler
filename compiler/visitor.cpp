@@ -18,6 +18,8 @@
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
 #include "ast/func.h"
+#include "ast/funccall.h"
+#include "ast/funcparam.h"
 
 #define INDENT "\t"
 
@@ -223,6 +225,29 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 
 antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
 	return (Statement *) new LogicalNot(visit(ctx->expr()).as<Statement*>());
+}
+
+antlrcpp::Any Visitor::visitFuncall(ifccParser::FuncallContext *ctx) {
+	string name = ctx->NAME()->getText();
+	auto paramList = visit(ctx->paramList()).as<const vector<Statement*>&>();
+	FuncCall *fCall = new FuncCall(name);
+	fCall->addParamStatements(paramList);
+	return (Statement *) fCall;
+}
+
+antlrcpp::Any Visitor::visitParamList(ifccParser::ParamListContext *ctx) {
+	vector<Statement*> statements;
+
+	for (int i = 0; i < ctx->expr().size(); ++i) {
+		auto statement = visit(ctx->expr(i)).as<Statement*>();
+		statements.push_back(statement);
+	}
+
+	return statements;
+}
+
+antlrcpp::Any Visitor::visitParam(ifccParser::ParamContext *ctx) {
+	// TODO: for declarations
 }
 
 string Visitor::allocateTempVar() {

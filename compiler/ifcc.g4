@@ -21,16 +21,21 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' expr)? ;
 
-expr: ADDMINUS expr 	 # unOp
+expr: NAME paramList     # funcall
+	| ADDMINUS expr 	 # unOp
 	| '!' expr 			 # notExpr
+	| ADDMINUS expr 	 # unOp
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
 	| expr BITWISE expr  # bitwiseExpr
 	| NAME '=' expr		 # affectExpr
-	| '('expr')'		 # parExpr
+    | LPAR expr RPAR	 # parExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
 	;
+
+paramList : LPAR expr (',' expr)* RPAR;
+param : 'int' NAME;
 
 ret: RETURN expr? ';';
 
@@ -40,6 +45,8 @@ MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
 BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
+LPAR : '(';
+RPAR : ')';
 COMMENT : '/*' .*? '*/' -> skip ;
 SINGLECOMMENT : '//' .*? '\n' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;

@@ -58,6 +58,12 @@ public:
 
     virtual antlrcpp::Any visitNotExpr(ifccParser::NotExprContext *ctx) override;
 
+    virtual antlrcpp::Any visitFuncall(ifccParser::FuncallContext *ctx) override;
+
+    virtual antlrcpp::Any visitParamList(ifccParser::ParamListContext *ctx) override;
+
+    virtual antlrcpp::Any visitParam(ifccParser::ParamContext *ctx) override;
+
     string allocateTempVar();
 
     int getErrCount() {
