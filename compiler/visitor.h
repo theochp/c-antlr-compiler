@@ -54,7 +54,7 @@ public:
         return warningCount;
     }
 
-    vector<warning> getWarnings() {
+    vector<warning*> getWarnings() {
         return warnings;
     }
 
@@ -81,6 +81,6 @@ private:
 	int stackOffset  = 0;
     int errorCount = 0;
     int warningCount = 0;
-    vector<warning> warnings;
+    vector<warning *> warnings;
 };
 

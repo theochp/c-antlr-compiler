@@ -6,7 +6,7 @@ class warning {
 public:
     warning();
     virtual ~warning();
-    virtual string getMessage();
+    virtual string getMessage()=0;
 };
 
 

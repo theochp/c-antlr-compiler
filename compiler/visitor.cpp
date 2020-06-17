@@ -70,7 +70,7 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		return declaration;
 	} else {
 		warningCount++;
-		doubleDeclaration warning(name);
+		doubleDeclaration* warning = new doubleDeclaration(name);
 		warnings.push_back(warning);
 	}
 	return nullptr;

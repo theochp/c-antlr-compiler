@@ -2,3 +2,4 @@
 
 warning::warning() {}
 
+warning::~warning() {}
