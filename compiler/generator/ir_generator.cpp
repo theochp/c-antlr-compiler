@@ -12,15 +12,15 @@ void IRGenerator::generate() {
     }
 }
 
-const instruction *IRGenerator::generateBlock(const Block *block) {
-    const instruction *last;
+const Instruction *IRGenerator::generateBlock(const Block *block) {
+    const Instruction *last;
     for (auto it = block->getStatements().begin(); it != block->getStatements().end(); ++it) {
         last = generateStatement(*it);
     }
     return last;
 }
 
-const instruction *IRGenerator::generateStatement(const Statement *statement) {
+const Instruction *IRGenerator::generateStatement(const Statement *statement) {
     if (const Constant *el = dynamic_cast<const Constant *>(statement)) {
       return generateConstant(el);
     }
@@ -39,17 +39,17 @@ const instruction *IRGenerator::generateStatement(const Statement *statement) {
     return nullptr;
 }
 
-const instruction *IRGenerator::generateConstant(const Constant *constant) {
+const Instruction *IRGenerator::generateConstant(const Constant *constant) {
     string dest = newTempVar();
-    auto instr = new instruction(cst, to_string(constant->getValue()), dest);
+    auto instr = new Instruction(cst, to_string(constant->getValue()), dest);
     instructions.push_back(instr);
     return instr;
 }
 
 // TODO: changer la manière dont on gère les déclarations
-const instruction *IRGenerator::generateDeclaration(const Declaration *declaration) {
+const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration) {
     string dest = newTempVar();
-    instruction *instr = nullptr;
+    Instruction *instr = nullptr;
     for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
         auto assignement = *it;
         string name = (*it).first;
@@ -57,7 +57,7 @@ const instruction *IRGenerator::generateDeclaration(const Declaration *declarati
         if (value != nullptr) {
             auto constInstr = generateConstant(value);
             string dest = newTempVar();
-            instr = new instruction(load, constInstr->dest(), name);
+            instr = new Instruction(load, constInstr->dest(), name);
             instructions.push_back(instr);
         }
     }
@@ -65,12 +65,12 @@ const instruction *IRGenerator::generateDeclaration(const Declaration *declarati
     return instr;
 }
 
-const instruction *IRGenerator::generateExpression(const Expression *expression) {
+const Instruction *IRGenerator::generateExpression(const Expression *expression) {
     if (expression->getOp().type() == ASSIGN) {
         if(const Variable *dest = dynamic_cast<const Variable *>(expression->getLeft())) {
             string destName = dest->getName();
             auto rightInstr = generateStatement(expression->getRight());
-            auto instr = new instruction(inst_type::store, rightInstr->dest(), destName);
+            auto instr = new Instruction(inst_type::store, rightInstr->dest(), destName);
             instructions.push_back(instr);
             return instr;
         } else {
@@ -84,19 +84,19 @@ const instruction *IRGenerator::generateExpression(const Expression *expression)
         string op2 = rightInstr->dest();
         string dest = newTempVar();
         
-        instruction *inst;
+        Instruction *inst;
         switch(expression->getOp().type()) {
             case ADD:
-                inst = new instruction(inst_type::add, op1, dest, op2);
+                inst = new Instruction(inst_type::add, op1, dest, op2);
                 break;
             case MINUS:
-                inst = new instruction(inst_type::sub, op1, dest, op2);
+                inst = new Instruction(inst_type::sub, op1, dest, op2);
                 break;
             case MULT:
-                inst = new instruction(inst_type::mul, op1, dest, op2);
+                inst = new Instruction(inst_type::mul, op1, dest, op2);
                 break;
             case DIV:
-                inst = new instruction(inst_type::div, op1, dest, op2);
+                inst = new Instruction(inst_type::div, op1, dest, op2);
             case ASSIGN:
                 assert("Le cas ASSIGN doit être géré d'une autre manière");
                 break;
@@ -108,16 +108,16 @@ const instruction *IRGenerator::generateExpression(const Expression *expression)
     }
 }
 
-const instruction *IRGenerator::generateReturn(const Return *ret) {
+const Instruction *IRGenerator::generateReturn(const Return *ret) {
     auto lastInstr = generateStatement(ret->getStatement());
-    auto instr = new instruction(inst_type::ret, lastInstr->dest());
+    auto instr = new Instruction(inst_type::ret, lastInstr->dest());
     instructions.push_back(instr);
     return instr;
 }
 
-const instruction *IRGenerator::generateVariable(const Variable *variable) {
+const Instruction *IRGenerator::generateVariable(const Variable *variable) {
     string dest = newTempVar();
-    auto instr = new instruction(load, variable->getName(), dest);
+    auto instr = new Instruction(load, variable->getName(), dest);
     instructions.push_back(instr);
     return instr;
 }
@@ -126,7 +126,7 @@ const map<string, int>& IRGenerator::getSymbolTable() {
     return symbolTable;
 }
 
-const vector<instruction*>& IRGenerator::getInstructions() {
+const vector<Instruction*>& IRGenerator::getInstructions() {
     return instructions;
 }
 

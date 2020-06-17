@@ -1,5 +1,5 @@
 #include "warning.h"
 
-warning::warning() {}
+Warning::Warning() {}
 
-warning::~warning() {}
+Warning::~Warning() {}

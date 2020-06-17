@@ -72,7 +72,7 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		}
 	} else {
 		errorCount++;
-		doubleDeclaration* error = new doubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
         errors.push_back(error);
 		declaration.first = "";
 		declaration.second = nullptr;
@@ -95,7 +95,7 @@ antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 		return statement;
 	} else {
 		errorCount++;
-		undeclaredVariable* error = new undeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
         errors.push_back(error);
 		return (Statement*) nullptr;
 	}

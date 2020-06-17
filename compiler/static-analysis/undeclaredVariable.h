@@ -1,10 +1,12 @@
+#pragma once
+
 #include "error.h"
 
-class undeclaredVariable : public error{
+class UndeclaredVariable : public Error{
 
 public:
-    undeclaredVariable(string nomVar, int lineNb=0, int charPosition=0);
-    ~undeclaredVariable();
+    UndeclaredVariable(string nomVar, int lineNb=0, int charPosition=0);
+    ~UndeclaredVariable();
     string getMessage();
 private:
     string nomVar;

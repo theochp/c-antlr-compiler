@@ -1,5 +1,5 @@
 #include "error.h"
 
-error::error() {}
+Error::Error() {}
 
-error::~error() {}
+Error::~Error() {}

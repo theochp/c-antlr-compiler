@@ -1,9 +1,11 @@
+#pragma once
+
 #include "warning.h"
 
-class unusedVariable : public warning {
+class UnusedVariable : public Warning {
 public:
-    unusedVariable(string nomVar, int lineNb=0, int charPosition=0);
-    ~unusedVariable();
+    UnusedVariable(string nomVar, int lineNb=0, int charPosition=0);
+    ~UnusedVariable();
     string getMessage();
 private:
     string nomVar;

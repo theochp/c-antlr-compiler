@@ -1,11 +1,13 @@
-#include <iostream>
 #pragma once
+
+#include <iostream>
+
 using namespace std;
 
-class error {
+class Error {
 public:
-    error();
-    virtual ~error();
+    Error();
+    virtual ~Error();
     virtual string getMessage()=0;
 };
 

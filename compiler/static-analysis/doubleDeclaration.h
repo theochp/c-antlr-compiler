@@ -3,11 +3,11 @@ using namespace std;
 
 #include "error.h"
 
-class doubleDeclaration : public error {
+class DoubleDeclaration : public Error {
 
 public:
-    doubleDeclaration(string nomVar, int lineNb=0, int charPosition=0);
-    ~doubleDeclaration();
+    DoubleDeclaration(string nomVar, int lineNb=0, int charPosition=0);
+    ~DoubleDeclaration();
     string getMessage();
 private:
     string nomVar;

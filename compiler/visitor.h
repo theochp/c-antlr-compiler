@@ -51,7 +51,7 @@ public:
         return errorCount;
     }
 
-    vector<error*> getErrors(){
+    vector<Error*> getErrors(){
         return errors;
     }
 
@@ -59,7 +59,7 @@ public:
         return warningCount;
     }
 
-    vector<warning*> getWarnings() {
+    vector<Warning*> getWarnings() {
         return warnings;
     }
 
@@ -71,7 +71,7 @@ public:
         return stackOffset;
     }
 
-    vector<instruction *> getInstructions() {
+    vector<Instruction *> getInstructions() {
         return instructions;
     }
 
@@ -82,11 +82,11 @@ public:
     }
 private:
 	map<string, int> symbolTable;
-    vector<instruction *> instructions;
+    vector<Instruction *> instructions;
 	int stackOffset  = 0;
     int errorCount = 0;
-    vector<error *> errors;
+    vector<Error *> errors;
     int warningCount = 0;
-    vector<warning *> warnings;
+    vector<Warning *> warnings;
 };
 

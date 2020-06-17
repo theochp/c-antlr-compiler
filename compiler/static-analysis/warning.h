@@ -2,10 +2,10 @@
 
 using namespace std;
 
-class warning {
+class Warning {
 public:
-    warning();
-    virtual ~warning();
+    Warning();
+    virtual ~Warning();
     virtual string getMessage()=0;
 };
 
