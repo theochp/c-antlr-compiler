@@ -96,10 +96,19 @@ antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 	string name = ctx->NAME()->getText();
+
+	// watching use of variable
 	vector<tuple<string, int, pair<int, int>>>::iterator it =
 			std::find_if(countUseVar.begin(), countUseVar.end(), [name](const std::tuple<string, int, pair<int, int>>& e) {return std::get<0>(e) == name;});
 	if (it != countUseVar.end())
 		get<1>(*it)++;
+
+	if (symbolTable.find(name) == symbolTable.end()) {
+		errorCount++;
+		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		errors.push_back(error);
+	}
+
 	return (Statement*) new Variable(name);
 }
 
