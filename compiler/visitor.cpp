@@ -48,8 +48,10 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        auto symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
-		declaration->addSymbol(symbol.first, symbol.second);
+        pair<string, Constant*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
+        if (symbol.first == ""){
+			declaration->addSymbol(symbol.first, symbol.second);
+		}
 	}
 	return declaration;
 }
@@ -57,7 +59,6 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
 	if (symbolTable.find(name) == symbolTable.end()) {
-		pair<string, Constant*> declaration;
 		declaration.first = name;
 		int offset = stackOffset -= 4;
 		symbolTable.emplace(name, offset);
@@ -66,14 +67,14 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		} else {
 			declaration.second = nullptr;
 		}
-		
-		return declaration;
 	} else {
 		warningCount++;
 		doubleDeclaration* warning = new doubleDeclaration(name);
 		warnings.push_back(warning);
+		declaration.first = "";
+		declaration.second = nullptr;
 	}
-	return nullptr;
+    return declaration;
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
