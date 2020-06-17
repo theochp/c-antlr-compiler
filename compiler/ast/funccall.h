@@ -14,8 +14,8 @@ class FuncCall : public Statement {
 public:
     FuncCall(string name);
     ~FuncCall();
-    string getName();
-    const vector<Statement*>& getParamStatements();
+    string getName() const;
+    const vector<Statement*>& getParamStatements() const;
     void addParamStatement(Statement *param);
     void addParamStatements(const vector<Statement *>& statements);
 };

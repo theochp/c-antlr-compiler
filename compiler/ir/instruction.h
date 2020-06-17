@@ -18,6 +18,7 @@ using namespace std;
         bitwise_or,
         bitwise_xor,
         logicalNot,
+        call,
     } IROp;
 
 class Instruction {

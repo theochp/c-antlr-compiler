@@ -50,8 +50,9 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
     } 
     else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(statement)){
         return generateLogicalNot(el, block);
-    }
-    else {
+    } else if(const FuncCall *el = dynamic_cast<const FuncCall *>(statement)) { 
+           return generateCall(el, block); 
+    } else {
         assert("Need to handle new types");
     }
     return nullptr;
@@ -184,6 +185,19 @@ const Instruction *IRGenerator::generateLogicalNot(const LogicalNot *expr, IRBlo
     auto lastInstr = generateStatement(expr->getExpr(), block);
     string dest = newTempVar();
     auto instr = new Instruction(IROp::logicalNot, dest, {lastInstr->dest()});
+    return instr;
+}
+
+const Instruction *IRGenerator::generateCall(const FuncCall *func, IRBlock *block) {
+    //TODO: handle func return
+    string dest = newTempVar();
+    vector<string> operands;
+    operands.push_back(func->getName());
+    for (auto it = func->getParamStatements().begin(); it != func->getParamStatements().end(); ++it) {
+        auto statementInstr = generateStatement(*it, block);
+        operands.push_back(statementInstr->dest());
+    }
+    auto instr = new Instruction(IROp::call, dest, operands);
     block->addInstruction(instr);
     return instr;
 }

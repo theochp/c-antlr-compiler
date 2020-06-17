@@ -10,11 +10,11 @@ FuncCall::~FuncCall() {
     }
 }
 
-string FuncCall::getName() {
+string FuncCall::getName() const {
     return name;
 }
 
-const vector<Statement*>& FuncCall::getParamStatements() {
+const vector<Statement*>& FuncCall::getParamStatements() const {
     return paramStatements;
 }
 

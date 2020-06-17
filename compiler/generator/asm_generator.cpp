@@ -63,6 +63,9 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::logicalNot:
                 res << TAB << generate_not(inst) << endl;
                 break;
+            case IROp::call:
+                res << TAB << generate_call(inst) << endl;
+                break;
         }
     }
 
@@ -215,6 +218,16 @@ string AsmGenerator::generate_not(Instruction& inst) {
     res << "andb $1, %al" << endl << TAB;
     res << "movzbl %al, %ecx" << endl << TAB;
     res << "movl %ecx, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_call(Instruction& inst) {
+    stringstream res;
+    string name = inst.operand(0);
+    int pNum = inst.operands().size() - 1;
+    res << "movl " << getOffsetRegister(inst.operand(1)) << ", %edi" << endl << TAB;
+    res << "call " << name << endl << TAB;
 
     return res.str();
 }
