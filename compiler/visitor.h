@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
 #include "ir/instruction.h"
+#include "static-analysis/doubleDeclaration.h"
 
 using namespace std;
 
@@ -49,6 +50,14 @@ public:
         return errorCount;
     }
 
+    int getWarningCount() {
+        return warningCount;
+    }
+
+    vector<warning> getWarnings() {
+        return warnings;
+    }
+
     map<string, int> getSymbolTable() {
         return symbolTable;
     }
@@ -71,5 +80,7 @@ private:
     vector<instruction *> instructions;
 	int stackOffset  = 0;
     int errorCount = 0;
+    int warningCount = 0;
+    vector<warning> warnings;
 };
 

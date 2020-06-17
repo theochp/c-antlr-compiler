@@ -69,8 +69,9 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		
 		return declaration;
 	} else {
-		errorCount++;
-		cerr << "ERR: Déclaration d'une variable qui existe déjà" << endl;
+		warningCount++;
+		doubleDeclaration warning(name);
+		warnings.push_back(warning);
 	}
 	return nullptr;
 }

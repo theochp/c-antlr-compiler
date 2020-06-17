@@ -15,7 +15,7 @@ FILTER=dirs antlr
 
 all: ifcc
 
-ifcc: dirs antlr main.o ast/node.o visitor.o ir/instruction.o generator/asm_generator.o generator/ir_generator.o ast/block.o ast/constant.o ast/expression.o ast/operator.o ast/variable.o ast/assignement.o ast/statement.o ast/return.o ast/declaration.o
+ifcc: dirs antlr main.o ast/node.o visitor.o ir/instruction.o generator/asm_generator.o generator/ir_generator.o ast/block.o ast/constant.o ast/expression.o ast/operator.o ast/variable.o ast/assignement.o ast/statement.o ast/return.o ast/declaration.o static-analysis/warning.o static-analysis/doubleDeclaration.o
 	$(CC) $(CCARGS) $(GENERATED)/ifccBaseVisitor.cpp -o $(OUTPUT)/ifccBaseVisitor.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccLexer.cpp -o $(OUTPUT)/ifccLexer.o 
 	$(CC) $(CCARGS) $(GENERATED)/ifccVisitor.cpp -o $(OUTPUT)/ifccVisitor.o
@@ -33,6 +33,7 @@ dirs:
 	mkdir -p $(OUTPUT)/ir
 	mkdir -p $(OUTPUT)/generator
 	mkdir -p $(OUTPUT)/ast
+	mkdir -p $(OUTPUT)/static-analysis
 
 clean:
 	rm -rf $(OUTPUT)

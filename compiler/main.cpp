@@ -45,6 +45,10 @@ int main(int argn, const char **argv) {
   Visitor visitor;
   Node *ast = visitor.visit(tree).as<Node*>();
 
+  for (int i=0; i<visitor.getWarnings().size(); i++){
+    cout << visitor.getWarnings().at(i).getMessage() << endl;
+  }
+
   if (visitor.getErrCount() == 0)  {
     IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
     irGen.generate();
