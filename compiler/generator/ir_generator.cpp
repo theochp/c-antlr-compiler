@@ -58,11 +58,11 @@ const instruction *IRGenerator::generateDeclaration(const Declaration *declarati
     for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
         auto assignement = *it;
         string name = (*it).first;
-        Constant *value = (*it).second;
+        Statement *value = (*it).second;
         if (value != nullptr) {
-            auto constInstr = generateConstant(value);
+            auto assignStmnt = generateStatement(value);
             string dest = newTempVar();
-            instr = new instruction(load, constInstr->dest(), name);
+            instr = new instruction(load, assignStmnt->dest(), name);
             instructions.push_back(instr);
         }
     }

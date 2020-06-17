@@ -15,7 +15,7 @@ statement: expr ';'         # exprStatement
 
 declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
-individualDeclaration: NAME ('=' CONST)? ;
+individualDeclaration: NAME ('=' expr)? ;
 
 expr: ADDMINUS expr 	 # unOp
 	| expr MULTDIV expr  # multExpr
