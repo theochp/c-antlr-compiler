@@ -18,6 +18,7 @@ class AsmGenerator {
     string generate_add(instruction& inst);
     string generate_sub(instruction& inst);
     string generate_mul(instruction& inst);
+    string generate_div(instruction& inst);
     string generate_neg(instruction& inst);
 
     string getOffsetRegister(string symbolName);
