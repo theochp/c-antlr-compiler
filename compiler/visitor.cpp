@@ -58,6 +58,7 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
+	pair<string, Constant*> declaration;
 	if (symbolTable.find(name) == symbolTable.end()) {
 		declaration.first = name;
 		int offset = stackOffset -= 4;
