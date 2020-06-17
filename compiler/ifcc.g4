@@ -17,7 +17,7 @@ statement: expr ';'         # exprStatement
          ;
 
 
-declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
+declaration: 'int' individualDeclaration? (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' expr)? ;
 

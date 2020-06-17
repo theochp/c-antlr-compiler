@@ -15,6 +15,7 @@
 #include "../ast/return.h"
 #include "../ast/variable.h"
 #include "../ast/func.h"
+#include "../ast/funccall.h"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ class IRGenerator {
     const Instruction *generateUnExpression(const UnExpression *expression, IRBlock *block);
     const Instruction *generateReturn(const Return *ret, IRBlock *block);
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
-
+    const Instruction *generateCall(const FuncCall *call, IRBlock *block);
     string newTempVar();
 
 public:

@@ -51,6 +51,9 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
                 break;
+            case IROp::call:
+                res << TAB << generate_call(inst) << endl;
+                break;
         }
     }
 
@@ -149,6 +152,16 @@ string AsmGenerator::generate_neg(Instruction& inst) {
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "negl %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_call(Instruction& inst) {
+    stringstream res;
+    string name = inst.operand(0);
+    int pNum = inst.operands().size() - 1;
+    res << "movl " << getOffsetRegister(inst.operand(1)) << ", %edi" << endl << TAB;
+    res << "call " << name << endl << TAB;
 
     return res.str();
 }

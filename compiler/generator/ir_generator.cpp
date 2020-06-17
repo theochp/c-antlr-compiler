@@ -46,6 +46,8 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
         return generateVariable(el, block);
     } else if(const UnExpression *el = dynamic_cast<const UnExpression *>(statement)) {
         return generateUnExpression(el, block);
+    } else if(const FuncCall *el = dynamic_cast<const FuncCall *>(statement)) { 
+           return generateCall(el, block); 
     } else {
         assert("Need to handle new types");
     }
@@ -162,6 +164,20 @@ const Instruction *IRGenerator::generateReturn(const Return *ret, IRBlock *block
 const Instruction *IRGenerator::generateVariable(const Variable *variable, IRBlock *block) {
     string dest = newTempVar();
     auto instr = new Instruction(IROp::store, dest, {variable->getName()});
+    block->addInstruction(instr);
+    return instr;
+}
+
+const Instruction *IRGenerator::generateCall(const FuncCall *func, IRBlock *block) {
+    //TODO: handle func return
+    string dest = newTempVar();
+    vector<string> operands;
+    operands.push_back(func->getName());
+    for (auto it = func->getParamStatements().begin(); it != func->getParamStatements().end(); ++it) {
+        auto statementInstr = generateStatement(*it, block);
+        operands.push_back(statementInstr->dest());
+    }
+    auto instr = new Instruction(IROp::call, dest, operands);
     block->addInstruction(instr);
     return instr;
 }
