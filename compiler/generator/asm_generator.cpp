@@ -43,6 +43,9 @@ void AsmGenerator::generate(ostream& os) {
             case inst_type::div:
                 os << endl;
                 // TODO
+            break;
+            case inst_type::neg:
+                os << TAB << generate_neg(inst) << endl;
                 break;
         }
     }
@@ -122,6 +125,18 @@ string AsmGenerator::generate_mul(instruction& inst) {
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "movl " + op2 + ", %ebx" << endl << TAB;
     res << "imull %ebx, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_neg(instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffsetRegister(inst.source());
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "negl %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
 
     return res.str();
