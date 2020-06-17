@@ -7,7 +7,6 @@
 #include "ast/declaration.h"
 #include "ir/instruction.h"
 #include "ast/operator.h"
-#include "ast/affectation.h"
 #include "ast/assignement.h"
 #include "ast/expression.h"
 #include "ast/return.h"
