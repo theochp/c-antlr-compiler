@@ -4,47 +4,57 @@
 
 #define TAB "\t"
 
-AsmGenerator::AsmGenerator(vector<Instruction*> instructions, map<string, int> symbolTable)
-    : instructions(instructions), symbolTable(symbolTable) {
+AsmGenerator::AsmGenerator(vector<IRBlock*> blocks, map<string, int> symbolTable)
+    : blocks(blocks), symbolTable(symbolTable) {
 }
 
 void AsmGenerator::generate(ostream& os) {
     // main setup
     os << ".global main" << endl;
-    os << "main:" << endl;
-    os << TAB << "pushq	%rbp" << endl;
-    os << TAB << "movq	%rsp, %rbp" << endl;
+    
+    for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+        os << generate_block(**it) << endl;
+    }
+}
 
-    for (auto it = instructions.begin(); it != instructions.end(); ++it) {
+string AsmGenerator::generate_block(IRBlock& block) {
+    stringstream res;
+    res << block.getLabel() << ":" << endl << TAB;
+    res  << "pushq	%rbp" << endl << TAB;
+    res  << "movq	%rsp, %rbp" << endl;
+
+    for (auto it = block.getInstructions().begin(); it != block.getInstructions().end(); ++it) {
         Instruction& inst = **it;
 
         switch (inst.op()) {
             case IROp::ldcst:
-                os << TAB << generate_ldcst(inst) << endl;
+                res << TAB << generate_ldcst(inst) << endl;
                 break;
             case IROp::store:
-                os << TAB << generate_store(inst) << endl;
+                res << TAB << generate_store(inst) << endl;
                 break;
             case IROp::ret:
-                os << TAB << generate_ret(inst) << endl;
+                res << TAB << generate_ret(inst) << endl;
                 break;
             case IROp::add:
-                os << TAB << generate_add(inst) << endl;
+                res << TAB << generate_add(inst) << endl;
                 break;
             case IROp::sub:
-                os << TAB << generate_sub(inst) << endl;
+                res << TAB << generate_sub(inst) << endl;
                 break;
             case IROp::mul:
-                os << TAB << generate_mul(inst) << endl;
+                res << TAB << generate_mul(inst) << endl;
                 break;
             case IROp::div:
-                os << TAB << generate_div(inst) << endl;
+                res << TAB << generate_div(inst) << endl;
             break;
             case IROp::neg:
-                os << TAB << generate_neg(inst) << endl;
+                res << TAB << generate_neg(inst) << endl;
                 break;
         }
     }
+
+    return res.str();
 }
 
 string AsmGenerator::generate_ldcst(Instruction& inst) {

@@ -64,7 +64,7 @@ int main(int argn, const char **argv) {
     if (visitor.getErrCount() == 0)  {
         IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
         irGen.generate();
-        AsmGenerator asmGen(irGen.getInstructions(), irGen.getSymbolTable());
+        AsmGenerator asmGen(irGen.getBlocks(), irGen.getSymbolTable());
 
         asmGen.generate(cout);
 
@@ -75,7 +75,8 @@ int main(int argn, const char **argv) {
         return 0;
     }
 
-  //delete ast;
+  delete ast;
+  delete tree;
 
   return 1;
 }

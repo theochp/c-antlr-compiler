@@ -16,6 +16,7 @@
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
+#include "ast/func.h"
 
 #define INDENT "\t"
 
@@ -32,7 +33,18 @@ antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
-	return visit(ctx->bloc()).as<Node*>();
+	// TODO : handle many top level blocks
+	return visit(ctx->toplevel(0)).as<Node*>();
+}
+
+antlrcpp::Any Visitor::visitToplevel(ifccParser::ToplevelContext *ctx) {
+	return (Node*) visit(ctx->funcdecl()).as<Func*>();
+}
+
+antlrcpp::Any Visitor::visitFuncdecl(ifccParser::FuncdeclContext *ctx) {
+	Block *block = visit(ctx->bloc()).as<Block*>();
+	string name = ctx->NAME()->getText();
+	return new Func(name, block);
 }
 
 antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
@@ -41,7 +53,7 @@ antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 		auto statement = visit(ctx->statement(i)).as<Statement*>();
 		block->addStatement(statement);
     }
-    return (Node*) block;
+    return block;
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {

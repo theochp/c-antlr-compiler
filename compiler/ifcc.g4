@@ -3,7 +3,11 @@ grammar ifcc;
 axiom : prog       
       ;
 
-prog : 'int' 'main' '(' ')' bloc ;
+prog : toplevel+ ;
+
+toplevel: funcdecl;
+
+funcdecl: 'int' NAME '()' bloc;
 
 bloc: '{' statement* '}';
 

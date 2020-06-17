@@ -1,58 +1,66 @@
 #include <assert.h>
 
 #include "ir_generator.h"
+#include "../ast/func.h"
 
 IRGenerator::IRGenerator(Node *ast, map<string, int> symbolTable, int stackOffset)
-    : ast(ast), symbolTable(symbolTable), stackOffset() {
+    : ast(ast), symbolTable(symbolTable), stackOffset(stackOffset) {
 
 }
 
 void IRGenerator::generate() {
-    if (const Block *block = dynamic_cast<const Block *>(ast)) {
-        generateBlock(block);
+    if (const Func *func = dynamic_cast<const Func *>(ast)) {
+        generateFunc(func);
     }
 }
 
-const Instruction *IRGenerator::generateBlock(const Block *block) {
+const IRBlock *IRGenerator::generateFunc(const Func *func) {
+    IRBlock *block = new IRBlock(func->getName());
+    generateBlock(func->getBlock(), block);
+    blocks.push_back(block);
+    return block;
+}
+
+const Instruction *IRGenerator::generateBlock(const Block *block, IRBlock *irBlock) {
     const Instruction *last;
     for (auto it = block->getStatements().begin(); it != block->getStatements().end(); ++it) {
-        last = generateStatement(*it);
+        last = generateStatement(*it, irBlock);
     }
     return last;
 }
 
-const Instruction *IRGenerator::generateStatement(const Statement *statement) {
+const Instruction *IRGenerator::generateStatement(const Statement *statement, IRBlock *block) {
     if (const Constant *el = dynamic_cast<const Constant *>(statement)) {
-        return generateConstant(el);
+        return generateConstant(el, block);
     }
     else if (const Declaration *el = dynamic_cast<const Declaration *>(statement)) {
-        return generateDeclaration(el);
+        return generateDeclaration(el, block);
     }
     else if (const Expression *el = dynamic_cast<const Expression *>(statement)) {
-        return generateExpression(el);
+        return generateExpression(el, block);
     }
     else if (const Return *el = dynamic_cast<const Return *>(statement)) {
-        return generateReturn(el);
+        return generateReturn(el, block);
     }
     else if (const Variable *el = dynamic_cast<const Variable *>(statement)) {
-        return generateVariable(el);
+        return generateVariable(el, block);
     } else if(const UnExpression *el = dynamic_cast<const UnExpression *>(statement)) {
-        return generateUnExpression(el);
+        return generateUnExpression(el, block);
     } else {
         assert("Need to handle new types");
     }
     return nullptr;
 }
 
-const Instruction *IRGenerator::generateConstant(const Constant *constant) {
+const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlock *block) {
     string dest = newTempVar();
     auto instr = new Instruction(IROp::ldcst, dest, {to_string(constant->getValue())});
-    instructions.push_back(instr);
+    block->addInstruction(instr);
     return instr;
 }
 
 // TODO: changer la manière dont on gère les déclarations
-const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration) {
+const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration, IRBlock *block) {
     string dest = newTempVar();
     Instruction *instr = nullptr;
     for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
@@ -60,31 +68,31 @@ const Instruction *IRGenerator::generateDeclaration(const Declaration *declarati
         string name = (*it).first;
         Statement *value = (*it).second;
         if (value != nullptr) {
-            auto assignStmnt = generateStatement(value);
+            auto assignStmnt = generateStatement(value, block);
             string dest = newTempVar();
             instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
-            instructions.push_back(instr);
+            block->addInstruction(instr);
         }
     }
 
     return instr;
 }
 
-const Instruction *IRGenerator::generateExpression(const Expression *expression) {
+const Instruction *IRGenerator::generateExpression(const Expression *expression, IRBlock *block) {
     if (expression->getOp().type() == OpType::ASSIGN) {
         if(const Variable *dest = dynamic_cast<const Variable *>(expression->getLeft())) {
             string destName = dest->getName();
-            auto rightInstr = generateStatement(expression->getRight());
+            auto rightInstr = generateStatement(expression->getRight(), block);
             auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()});
-            instructions.push_back(instr);
+            block->addInstruction(instr);
             return instr;
         } else {
             assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici");
             return nullptr;
         }
     } else {
-        auto leftInstr = generateStatement(expression->getLeft());
-        auto rightInstr = generateStatement(expression->getRight());
+        auto leftInstr = generateStatement(expression->getLeft(), block);
+        auto rightInstr = generateStatement(expression->getRight(), block);
         string op1 = leftInstr->dest();
         string op2 = rightInstr->dest();
         string dest = newTempVar();
@@ -110,14 +118,14 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression)
                 break;
         }
 
-        instructions.push_back(inst);
+        block->addInstruction(inst);
 
         return inst;
     }
 }
 
-const Instruction *IRGenerator::generateUnExpression(const UnExpression *expression) {
-    auto instr = generateStatement(expression->getExpr());
+const Instruction *IRGenerator::generateUnExpression(const UnExpression *expression, IRBlock *block) {
+    auto instr = generateStatement(expression->getExpr(), block);
 
     if (expression->getOp().type() == UnOpType::UN_PLUS) {
         return instr;
@@ -139,22 +147,22 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
             break;
     }
 
-    instructions.push_back(inst);
+    block->addInstruction(inst);
 
     return inst;
 }
 
-const Instruction *IRGenerator::generateReturn(const Return *ret) {
-    auto lastInstr = generateStatement(ret->getStatement());
+const Instruction *IRGenerator::generateReturn(const Return *ret, IRBlock *block) {
+    auto lastInstr = generateStatement(ret->getStatement(), block);
     auto instr = new Instruction(IROp::ret, string(""), {lastInstr->dest()});
-    instructions.push_back(instr);
+    block->addInstruction(instr);
     return instr;
 }
 
-const Instruction *IRGenerator::generateVariable(const Variable *variable) {
+const Instruction *IRGenerator::generateVariable(const Variable *variable, IRBlock *block) {
     string dest = newTempVar();
     auto instr = new Instruction(IROp::store, dest, {variable->getName()});
-    instructions.push_back(instr);
+    block->addInstruction(instr);
     return instr;
 }
 
@@ -162,8 +170,8 @@ const map<string, int>& IRGenerator::getSymbolTable() {
     return symbolTable;
 }
 
-const vector<Instruction*>& IRGenerator::getInstructions() {
-    return instructions;
+const vector<IRBlock*>& IRGenerator::getBlocks() {
+    return blocks;
 }
 
 string IRGenerator::newTempVar() {

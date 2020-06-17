@@ -7,10 +7,12 @@
 
 using namespace std;
 
-class Block {
+class IRBlock {
     string label;
     vector<Instruction*> instructions;
 public:
-    Block(string label);
+    IRBlock(string label);
+    string getLabel();
     void addInstruction(Instruction *instr);
+    const vector<Instruction*> &getInstructions();
 };
