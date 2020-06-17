@@ -1,0 +1,143 @@
+@startuml
+skinparam classAttributeIconSize 0
+left to right direction
+
+package generator{
+
+    Asm_generator *-- "*" Instrcution
+
+    class Asm_generator{
+        -vector<Instruction *> instruction
+        -symbolTable : map<string, int>
+    }
+
+    
+    Ir_generator *-- "*" Instrcution
+
+    class Ir_generator{
+        -vector<Instruction *> instruction
+        -ast : Node *
+        -symbolTable : map<string, int>
+        -tempVarCount : int
+        -stackOffset : int
+    }
+
+}
+
+package ir{
+
+    Instruction --> inst_type
+
+    class Instruction{
+        -_op : inst_type
+        -_source : string
+        -_dest : string
+        -_operand : string
+    }
+
+    enum inst_type {
+        cst
+        store
+        load
+        ret
+        add
+        su
+        mul
+        div
+    }
+}
+
+
+package ast{
+
+    Statement --|> Node
+    Assignement --|> Expression
+    Block --|> Node
+    Constant --|> Statement
+    Declaration --|> Statement
+    Expression --|> Statement
+    Return --|> Statement
+    Variable --|> Statement
+
+    Block *-- "*" Statement
+    
+    class Node{
+        
+    }
+
+    class Assignement{
+        -lvalue : Variable *
+        -rvalue : Statement *
+    }
+    
+    class Block{
+        -statement : Statement *
+    }
+    
+    class Constant{
+        -value : int
+    }
+    
+    class Declaration{
+        -symbols : map<string, Statement *>
+    }
+    
+    class Expression{
+        -left : Statement *
+        -right : Statement *
+        -op : Operator
+    }
+    
+    Operator --> OpType
+    class Operator{
+        -opType : OpType
+    }
+    
+    enum OpType {
+        MULT
+        DIV
+        ADD
+        MINUS
+        ASSIGN
+    }
+
+    
+    class Return{
+        -statement : Statement *
+    }
+    
+    class unExpression{
+        -expr : Statement *
+        -op : UnOperator
+    }
+    UnOperator --> UnOpType
+    class UnOperator{
+        -opType : UnOpType
+    }
+
+    enum UnOpType{
+        UN_PLUS
+        UN_MINUS
+    }
+
+    class Statement{
+        
+    }
+    
+    class Variable{
+        -name : string
+    }
+
+}
+    
+class Visitor{
+    -symbolTable : map<string, int>
+    -stackOffset : int
+    -errorCount : int
+}
+
+class main{
+
+}
+
+@enduml
