@@ -11,6 +11,8 @@
 #include "ast/assignement.h"
 #include "ast/expression.h"
 #include "ast/return.h"
+#include "static-analysis/undeclaredVariable.h"
+#include "static-analysis/doubleDeclaration.h"
 
 #define INDENT "\t"
 
@@ -92,8 +94,9 @@ antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
 		return statement;
 	} else {
-		cerr << "ERR: Use of undefined variable " + name << endl;
 		errorCount++;
+		undeclaredVariable* error = new undeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        errors.push_back(error);
 		return (Statement*) nullptr;
 	}
 }

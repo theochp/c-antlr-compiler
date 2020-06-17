@@ -7,7 +7,7 @@
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
 #include "ir/instruction.h"
-#include "static-analysis/doubleDeclaration.h"
+#include "static-analysis/error.h"
 #include "static-analysis/warning.h"
 
 using namespace std;
