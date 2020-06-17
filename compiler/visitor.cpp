@@ -49,7 +49,7 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
         pair<string, Constant*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
-        if (symbol.first == ""){
+        if (symbol.first != ""){
 			declaration->addSymbol(symbol.first, symbol.second);
 		}
 	}

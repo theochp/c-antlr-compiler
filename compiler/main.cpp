@@ -45,9 +45,16 @@ int main(int argn, const char **argv) {
   Visitor visitor;
   Node *ast = visitor.visit(tree).as<Node*>();
 
+    if (visitor.getErrors().size() > 0){
+        cout << to_string(visitor.getErrors().size()) << " error(s)" << endl;
+    }
 
     for (int i=0; i<visitor.getErrors().size(); i++){
         cout << visitor.getErrors().at(i)->getMessage() << endl;
+    }
+
+    if (visitor.getWarnings().size() > 0){
+        cout << to_string(visitor.getWarnings().size()) << " warning(s)" << endl;
     }
 
     for (int i=0; i<visitor.getWarnings().size(); i++){
