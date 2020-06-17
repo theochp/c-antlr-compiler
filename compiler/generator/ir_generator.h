@@ -10,6 +10,7 @@
 #include "../ast/constant.h"
 #include "../ast/declaration.h"
 #include "../ast/expression.h"
+#include "../ast/unexpression.h"
 #include "../ast/return.h"
 #include "../ast/variable.h"
 
@@ -27,6 +28,7 @@ class IRGenerator {
     const instruction *generateConstant(const Constant *constant);
     const instruction *generateDeclaration(const Declaration *declaration);
     const instruction *generateExpression(const Expression *expression);
+    const instruction *generateUnExpression(const UnExpression *expression);
     const instruction *generateReturn(const Return *ret);
     const instruction *generateVariable(const Variable *variable);
 

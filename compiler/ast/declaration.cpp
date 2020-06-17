@@ -1,6 +1,6 @@
 #include "declaration.h"
 
-void Declaration::addSymbol(string name, Constant * value) {
+void Declaration::addSymbol(string name, Statement * value) {
     symbols.emplace(name, value);
 }
 
@@ -10,7 +10,7 @@ Declaration::~Declaration() {
     }
 }
 
-const map<string, Constant *>& Declaration::getSymbols() const {
+const map<string, Statement *>& Declaration::getSymbols() const {
     return symbols;
 }
 

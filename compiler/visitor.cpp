@@ -1,5 +1,6 @@
 // Copied from a file generated from ifcc.g4 by ANTLR 4.7.2
 #include <map>
+#include <assert.h>
 
 #include "visitor.h"
 #include "ast/block.h"
@@ -7,8 +8,10 @@
 #include "ast/declaration.h"
 #include "ir/instruction.h"
 #include "ast/operator.h"
+#include "ast/unoperator.h"
 #include "ast/assignement.h"
 #include "ast/expression.h"
+#include "ast/unexpression.h"
 #include "ast/return.h"
 
 #define INDENT "\t"
@@ -47,7 +50,7 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        auto symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
+        auto symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Statement*>>();
 		declaration->addSymbol(symbol.first, symbol.second);
 	}
 	return declaration;
@@ -56,12 +59,13 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
 	if (symbolTable.find(name) == symbolTable.end()) {
-		pair<string, Constant*> declaration;
+		pair<string, Statement*> declaration;
 		declaration.first = name;
 		int offset = stackOffset -= 4;
 		symbolTable.emplace(name, offset);
-		if (ctx->CONST() != nullptr) {
-			declaration.second = new Constant(stoi(ctx->CONST()->getText()));
+		if (ctx->expr() != nullptr) {
+			auto stmnt = visit(ctx->expr()).as<Statement*>();
+			declaration.second = stmnt;
 		} else {
 			declaration.second = nullptr;
 		}
@@ -117,6 +121,36 @@ antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
 	auto rightExpr = visit(ctx->expr(1));
 
 	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+}
+
+antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
+	string op = ctx->ADDMINUS()->getText();
+	auto expr = visit(ctx->expr()).as<Statement*>();
+
+	if (const Constant * cst = dynamic_cast<const Constant*>(expr)) {
+		if (op == "+") {
+			return expr;
+		} else if(op == "-") {
+			// replace by negative value constant
+			auto newCst = new Constant(-cst->getValue());
+			delete cst;
+			return (Statement*) newCst;
+		} else {
+			assert("Need to handle new op");
+		}
+	} else {
+		UnOpType opType;
+		if (op == "+") {
+			opType = UnOpType::UN_PLUS;
+		} else if (op == "-") {
+			opType = UnOpType::UN_MINUS;
+		} else {
+			assert("Need to handle new op");
+		}
+		return (Statement *) new UnExpression(opType, expr);
+	}
+
+	return nullptr;
 }
 
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
