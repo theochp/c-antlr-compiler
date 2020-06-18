@@ -226,7 +226,16 @@ string AsmGenerator::generate_call(Instruction& inst) {
     stringstream res;
     string name = inst.operand(0);
     int pNum = inst.operands().size() - 1;
-    res << "movl " << getOffsetRegister(inst.operand(1)) << ", %edi" << endl << TAB;
+    const int nRegisters = 6; 
+    string registers[nRegisters] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"}; // x86-64 ABI
+    for (int i = pNum; i >= 1; --i) {
+        if (i > nRegisters) {
+            res << "pushq " << getOffsetRegister(inst.operand(i)) << endl << TAB;
+        } else {
+            res << "movl " << getOffsetRegister(inst.operand(i)) << ", " << registers[i - 1] << endl << TAB;
+        }
+    }
+    
     res << "call " << name << endl << TAB;
 
     return res.str();
