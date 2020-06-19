@@ -43,6 +43,8 @@ public:
 
     virtual antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
 
+    virtual antlrcpp::Any visitUnOp(ifccParser::UnOpContext *ctx) override;
+
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
     string allocateTempVar();
@@ -81,7 +83,7 @@ public:
         }
     }
 private:
-	map<string, int> symbolTable;
+	  map<string, int> symbolTable;
     vector<tuple<string, int, pair<int, int>>> countUseVar; // variable name, variable nb of use, variable declaration line and position
     vector<Instruction *> instructions;
 	int stackOffset  = 0;

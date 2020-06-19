@@ -10,6 +10,7 @@
 #include "../ast/constant.h"
 #include "../ast/declaration.h"
 #include "../ast/expression.h"
+#include "../ast/unexpression.h"
 #include "../ast/return.h"
 #include "../ast/variable.h"
 
@@ -22,11 +23,13 @@ class IRGenerator {
     int tempVarCount = 0;
     int stackOffset;
 
+
     const Instruction *generateBlock(const Block *block);
     const Instruction *generateStatement(const Statement *statement);
     const Instruction *generateConstant(const Constant *constant);
     const Instruction *generateDeclaration(const Declaration *declaration);
     const Instruction *generateExpression(const Expression *expression);
+    const Instruction *generateUnExpression(const UnExpression *expression);
     const Instruction *generateReturn(const Return *ret);
     const Instruction *generateVariable(const Variable *variable);
 

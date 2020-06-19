@@ -11,6 +11,7 @@ typedef enum {
     sub,
     mul,
     div,
+    neg,
 } inst_type;
 
 class Instruction {
