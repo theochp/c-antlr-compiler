@@ -8,24 +8,25 @@ using namespace std;
 
 class AsmGenerator {
 
-    vector<instruction*> instructions;
+    vector<Instruction*> instructions;
     map<string, int> symbolTable;
 
-    string generate_cst(instruction& inst);
-    string generate_load(instruction& inst);
-    string generate_store(instruction& inst);
-    string generate_ret(instruction& inst);
-    string generate_add(instruction& inst);
-    string generate_sub(instruction& inst);
-    string generate_mul(instruction& inst);
-    string generate_div(instruction& inst);
-    string generate_neg(instruction& inst);
+
+    string generate_cst(Instruction& inst);
+    string generate_load(Instruction& inst);
+    string generate_store(Instruction& inst);
+    string generate_ret(Instruction& inst);
+    string generate_add(Instruction& inst);
+    string generate_sub(Instruction& inst);
+    string generate_mul(Instruction& inst);
+    string generate_div(Instruction& inst);
+    string generate_neg(Instruction& inst);
 
     string getOffsetRegister(string symbolName);
 
 public:
     // constructor
-    AsmGenerator(vector<instruction*> instructions, map<string, int> symbolTable);
+    AsmGenerator(vector<Instruction*> instructions, map<string, int> symbolTable);
 
     void generate(ostream& os);
 };

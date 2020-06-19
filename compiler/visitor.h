@@ -7,6 +7,8 @@
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccVisitor.h"
 #include "ir/instruction.h"
+#include "static-analysis/error.h"
+#include "static-analysis/warning.h"
 
 using namespace std;
 
@@ -51,6 +53,18 @@ public:
         return errorCount;
     }
 
+    vector<Error*> getErrors(){
+        return errors;
+    }
+
+    int getWarningCount() {
+        return warningCount;
+    }
+
+    vector<Warning*> getWarnings() {
+        return warnings;
+    }
+
     map<string, int> getSymbolTable() {
         return symbolTable;
     }
@@ -59,9 +73,23 @@ public:
         return stackOffset;
     }
 
+    vector<Instruction *> getInstructions() {
+        return instructions;
+    }
+
+    ~Visitor() {
+        for (auto it = instructions.begin(); it != instructions.end(); ++it) {
+            delete *it;
+        }
+    }
 private:
-	map<string, int> symbolTable;
+	  map<string, int> symbolTable;
+    vector<tuple<string, int, pair<int, int>>> countUseVar; // variable name, variable nb of use, variable declaration line and position
+    vector<Instruction *> instructions;
 	int stackOffset  = 0;
     int errorCount = 0;
+    vector<Error *> errors;
+    int warningCount = 0;
+    vector<Warning *> warnings;
 };
 

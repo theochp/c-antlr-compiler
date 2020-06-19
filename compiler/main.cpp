@@ -45,19 +45,35 @@ int main(int argn, const char **argv) {
   Visitor visitor;
   Node *ast = visitor.visit(tree).as<Node*>();
 
-  if (visitor.getErrCount() == 0)  {
-    IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
-    irGen.generate();
-    AsmGenerator asmGen(irGen.getInstructions(), irGen.getSymbolTable());
+    if (visitor.getErrors().size() > 0){
+        cout <<  "# " << to_string(visitor.getErrors().size()) << " error(s)" << endl;
+    }
 
-    asmGen.generate(cout);
+    for (int i=0; i<visitor.getErrors().size(); i++){
+        cout << visitor.getErrors().at(i)->getMessage() << endl;
+    }
 
-    ofstream out("output.s");
-    asmGen.generate(out);
-    out.close();
+    if (visitor.getWarnings().size() > 0){
+        cout << "# " << to_string(visitor.getWarnings().size()) << " warning(s)" << endl;
+    }
 
-    return 0;
-  }
+    for (int i=0; i<visitor.getWarnings().size(); i++){
+        cout << visitor.getWarnings().at(i)->getMessage() << endl;
+    }
+
+    if (visitor.getErrCount() == 0)  {
+        IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
+        irGen.generate();
+        AsmGenerator asmGen(irGen.getInstructions(), irGen.getSymbolTable());
+
+        asmGen.generate(cout);
+
+        ofstream out("output.s");
+        asmGen.generate(out);
+        out.close();
+
+        return 0;
+    }
 
   //delete ast;
 

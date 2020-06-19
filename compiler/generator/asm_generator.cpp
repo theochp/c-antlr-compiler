@@ -4,7 +4,7 @@
 
 #define TAB "\t"
 
-AsmGenerator::AsmGenerator(vector<instruction*> instructions, map<string, int> symbolTable)
+AsmGenerator::AsmGenerator(vector<Instruction*> instructions, map<string, int> symbolTable)
     : instructions(instructions), symbolTable(symbolTable) {
 }
 
@@ -16,7 +16,7 @@ void AsmGenerator::generate(ostream& os) {
     os << TAB << "movq	%rsp, %rbp" << endl;
 
     for (auto it = instructions.begin(); it != instructions.end(); ++it) {
-        instruction& inst = **it;
+        Instruction& inst = **it;
 
         switch (inst.op()) {
             case inst_type::cst:
@@ -50,12 +50,12 @@ void AsmGenerator::generate(ostream& os) {
     }
 }
 
-string AsmGenerator::generate_cst(instruction& inst) {
+string AsmGenerator::generate_cst(Instruction& inst) {
     string dest = getOffsetRegister(inst.dest());
     return "movl $" + inst.source() + ", " + dest;
 }
 
-string AsmGenerator::generate_load(instruction& inst) {
+string AsmGenerator::generate_load(Instruction& inst) {
     string source = getOffsetRegister(inst.source());
     string dest = getOffsetRegister(inst.dest());
     stringstream res;
@@ -65,7 +65,7 @@ string AsmGenerator::generate_load(instruction& inst) {
 }
 
 // Todo: refactor (same behavior twice)
-string AsmGenerator::generate_store(instruction& inst) {
+string AsmGenerator::generate_store(Instruction& inst) {
     string source = getOffsetRegister(inst.source());
     string dest = getOffsetRegister(inst.dest());
     stringstream res;
@@ -74,7 +74,7 @@ string AsmGenerator::generate_store(instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_ret(instruction& inst) {
+string AsmGenerator::generate_ret(Instruction& inst) {
     stringstream res;
     if (inst.source() != "") {
         string source = getOffsetRegister(inst.source());
@@ -87,7 +87,7 @@ string AsmGenerator::generate_ret(instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_add(instruction& inst) {
+string AsmGenerator::generate_add(Instruction& inst) {
     stringstream res;
     
     string op1 = getOffsetRegister(inst.source());
@@ -101,7 +101,7 @@ string AsmGenerator::generate_add(instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_sub(instruction& inst) {
+string AsmGenerator::generate_sub(Instruction& inst) {
     stringstream res;
     
     string op1 = getOffsetRegister(inst.source());
@@ -115,7 +115,7 @@ string AsmGenerator::generate_sub(instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_mul(instruction& inst) {
+string AsmGenerator::generate_mul(Instruction& inst) {
     stringstream res;
     
     string op1 = getOffsetRegister(inst.source());
@@ -129,7 +129,7 @@ string AsmGenerator::generate_mul(instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_div(instruction& inst) {
+string AsmGenerator::generate_div(Instruction& inst) {
     stringstream res;
     
     string op1 = getOffsetRegister(inst.source());
@@ -143,7 +143,7 @@ string AsmGenerator::generate_div(instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_neg(instruction& inst) {
+string AsmGenerator::generate_neg(Instruction& inst) {
     stringstream res;
     
     string op1 = getOffsetRegister(inst.source());

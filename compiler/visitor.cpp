@@ -13,12 +13,22 @@
 #include "ast/expression.h"
 #include "ast/unexpression.h"
 #include "ast/return.h"
+#include "static-analysis/undeclaredVariable.h"
+#include "static-analysis/doubleDeclaration.h"
+#include "static-analysis/unusedVariable.h"
 
 #define INDENT "\t"
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	return visit(ctx->prog()).as<Node*>();
+	antlrcpp::Any res = visit(ctx->prog()).as<Node*>();
+    for (tuple<string, int, pair<int, int>> varData : countUseVar){
+        if (get<1>(varData) == 0){
+            warnings.push_back(new UnusedVariable(get<0>(varData), get<2>(varData).first, get<2>(varData).second));
+            warningCount++;
+        }
+    }
+    return res;
 }
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
@@ -50,32 +60,37 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        auto symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Statement*>>();
-		declaration->addSymbol(symbol.first, symbol.second);
+        pair<string, Statement*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Statement*>>();
+        if (symbol.first != ""){
+            declaration->addSymbol(symbol.first, symbol.second);
+        }
 	}
 	return declaration;
 }
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
+	pair<string, Statement*> declaration;
 	if (symbolTable.find(name) == symbolTable.end()) {
-		pair<string, Statement*> declaration;
 		declaration.first = name;
 		int offset = stackOffset -= 4;
 		symbolTable.emplace(name, offset);
-		if (ctx->expr() != nullptr) {
-			auto stmnt = visit(ctx->expr()).as<Statement*>();
-			declaration.second = stmnt;
-		} else {
-			declaration.second = nullptr;
-		}
-		
-		return declaration;
+        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		countUseVar.push_back(make_tuple(name, 0, positionPair));
+        if (ctx->expr() != nullptr) {
+            Statement* stmnt = visit(ctx->expr()).as<Statement*>();
+            declaration.second = stmnt;
+        } else {
+            declaration.second = nullptr;
+        }
 	} else {
 		errorCount++;
-		cerr << "ERR: Déclaration d'une variable qui existe déjà" << endl;
+		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        errors.push_back(error);
+		declaration.first = "";
+		declaration.second = nullptr;
 	}
-	return nullptr;
+    return declaration;
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
@@ -83,7 +98,21 @@ antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
-	return (Statement*) new Variable(ctx->NAME()->getText());
+	string name = ctx->NAME()->getText();
+
+	// watching use of variable
+	vector<tuple<string, int, pair<int, int>>>::iterator it =
+			std::find_if(countUseVar.begin(), countUseVar.end(), [name](const std::tuple<string, int, pair<int, int>>& e) {return std::get<0>(e) == name;});
+	if (it != countUseVar.end())
+		get<1>(*it)++;
+
+	if (symbolTable.find(name) == symbolTable.end()) {
+		errorCount++;
+		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		errors.push_back(error);
+	}
+
+	return (Statement*) new Variable(name);
 }
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
@@ -92,8 +121,9 @@ antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
 		return statement;
 	} else {
-		cerr << "ERR: Use of undefined variable " + name << endl;
 		errorCount++;
+		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        errors.push_back(error);
 		return (Statement*) nullptr;
 	}
 }

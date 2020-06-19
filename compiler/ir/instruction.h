@@ -14,7 +14,7 @@ typedef enum {
     neg,
 } inst_type;
 
-class instruction {
+class Instruction {
     private: 
         inst_type _op;
         string _source = ""; // can be a constant or a symbol name
@@ -22,14 +22,14 @@ class instruction {
         string _operand = "";
 
     public:
-        instruction(inst_type opType);
-        instruction(inst_type opType, string source);
-        instruction(inst_type opType, string source, string dest);
-        instruction(inst_type opType, string source, string dest, string operand);
+        Instruction(inst_type opType);
+        Instruction(inst_type opType, string source);
+        Instruction(inst_type opType, string source, string dest);
+        Instruction(inst_type opType, string source, string dest, string operand);
         inst_type op() const;
         string source() const;
         string dest() const;
         string operand() const;
 
-        friend std::ostream& operator<<(std::ostream& os, const instruction& obj);
+        friend std::ostream& operator<<(std::ostream& os, const Instruction& obj);
 };

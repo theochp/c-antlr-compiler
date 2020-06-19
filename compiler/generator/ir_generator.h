@@ -19,18 +19,19 @@ using namespace std;
 class IRGenerator {
     Node *ast;
     map<string, int> symbolTable;
-    vector<instruction*> instructions;
+    vector<Instruction*> instructions;
     int tempVarCount = 0;
     int stackOffset;
 
-    const instruction *generateBlock(const Block *block);
-    const instruction *generateStatement(const Statement *statement);
-    const instruction *generateConstant(const Constant *constant);
-    const instruction *generateDeclaration(const Declaration *declaration);
-    const instruction *generateExpression(const Expression *expression);
-    const instruction *generateUnExpression(const UnExpression *expression);
-    const instruction *generateReturn(const Return *ret);
-    const instruction *generateVariable(const Variable *variable);
+
+    const Instruction *generateBlock(const Block *block);
+    const Instruction *generateStatement(const Statement *statement);
+    const Instruction *generateConstant(const Constant *constant);
+    const Instruction *generateDeclaration(const Declaration *declaration);
+    const Instruction *generateExpression(const Expression *expression);
+    const Instruction *generateUnExpression(const UnExpression *expression);
+    const Instruction *generateReturn(const Return *ret);
+    const Instruction *generateVariable(const Variable *variable);
 
     string newTempVar();
 
@@ -38,6 +39,6 @@ public:
     void generate();
     IRGenerator(Node *ast, map<string, int> symbolTable, int stackOffset);
     const map<string, int>& getSymbolTable();
-    const vector<instruction*>& getInstructions();
+    const vector<Instruction*>& getInstructions();
     void genConstant(Constant *constant);
 };

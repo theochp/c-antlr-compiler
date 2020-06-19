@@ -1,42 +1,42 @@
 #include "instruction.h"
 
-instruction::instruction(inst_type opType) {
+Instruction::Instruction(inst_type opType) {
     _op = opType;
 }
 
-instruction::instruction(inst_type opType, std::string source) {
+Instruction::Instruction(inst_type opType, std::string source) {
     _op = opType;
     _source = source;
 }
 
-instruction::instruction(inst_type opType, std::string source, std::string dest) {
+Instruction::Instruction(inst_type opType, std::string source, std::string dest) {
     _op = opType;
     _source = source;
     _dest = dest;
 }
 
-instruction::instruction(inst_type opType, std::string source, std::string dest, std::string operand) {
+Instruction::Instruction(inst_type opType, std::string source, std::string dest, std::string operand) {
     _op = opType;
     _source = source;
     _dest = dest;
     _operand = operand;
 }
 
-inst_type instruction::op() const {
+inst_type Instruction::op() const {
     return _op;
 }
-string instruction::source() const {
+string Instruction::source() const {
     return _source;
 }
-string instruction::dest() const {
+string Instruction::dest() const {
     return _dest;
 }
-string instruction::operand() const {
+string Instruction::operand() const {
     return _operand;
 }
 
 
-std::ostream& operator<<(std::ostream& os, const instruction& obj)
+std::ostream& operator<<(std::ostream& os, const Instruction& obj)
 {
     /*switch (obj._op) {
         case cst:
