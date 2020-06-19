@@ -60,29 +60,29 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        pair<string, Constant*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Constant*>>();
+        pair<string, Statement*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Statement*>>();
         if (symbol.first != ""){
-			      declaration->addSymbol(symbol.first, symbol.second);
-		    }
+            declaration->addSymbol(symbol.first, symbol.second);
+        }
 	}
 	return declaration;
 }
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	pair<string, Constant*> declaration;
+	pair<string, Statement*> declaration;
 	if (symbolTable.find(name) == symbolTable.end()) {
 		declaration.first = name;
 		int offset = stackOffset -= 4;
 		symbolTable.emplace(name, offset);
-    pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
-    if (ctx->expr() != nullptr) {
-			auto stmnt = visit(ctx->expr()).as<Statement*>();
-			declaration.second = stmnt;
-		} else {
-			declaration.second = nullptr;
-		}
+        if (ctx->expr() != nullptr) {
+            Statement* stmnt = visit(ctx->expr()).as<Statement*>();
+            declaration.second = stmnt;
+        } else {
+            declaration.second = nullptr;
+        }
 	} else {
 		errorCount++;
 		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());

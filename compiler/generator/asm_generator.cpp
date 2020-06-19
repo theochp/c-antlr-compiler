@@ -129,7 +129,7 @@ string AsmGenerator::generate_mul(Instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_div(instruction& inst) {
+string AsmGenerator::generate_div(Instruction& inst) {
     stringstream res;
     
     string op1 = getOffsetRegister(inst.source());
@@ -143,7 +143,7 @@ string AsmGenerator::generate_div(instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_neg(instruction& inst) {
+string AsmGenerator::generate_neg(Instruction& inst) {
     stringstream res;
     
     string op1 = getOffsetRegister(inst.source());

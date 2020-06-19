@@ -126,13 +126,13 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
     string op1 = instr->dest();
     string dest = newTempVar();
     
-    instruction *inst;
+    Instruction *inst;
     switch(expression->getOp().type()) {
         case UnOpType::UN_PLUS:
             // nothing has to be done
             break;
         case UnOpType::UN_MINUS:
-            inst = new instruction(inst_type::neg, op1, dest);
+            inst = new Instruction(inst_type::neg, op1, dest);
             break;
         default:
             assert("Missing type");
