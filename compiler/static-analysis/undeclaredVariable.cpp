@@ -7,7 +7,7 @@ UndeclaredVariable::UndeclaredVariable(string nomVar, int lineNb, int charPositi
 }
 
 string UndeclaredVariable::getMessage() {
-    string message = "Line "+to_string(lineNb)+" (position "+to_string(charPosition)+") :\n\t"+"Variable "+nomVar+" was not declared.";
+    string message = AS_COMMENT+"Line "+to_string(lineNb)+" (position "+to_string(charPosition)+") :\n"+AS_COMMENT+"\t"+"Variable "+nomVar+" was not declared.";
     return message;
 }
 
