@@ -6,7 +6,7 @@ using namespace std;
 
 class Error {
 protected:
-    string AS_COMMENT = "; ";
+    string AS_COMMENT = "# ";
 public:
     Error();
     virtual ~Error();

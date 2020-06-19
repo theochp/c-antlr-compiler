@@ -6,7 +6,7 @@ using namespace std;
 
 class Warning {
 protected:
-    string AS_COMMENT = "; ";
+    string AS_COMMENT = "# ";
 public:
     Warning();
     virtual ~Warning();
