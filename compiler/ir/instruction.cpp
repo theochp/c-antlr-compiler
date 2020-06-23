@@ -1,40 +1,38 @@
+#include <assert.h>
+
 #include "instruction.h"
 
-Instruction::Instruction(inst_type opType) {
-    _op = opType;
+Instruction::Instruction(IROp op) {
+    _op = op;
 }
 
-Instruction::Instruction(inst_type opType, std::string source) {
-    _op = opType;
-    _source = source;
-}
-
-Instruction::Instruction(inst_type opType, std::string source, std::string dest) {
-    _op = opType;
-    _source = source;
+Instruction::Instruction(IROp op, string dest) {
+    _op = op;
     _dest = dest;
 }
 
-Instruction::Instruction(inst_type opType, std::string source, std::string dest, std::string operand) {
-    _op = opType;
-    _source = source;
+Instruction::Instruction(IROp op, string dest, const vector<string>& operands) {
+    _op = op;
     _dest = dest;
-    _operand = operand;
+    
+    copy(operands.begin(), operands.end(), back_inserter(_operands));
 }
 
-inst_type Instruction::op() const {
+IROp Instruction::op() const {
     return _op;
-}
-string Instruction::source() const {
-    return _source;
 }
 string Instruction::dest() const {
     return _dest;
 }
-string Instruction::operand() const {
-    return _operand;
+
+const vector<string>& Instruction::operands() {
+    return _operands;
 }
 
+const string& Instruction::operand(int i) {
+    assert(_operands.size() > i);
+    return _operands[i];
+}
 
 std::ostream& operator<<(std::ostream& os, const Instruction& obj)
 {

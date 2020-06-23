@@ -4,69 +4,67 @@
 
 #define TAB "\t"
 
-AsmGenerator::AsmGenerator(vector<Instruction*> instructions, map<string, int> symbolTable)
-    : instructions(instructions), symbolTable(symbolTable) {
+AsmGenerator::AsmGenerator(vector<IRBlock*> blocks, map<string, int> symbolTable)
+    : blocks(blocks), symbolTable(symbolTable) {
 }
 
 void AsmGenerator::generate(ostream& os) {
     // main setup
     os << ".global main" << endl;
-    os << "main:" << endl;
-    os << TAB << "pushq	%rbp" << endl;
-    os << TAB << "movq	%rsp, %rbp" << endl;
-
-    for (auto it = instructions.begin(); it != instructions.end(); ++it) {
-        Instruction& inst = **it;
-
-        switch (inst.op()) {
-            case inst_type::cst:
-                os << TAB << generate_cst(inst) << endl;
-                break;
-            case inst_type::load:
-                os << TAB << generate_load(inst) << endl;
-                break;
-            case inst_type::store:
-                os << TAB << generate_store(inst) << endl;
-                break;
-            case inst_type::ret:
-                os << TAB << generate_ret(inst) << endl;
-                break;
-            case inst_type::add:
-                os << TAB << generate_add(inst) << endl;
-                break;
-            case inst_type::sub:
-                os << TAB << generate_sub(inst) << endl;
-                break;
-            case inst_type::mul:
-                os << TAB << generate_mul(inst) << endl;
-                break;
-            case inst_type::div:
-                os << TAB << generate_div(inst) << endl;
-            break;
-            case inst_type::neg:
-                os << TAB << generate_neg(inst) << endl;
-                break;
-        }
+    
+    for (auto it = blocks.begin(); it != blocks.end(); ++it) {
+        os << generate_block(**it) << endl;
     }
 }
 
-string AsmGenerator::generate_cst(Instruction& inst) {
-    string dest = getOffsetRegister(inst.dest());
-    return "movl $" + inst.source() + ", " + dest;
+string AsmGenerator::generate_block(IRBlock& block) {
+    stringstream res;
+    res << block.getLabel() << ":" << endl << TAB;
+    res  << "pushq	%rbp" << endl << TAB;
+    res  << "movq	%rsp, %rbp" << endl;
+
+    for (auto it = block.getInstructions().begin(); it != block.getInstructions().end(); ++it) {
+        Instruction& inst = **it;
+
+        switch (inst.op()) {
+            case IROp::ldcst:
+                res << TAB << generate_ldcst(inst) << endl;
+                break;
+            case IROp::store:
+                res << TAB << generate_store(inst) << endl;
+                break;
+            case IROp::ret:
+                res << TAB << generate_ret(inst) << endl;
+                break;
+            case IROp::add:
+                res << TAB << generate_add(inst) << endl;
+                break;
+            case IROp::sub:
+                res << TAB << generate_sub(inst) << endl;
+                break;
+            case IROp::mul:
+                res << TAB << generate_mul(inst) << endl;
+                break;
+            case IROp::div:
+                res << TAB << generate_div(inst) << endl;
+            break;
+            case IROp::neg:
+                res << TAB << generate_neg(inst) << endl;
+                break;
+        }
+    }
+
+    return res.str();
 }
 
-string AsmGenerator::generate_load(Instruction& inst) {
-    string source = getOffsetRegister(inst.source());
+string AsmGenerator::generate_ldcst(Instruction& inst) {
     string dest = getOffsetRegister(inst.dest());
-    stringstream res;
-    res << "movl " + source + ", %eax" << endl;
-    res << TAB << "movl %eax," + dest;
-    return res.str();
+    return "movl $" + inst.operands()[0] + ", " + dest;
 }
 
 // Todo: refactor (same behavior twice)
 string AsmGenerator::generate_store(Instruction& inst) {
-    string source = getOffsetRegister(inst.source());
+    string source = getOffsetRegister(inst.operand(0));
     string dest = getOffsetRegister(inst.dest());
     stringstream res;
     res << "movl " + source + ", %eax" << endl;
@@ -76,8 +74,8 @@ string AsmGenerator::generate_store(Instruction& inst) {
 
 string AsmGenerator::generate_ret(Instruction& inst) {
     stringstream res;
-    if (inst.source() != "") {
-        string source = getOffsetRegister(inst.source());
+    if (inst.operand(0) != "") {
+        string source = getOffsetRegister(inst.operand(0));
         res << "movl " + source + ", %eax" << endl << TAB;
     }
 
@@ -90,8 +88,8 @@ string AsmGenerator::generate_ret(Instruction& inst) {
 string AsmGenerator::generate_add(Instruction& inst) {
     stringstream res;
     
-    string op1 = getOffsetRegister(inst.source());
-    string op2 = getOffsetRegister(inst.operand());
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
     string dest = getOffsetRegister(inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "movl " + op2 + ", %ebx" << endl << TAB;
@@ -104,8 +102,8 @@ string AsmGenerator::generate_add(Instruction& inst) {
 string AsmGenerator::generate_sub(Instruction& inst) {
     stringstream res;
     
-    string op1 = getOffsetRegister(inst.source());
-    string op2 = getOffsetRegister(inst.operand());
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
     string dest = getOffsetRegister(inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "movl " + op2 + ", %ebx" << endl << TAB;
@@ -118,8 +116,8 @@ string AsmGenerator::generate_sub(Instruction& inst) {
 string AsmGenerator::generate_mul(Instruction& inst) {
     stringstream res;
     
-    string op1 = getOffsetRegister(inst.source());
-    string op2 = getOffsetRegister(inst.operand());
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
     string dest = getOffsetRegister(inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "movl " + op2 + ", %ebx" << endl << TAB;
@@ -132,8 +130,8 @@ string AsmGenerator::generate_mul(Instruction& inst) {
 string AsmGenerator::generate_div(Instruction& inst) {
     stringstream res;
     
-    string op1 = getOffsetRegister(inst.source());
-    string op2 = getOffsetRegister(inst.operand());
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
     string dest = getOffsetRegister(inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "cltd" << endl << TAB; // convert %eax to dword
@@ -146,7 +144,7 @@ string AsmGenerator::generate_div(Instruction& inst) {
 string AsmGenerator::generate_neg(Instruction& inst) {
     stringstream res;
     
-    string op1 = getOffsetRegister(inst.source());
+    string op1 = getOffsetRegister(inst.operand(0));
     string dest = getOffsetRegister(inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "negl %eax" << endl << TAB;

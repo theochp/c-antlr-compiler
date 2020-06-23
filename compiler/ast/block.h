@@ -8,6 +8,7 @@
 using namespace std;
 
 class Block : public Node {
+protected:
     vector<Statement *> statements;
     
 public:

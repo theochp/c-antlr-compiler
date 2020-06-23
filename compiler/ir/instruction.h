@@ -1,35 +1,43 @@
 #pragma once
+
 #include <iostream>
+#include <vector>
+
 using namespace std;
 
-typedef enum {
-    cst,
-    store,
-    load,
-    ret,
-    add,
-    sub,
-    mul,
-    div,
-    neg,
-} inst_type;
+    typedef enum {
+        ldcst,
+        store,
+        ret,
+        add,
+        sub,
+        mul,
+        div,
+        neg,
+    } IROp;
 
 class Instruction {
-    private: 
-        inst_type _op;
-        string _source = ""; // can be a constant or a symbol name
-        string _dest = "";
-        string _operand = "";
+public:
+    Instruction(IROp op);
+    Instruction(IROp op, string dest);
+    Instruction(IROp op, string dest, const vector<string>& operands);
+    IROp op() const;
+    string dest() const;
+    const vector<string>& operands();
 
-    public:
-        Instruction(inst_type opType);
-        Instruction(inst_type opType, string source);
-        Instruction(inst_type opType, string source, string dest);
-        Instruction(inst_type opType, string source, string dest, string operand);
-        inst_type op() const;
-        string source() const;
-        string dest() const;
-        string operand() const;
+    /**
+     * Allows to retrieve instructions operands.
+     * Asserts if the operand list is long enough
+     * 
+     * @param i The opreand position (starting at 0)
+     * @return The operand symbol name
+     *
+     */
+    const string& operand(int i);
 
-        friend std::ostream& operator<<(std::ostream& os, const Instruction& obj);
+    friend std::ostream& operator<<(std::ostream& os, const Instruction& obj);
+private: 
+    IROp _op;
+    string _dest;
+    vector<string> _operands;
 };

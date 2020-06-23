@@ -10,3 +10,4 @@ tests/pld-test-output
 *.out
 .idea
 *.iml
+.gdb_history
