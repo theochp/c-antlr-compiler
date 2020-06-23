@@ -30,6 +30,12 @@ expr: ADDMINUS expr 	 # unOp
 	| CONST				 # constExpr
 	;
 
+condition: expr '==' expr # equalCond
+	| expr '!=' expr      # diffCond
+	| expr '<' expr       # infCond
+	| expr '>' expr       # supCond
+	;
+
 ret: RETURN expr? ';';
 
 RETURN : 'return' ;
