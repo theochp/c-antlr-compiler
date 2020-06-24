@@ -12,6 +12,7 @@
 #include "../ast/declaration.h"
 #include "../ast/expression.h"
 #include "../ast/unexpression.h"
+#include "../ast/exclamationOperator.h"
 #include "../ast/return.h"
 #include "../ast/variable.h"
 #include "../ast/func.h"
@@ -32,6 +33,7 @@ class IRGenerator {
     const Instruction *generateDeclaration(const Declaration *declaration, IRBlock *block);
     const Instruction *generateExpression(const Expression *expression, IRBlock *block);
     const Instruction *generateUnExpression(const UnExpression *expression, IRBlock *block);
+    const Instruction *generateExclamationOperator(const ExclamationOperator *expression, IRBlock *block);
     const Instruction *generateReturn(const Return *ret, IRBlock *block);
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
 
