@@ -21,6 +21,8 @@ using namespace std;
         bitwise_or,
         bitwise_xor,
         logicalNot,
+        je,
+        jmp,
     } IROp;
 
 class IRBlock;

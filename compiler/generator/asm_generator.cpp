@@ -19,14 +19,15 @@ void AsmGenerator::generate(ostream& os) {
     }
 }
 
-string AsmGenerator::generate_block(IRBlock& block) {
+string AsmGenerator::generate_block(const IRBlock& block) {
     stringstream res;
     res << block.getLabel() << ":" << endl << TAB;
-    res  << "pushq	%rbp" << endl << TAB;
-    res  << "movq	%rsp, %rbp" << endl << TAB;
-    res << "subq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl;
 
     if (block.getLabel() == block.getFunc()->getName()) {
+        res  << "pushq	%rbp" << endl << TAB;
+        res  << "movq	%rsp, %rbp" << endl << TAB;
+        res << "subq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl;
+
         int pNum = block.getFunc()->getParams().size();
         const int nRegisters = 6; 
         string registers[nRegisters] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"}; // x86-64 ABI
@@ -40,11 +41,12 @@ string AsmGenerator::generate_block(IRBlock& block) {
             } else {
                 res << "movl " << registers[i - 1] << ", " << getOffsetRegister(block.getFunc()->getName(), params[i-1]) << endl;
             }
-        }    
+        }
+        res << endl;
     }
     bool hasRet = false;
-    for (auto it = block.getInstructions().begin(); it != block.getInstructions().end(); ++it) {
-        Instruction& inst = **it;
+    for (auto it : block.getInstructions()) {
+        Instruction& inst = *it;
 
         switch (inst.op()) {
             case IROp::ldcst:
@@ -54,6 +56,7 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 res << TAB << generate_store(inst) << endl;
                 break;
             case IROp::ret:
+                // TODO: handle return inside other blocks
                 res << TAB << generate_ret(inst) << endl;
                 hasRet = true;
                 break;
@@ -86,6 +89,12 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 break;
             case IROp::logicalNot:
                 res << TAB << generate_not(inst) << endl;
+                break;
+            case IROp::je:
+                res << TAB << generate_je(inst) << endl;
+                break;
+            case IROp::jmp:
+                res << TAB << generate_jmp(inst) << endl;
                 break;
         }
     }
@@ -264,6 +273,24 @@ string AsmGenerator::generate_not(Instruction& inst) {
     res << "sete %al" << endl << TAB;
     res << "movzbl %al, %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_je(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    res << "cmpl $" << inst.operand(1) << ", " << op1 << endl << TAB;
+    res << "je " << inst.dest() << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_jmp(Instruction& inst) {
+    stringstream res;
+
+    res << "jmp " << inst.dest() << endl;
 
     return res.str();
 }

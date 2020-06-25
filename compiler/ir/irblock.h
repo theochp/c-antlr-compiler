@@ -14,11 +14,26 @@ class Instruction;
 class IRBlock {
     string label;
     vector<Instruction*> instructions;
-    const IRFunc *func;
+    IRFunc *func;
+    const IRBlock *exitTrue;
+    const IRBlock *exitFalse;
+    string testVarName;
 public:
-    IRBlock(string label, const IRFunc *func);
+    IRBlock(string label, IRFunc *func);
     string getLabel() const;
-    const IRFunc *getFunc() const;
+    IRFunc *getFunc() const;
     void addInstruction(Instruction *instr);
     const vector<Instruction*> &getInstructions() const;
+
+    const IRBlock *getExitTrue() const;
+
+    void setExitTrue(const IRBlock *exitTrue);
+
+    const IRBlock *getExitFalse() const;
+
+    void setExitFalse(const IRBlock *exitFalse);
+
+    const string &getTestVarName() const;
+
+    void setTestVarName(const string &testVarName);
 };
