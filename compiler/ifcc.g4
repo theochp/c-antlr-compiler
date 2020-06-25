@@ -38,5 +38,6 @@ MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
+SINGLECOMMENT : '//' .*? '\n' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);
