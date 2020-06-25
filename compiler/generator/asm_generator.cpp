@@ -42,7 +42,7 @@ string AsmGenerator::generate_block(IRBlock& block) {
             }
         }    
     }
-
+    bool hasRet = false;
     for (auto it = block.getInstructions().begin(); it != block.getInstructions().end(); ++it) {
         Instruction& inst = **it;
 
@@ -55,6 +55,7 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 break;
             case IROp::ret:
                 res << TAB << generate_ret(inst) << endl;
+                hasRet = true;
                 break;
             case IROp::add:
                 res << TAB << generate_add(inst) << endl;
@@ -91,6 +92,9 @@ string AsmGenerator::generate_block(IRBlock& block) {
 
     if (block.getLabel() == block.getFunc()->getName()) {
         res << TAB;
+        if (!hasRet) {
+            res << "movl $0, %eax" << endl << TAB;
+        }
         res << "addq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl << TAB;
         res << "popq %rbp" << endl << TAB;
         res << "ret" << endl;
