@@ -199,23 +199,27 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return visit(ctx->expr());
 }
 
+antlrcpp::Any Visitor::visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx){
+	Operator opType = INFCOMP;
+	if (ctx->COMP_PRIO()->getText() == "<=") {
+		opType = INFEQCOMP;
+	}
+	else if (ctx->COMP_PRIO()->getText() == ">") {
+		opType = SUPCOMP;
+	}
+	else if (ctx->COMP_PRIO()->getText() == ">=") {
+		opType = SUPEQCOMP;
+	}
+	Statement* leftExpr = visit(ctx->expr(0));
+	Statement* rightExpr = visit(ctx->expr(1));
+
+	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+}
 
 antlrcpp::Any Visitor::visitCompExpr(ifccParser::CompExprContext *ctx){
 	Operator opType = EQUALCOMP;
 	if (ctx->COMP()->getText() == "!=") {
 		opType = DIFFCOMP;
-	}
-	else if (ctx->COMP()->getText() == "<") {
-		opType = INFCOMP;
-	}
-	else if (ctx->COMP()->getText() == "<=") {
-		opType = INFEQCOMP;
-	}
-	else if (ctx->COMP()->getText() == ">") {
-		opType = SUPCOMP;
-	}
-	else if (ctx->COMP()->getText() == ">=") {
-		opType = SUPEQCOMP;
 	}
 	Statement* leftExpr = visit(ctx->expr(0));
 	Statement* rightExpr = visit(ctx->expr(1));

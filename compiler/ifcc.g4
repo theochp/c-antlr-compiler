@@ -21,14 +21,15 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' expr)? ;
 
-expr: ADDMINUS expr 	 # unOp
-	| expr MULTDIV expr  # multExpr
-	| expr ADDMINUS expr # addExpr
-	| expr COMP expr     # compExpr
-	| NAME '=' expr		 # affectExpr
-	| '('expr')'		 # parExpr
-	| NAME				 # nameExpr
-	| CONST				 # constExpr
+expr: ADDMINUS expr 	  # unOp
+	| expr MULTDIV expr   # multExpr
+	| expr ADDMINUS expr  # addExpr
+	| expr COMP_PRIO expr # compPrioExpr
+	| expr COMP expr      # compExpr
+	| NAME '=' expr		  # affectExpr
+	| '('expr')'		  # parExpr
+	| NAME				  # nameExpr
+	| CONST				  # constExpr
 	;
 
 ret: RETURN expr? ';';
@@ -37,7 +38,8 @@ RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
-COMP : ('=='|'!='|'<='|'<'|'>='|'>');
+COMP_PRIO : ('<='|'<'|'>='|'>');
+COMP : ('=='|'!=');
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
