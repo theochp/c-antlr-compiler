@@ -26,7 +26,7 @@ std::string Operator::print() {
         case BITWISE_OR:
             return "|";
         case BITWISE_XOR:
-            return "~";
+            return "^";
         default: return "";
     }
 }

@@ -169,7 +169,7 @@ string AsmGenerator::generate_bitwise_and(Instruction& inst) {
     string op2 = getOffsetRegister(inst.operand(1));
     string dest = getOffsetRegister(inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
-    res << "addl " + op2 + ", %eax" << endl << TAB;
+    res << "andl " + op2 + ", %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
 
     return res.str();
