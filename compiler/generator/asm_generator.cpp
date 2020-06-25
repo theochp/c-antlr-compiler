@@ -50,7 +50,10 @@ string AsmGenerator::generate_block(IRBlock& block) {
             break;
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
-                break;
+            break;
+            case IROp::logicalNot:
+                res << TAB << generate_not(inst) << endl;
+            break;
         }
     }
 
@@ -153,7 +156,23 @@ string AsmGenerator::generate_neg(Instruction& inst) {
     return res.str();
 }
 
+string AsmGenerator::generate_not(Instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffsetRegister(inst.operand(0));
+    string dest = getOffsetRegister(inst.dest());
+    res << "cmpl $0," + op1 << endl << TAB;
+    res << "setne %al" << endl << TAB;
+    res << "xorb $-1, %al" << endl << TAB;
+    res << "andb $1, %al" << endl << TAB;
+    res << "movzbl %al, %ecx" << endl << TAB;
+    res << "movl %ecx, " << dest << endl;
+
+    return res.str();
+}
+
 string AsmGenerator::getOffsetRegister(string symbolName) {
     int offset = symbolTable.at(symbolName);
     return to_string(offset) + "(%rbp)";
 }
+
