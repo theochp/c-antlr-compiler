@@ -54,11 +54,11 @@ public:
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
-    virtual antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *context) override;
+    virtual antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) override;
 
-    virtual antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) override;
+    virtual antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) override;
 
-    virtual antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) override;
+    virtual antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) override;
     
     string allocateTempVar();
 

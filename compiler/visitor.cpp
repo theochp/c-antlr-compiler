@@ -204,15 +204,15 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 }
 
 
-antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *context) {
+antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {
 		
 }
 
-antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) {
+antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) {
 	
 }
 
-antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) {
+antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) {
 	
 }
 
