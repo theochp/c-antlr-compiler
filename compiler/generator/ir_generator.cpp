@@ -59,6 +59,13 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
     return instr;
 }
 
+const Instruction *IRGenerator::generateChar(const Char *character, IRBlock *block) {
+    string dest = newTempVar();
+    auto instr = new Instruction(IROp::ldcst, dest, {character->getValue()});
+    block->addInstruction(instr);
+    return instr;
+}
+
 // TODO: changer la manière dont on gère les déclarations
 const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration, IRBlock *block) {
     string dest = newTempVar();
