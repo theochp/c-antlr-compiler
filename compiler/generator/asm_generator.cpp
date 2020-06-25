@@ -23,7 +23,8 @@ string AsmGenerator::generate_block(IRBlock& block) {
     stringstream res;
     res << block.getLabel() << ":" << endl << TAB;
     res  << "pushq	%rbp" << endl << TAB;
-    res  << "movq	%rsp, %rbp" << endl;
+    res  << "movq	%rsp, %rbp" << endl << TAB;
+    res << "subq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl;
 
     if (block.getLabel() == block.getFunc()->getName()) {
         int pNum = block.getFunc()->getParams().size();
@@ -88,6 +89,13 @@ string AsmGenerator::generate_block(IRBlock& block) {
         }
     }
 
+    if (block.getLabel() == block.getFunc()->getName()) {
+        res << TAB;
+        res << "addq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl << TAB;
+        res << "popq %rbp" << endl << TAB;
+        res << "ret" << endl;
+    }
+
     return res.str();
 }
 
@@ -110,11 +118,8 @@ string AsmGenerator::generate_ret(Instruction& inst) {
     stringstream res;
     if (inst.operand(0) != "") {
         string source = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
-        res << "movl " + source + ", %eax" << endl << TAB;
+        res << "movl " + source + ", %eax" << endl;
     }
-
-    res << "popq %rbp" << endl;
-    res << TAB << "ret" << endl;
 
     return res.str();
 }

@@ -106,7 +106,7 @@ private:
     string activeSymbolTable; // function name or !global
     vector<tuple<string, int, pair<int, int>>> countUseVar; // variable name, variable nb of use, variable declaration line and position
     vector<Instruction *> instructions;
-	int stackOffset  = 0;
+	int stackOffset = 0;
     int errorCount = 0;
     vector<Error *> errors;
     int warningCount = 0;
