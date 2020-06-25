@@ -12,6 +12,7 @@
 #include "../ast/declaration.h"
 #include "../ast/expression.h"
 #include "../ast/unexpression.h"
+#include "../ast/arrayDeclaration.h"
 #include "../ast/return.h"
 #include "../ast/variable.h"
 #include "../ast/func.h"
@@ -36,6 +37,7 @@ class IRGenerator {
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
 
     string newTempVar();
+    string newRangeTempVar(size_t size);
 
 public:
     void generate();

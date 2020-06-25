@@ -1,16 +1,16 @@
 #include "declaration.h"
 
-void Declaration::addSymbol(string name, Statement * value) {
-    symbols.emplace(name, value);
+void Declaration::addSymbol(string name, Statement * value, int size) {
+    symbols.emplace(name, make_pair(value, size));
 }
 
 Declaration::~Declaration() {
     for (auto it = symbols.begin(); it != symbols.end(); ++it) {
-        delete it->second;
+        delete it->second.first;
     }
 }
 
-const map<string, Statement *>& Declaration::getSymbols() const {
+const map<string, pair<Statement *, int>>& Declaration::getSymbols() const {
     return symbols;
 }
 
@@ -19,8 +19,8 @@ std::string Declaration::print() {
     for (auto it = symbols.begin(); it != symbols.end(); ++it) {
         res.append((*it).first);
         res.append("=");
-        if ((*it).second != nullptr) {   
-            res.append((*it).second->print());
+        if ((*it).second.first != nullptr) {   
+            res.append((*it).second.first->print());
         } else {
             res.append("null");
         }

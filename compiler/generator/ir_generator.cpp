@@ -61,17 +61,25 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
 
 // TODO: changer la manière dont on gère les déclarations
 const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration, IRBlock *block) {
-    string dest = newTempVar();
     Instruction *instr = nullptr;
     for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
         auto assignement = *it;
         string name = (*it).first;
-        Statement *value = (*it).second;
+        Statement *value = (*it).second.first;
         if (value != nullptr) {
-            auto assignStmnt = generateStatement(value, block);
-            string dest = newTempVar();
-            instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
-            block->addInstruction(instr);
+            if(const Declaration *el = dynamic_cast<const Declaration *>(value))
+            {
+                auto assignStmnt = generateStatement(value, block);
+                instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
+                block->addInstruction(instr);
+            }else if(ArrayDeclaration *el = dynamic_cast<ArrayDeclaration*>(value)){
+                int i = 0;
+                for(; i < (*it).second.second && i < el->Size(); i++)
+                {
+                    auto stm = new Constant(atoi(el->Values().at(i).c_str()));
+                    block->addInstruction(new Instruction(IROp::store, el->Names().at(i), {generateStatement(stm, block)->dest()}));
+                }
+            }
         }
     }
 
@@ -181,4 +189,9 @@ string IRGenerator::newTempVar() {
 	symbolTable.emplace(name, offset);
 
 	return name;
+}
+
+string IRGenerator::newRangeTempVar(size_t size) {
+    stackOffset -= --size;
+    return newTempVar();
 }

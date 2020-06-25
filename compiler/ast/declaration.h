@@ -8,11 +8,11 @@
 using namespace std;
 
 class Declaration : public Statement {
-    map<string, Statement *> symbols;
+    map<string, pair<Statement *, int>> symbols;
 
 public:
-    void addSymbol(string, Statement *);
-    const map<string, Statement *>& getSymbols() const;
+    void addSymbol(string, Statement *, int);
+    const map<string, pair<Statement *, int>>& getSymbols() const;
     virtual ~Declaration();
     virtual std::string print();
 };
