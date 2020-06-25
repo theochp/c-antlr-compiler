@@ -12,10 +12,10 @@ typedef enum {
     SUPCOMP,
     SUPEQCOMP,
     EQUALCOMP,
-    DIFFCOMP
+    DIFFCOMP,
     BITWISE_AND,
     BITWISE_OR,
-    BITWISE_XOR,
+    BITWISE_XOR
 } OpType;
 
 class Operator {

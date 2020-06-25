@@ -19,11 +19,11 @@ using namespace std;
         infcomp,
         infeqcomp,
         supcomp,
-        supeqcomp
+        supeqcomp,
         bitwise_and,
         bitwise_or,
         bitwise_xor,
-        logicalNot,
+        logicalNot
     } IROp;
 
 class Instruction {
