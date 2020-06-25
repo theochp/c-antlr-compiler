@@ -44,9 +44,14 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
     }
     else if (const Variable *el = dynamic_cast<const Variable *>(statement)) {
         return generateVariable(el, block);
-    } else if(const UnExpression *el = dynamic_cast<const UnExpression *>(statement)) {
+    } 
+    else if(const UnExpression *el = dynamic_cast<const UnExpression *>(statement)) {
         return generateUnExpression(el, block);
-    } else {
+    } 
+    else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(statement)){
+        return generateLogicalNot(el, block);
+    }
+    else {
         assert("Need to handle new types");
     }
     return nullptr;
@@ -171,6 +176,14 @@ const Instruction *IRGenerator::generateReturn(const Return *ret, IRBlock *block
 const Instruction *IRGenerator::generateVariable(const Variable *variable, IRBlock *block) {
     string dest = newTempVar();
     auto instr = new Instruction(IROp::store, dest, {variable->getName()});
+    block->addInstruction(instr);
+    return instr;
+}
+
+const Instruction *IRGenerator::generateLogicalNot(const LogicalNot *expr, IRBlock *block) {
+    auto lastInstr = generateStatement(expr->getExpr(), block);
+    string dest = newTempVar();
+    auto instr = new Instruction(IROp::logicalNot, dest, {lastInstr->dest()});
     block->addInstruction(instr);
     return instr;
 }

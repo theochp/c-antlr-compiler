@@ -22,6 +22,7 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 individualDeclaration: NAME ('=' expr)? ;
 
 expr: ADDMINUS expr 	 # unOp
+	| '!' expr 			 # notExpr
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
 	| expr BITWISE expr  # bitwiseExpr
@@ -40,5 +41,6 @@ ADDMINUS : ('+'|'-');
 BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
+SINGLECOMMENT : '//' .*? '\n' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);

@@ -17,6 +17,7 @@ using namespace std;
         bitwise_and,
         bitwise_or,
         bitwise_xor,
+        logicalNot,
     } IROp;
 
 class Instruction {
