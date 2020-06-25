@@ -6,9 +6,11 @@
 class Expression : public Statement {
     Statement *left;
     Statement *right;
+    Expression *offset;
     Operator op;
 
 public:
+    Expression(Operator op, Statement *left, Statement *right, Expression *Expression);
     Expression(Operator op, Statement *left, Statement *right);
     ~Expression();
     const Statement *getLeft() const;

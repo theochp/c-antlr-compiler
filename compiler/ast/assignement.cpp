@@ -1,5 +1,9 @@
 #include "assignement.h"
 
+Assignement::Assignement(Variable *lvalue, Statement *rvalue, Expression * offset) 
+    : Expression(ASSIGN, lvalue, rvalue, offset) {
+}
+
 Assignement::Assignement(Variable *lvalue, Statement *rvalue) 
     : Expression(ASSIGN, lvalue, rvalue) {
 }

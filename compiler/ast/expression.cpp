@@ -1,8 +1,13 @@
 #include "expression.h"
 #include <string>
 
+Expression::Expression(Operator op, Statement *left, Statement *right, Expression *offset)
+    : op(op), left(left), right(right), offset(offset){
+
+}
+
 Expression::Expression(Operator op, Statement *left, Statement *right)
-    : op(op), left(left), right(right) {
+    : op(op), left(left), right(right), offset(nullptr){
 
 }
 
