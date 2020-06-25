@@ -156,6 +156,9 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
         case UnOpType::UN_MINUS:
             inst = new Instruction(IROp::neg, dest, {op1});
             break;
+        case UnOpType::BITWISE_NOT:
+            inst = new Instruction(IROp::bitwise_not, dest, {op1});
+            break;
         default:
             assert("Missing type");
             break;

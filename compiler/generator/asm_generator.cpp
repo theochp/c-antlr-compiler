@@ -60,6 +60,9 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::bitwise_xor:
                 res << TAB << generate_bitwise_xor(inst) << endl;
                 break;
+            case IROp::bitwise_not:
+                res << TAB << generate_bitwise_not(inst) << endl;
+                break;
             case IROp::logicalNot:
                 res << TAB << generate_not(inst) << endl;
                 break;
@@ -199,6 +202,18 @@ string AsmGenerator::generate_bitwise_xor(Instruction& inst) {
     string dest = getOffsetRegister(inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "xorl " + op2 + ", %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_bitwise_not(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "notl %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
 
     return res.str();

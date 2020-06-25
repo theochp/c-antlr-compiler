@@ -26,6 +26,7 @@ expr: ADDMINUS expr 	 # unOp
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
 	| expr BITWISE expr  # bitwiseExpr
+	| BITNEG expr        # bitwiseNeg
 	| NAME '=' expr		 # affectExpr
 	| '('expr')'		 # parExpr
 	| NAME				 # nameExpr
@@ -39,6 +40,7 @@ NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
 BITWISE : ('&' | '|' | '^');
+BITNEG : '~';
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
 SINGLECOMMENT : '//' .*? '\n' -> skip ;

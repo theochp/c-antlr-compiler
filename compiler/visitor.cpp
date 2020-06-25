@@ -213,6 +213,10 @@ antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
     return (Statement*) new Expression(opType, leftExpr, rightExpr);
 }
 
+antlrcpp::Any Visitor::visitBitwiseNeg(ifccParser::BitwiseNegContext *ctx){
+    return (Statement *) new UnExpression(UnOpType::BITWISE_NOT, visit(ctx->expr()).as<Statement*>());
+}
+
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return visit(ctx->expr());
 }
