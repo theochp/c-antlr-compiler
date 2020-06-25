@@ -7,6 +7,10 @@ typedef enum {
     ADD,
     MINUS,
     ASSIGN,
+    INFCOMP,
+    SUPCOMP,
+    EQUALCOMP,
+    DIFFCOMP
 } OpType;
 
 class Operator {

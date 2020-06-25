@@ -21,6 +21,14 @@ std::string Operator::print() {
             return "/";
         case ASSIGN:
             return "=";
+        case INFCOMP:
+            return "<";
+        case SUPCOMP:
+            return ">";
+        case EQUALCOMP:
+            return "==";
+        case DIFFCOMP:
+            return "!=";
         default: return "";
     }
 }

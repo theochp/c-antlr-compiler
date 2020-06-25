@@ -47,9 +47,21 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 break;
             case IROp::div:
                 res << TAB << generate_div(inst) << endl;
-            break;
+                break;
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
+                break;
+            case IROp::equalcomp:
+                res << TAB << generate_equal_comp(inst) << endl;
+                break;
+            case IROp::diffcomp:
+                res << TAB << generate_diff_comp(inst) << endl;
+                break;
+            case IROp::infcomp:
+                res << TAB << generate_inf_comp(inst) << endl;
+                break;
+            case IROp::supcomp:
+                res << TAB << generate_sup_comp(inst) << endl;
                 break;
         }
     }
@@ -152,6 +164,33 @@ string AsmGenerator::generate_neg(Instruction& inst) {
 
     return res.str();
 }
+
+string AsmGenerator::generate_equal_comp(Instruction &inst) {
+
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    /*movl    -20(%rbp), %eax
+    cmpl    -24(%rbp), %eax
+    sete    %al
+    movzbl  %al, %eax
+    movl    %eax, -4(%rbp)*/
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "sete %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_diff_comp(Instruction &inst) {}
+
+string AsmGenerator::generate_inf_comp(Instruction &inst) {}
+
+string AsmGenerator::generate_sup_comp(Instruction &inst) {}
 
 string AsmGenerator::getOffsetRegister(string symbolName) {
     int offset = symbolTable.at(symbolName);

@@ -26,14 +26,9 @@ expr: ADDMINUS expr 	 # unOp
 	| expr ADDMINUS expr # addExpr
 	| NAME '=' expr		 # affectExpr
 	| '('expr')'		 # parExpr
+	| expr COMP expr     # compExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
-	;
-
-condition: expr '==' expr # equalCond
-	| expr '!=' expr      # diffCond
-	| expr '<' expr       # infCond
-	| expr '>' expr       # supCond
 	;
 
 ret: RETURN expr? ';';
@@ -42,6 +37,7 @@ RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
+COMP : ('=='|'!='|'<'|'>');
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
