@@ -156,6 +156,18 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
         case UnOpType::UN_MINUS:
             inst = new Instruction(IROp::neg, dest, {op1});
             break;
+        case UnOpType::POSTINCRE:
+            inst = new Instruction(IROp::postincre, dest, {op1});
+            break;
+        case UnOpType::PREINCRE:
+            inst = new Instruction(IROp::preincre, dest, {op1});
+            break;
+        case UnOpType::POSTDECRE:
+            inst = new Instruction(IROp::postdecre, dest, {op1});
+            break;
+        case UnOpType::PREDECRE:
+            inst = new Instruction(IROp::predecre, dest, {op1});
+            break;
         default:
             assert("Missing type");
             break;

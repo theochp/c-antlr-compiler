@@ -26,6 +26,10 @@ class AsmGenerator {
     string generate_bitwise_or(Instruction& inst);
     string generate_bitwise_xor(Instruction& inst);
     string generate_not(Instruction& inst);
+    string generate_preincre(Instruction& inst);
+    string generate_postincre(Instruction& inst);
+    string generate_predecre(Instruction& inst);
+    string generate_postdecre(Instruction& inst);
 
     string getOffsetRegister(string symbolName);
 

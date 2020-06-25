@@ -18,6 +18,10 @@ using namespace std;
         bitwise_or,
         bitwise_xor,
         logicalNot,
+        preincre,
+        predecre,
+        postincre,
+        postdecre
     } IROp;
 
 class Instruction {

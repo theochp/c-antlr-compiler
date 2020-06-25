@@ -225,6 +225,36 @@ antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
 	return (Statement *) new LogicalNot(visit(ctx->expr()).as<Statement*>());
 }
 
+antlrcpp::Any Visitor::visitPreInDecrExpr(ifccParser::PreInDecrExprContext *ctx) {
+    string op = ctx->IN_DECREMENT()->getText();
+    auto expr = visit(ctx->expr()).as<Statement*>();
+
+    UnOpType opType;
+    if (op == "++") {
+        opType = UnOpType::PREINCRE;
+    } else if (op == "--") {
+        opType = UnOpType::PREDECRE;
+    } else {
+        assert("Need to handle new op");
+    }
+    return (Statement *) new UnExpression(opType, expr);
+}
+
+antlrcpp::Any Visitor::visitPostInDecrExpr(ifccParser::PostInDecrExprContext *ctx) {
+    string op = ctx->IN_DECREMENT()->getText();
+    auto expr = visit(ctx->expr()).as<Statement*>();
+
+    UnOpType opType;
+    if (op == "++") {
+        opType = UnOpType::POSTINCRE;
+    } else if (op == "--") {
+        opType = UnOpType::POSTDECRE;
+    } else {
+        assert("Need to handle new op");
+    }
+    return (Statement *) new UnExpression(opType, expr);
+}
+
 string Visitor::allocateTempVar() {
 	int offset = stackOffset -= 4;
 	string name("0_"); // on met un 0 au début pour être sur que ça ne correspond à aucun variable c
