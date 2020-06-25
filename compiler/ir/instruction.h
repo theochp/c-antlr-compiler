@@ -17,6 +17,10 @@ using namespace std;
         div,
         neg,
         call,
+        bitwise_and,
+        bitwise_or,
+        bitwise_xor,
+        logicalNot,
     } IROp;
 
 class IRBlock;

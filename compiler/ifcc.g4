@@ -25,8 +25,10 @@ individualDeclaration: NAME ('=' expr)? ;
 
 expr: NAME paramList     # funcall
 	| ADDMINUS expr 	 # unOp
+	| '!' expr 			 # notExpr
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
+	| expr BITWISE expr  # bitwiseExpr
 	| NAME '=' expr		 # affectExpr
     | LPAR expr RPAR	 # parExpr
 	| NAME				 # nameExpr
@@ -42,9 +44,11 @@ RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
+BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
 LPAR : '(';
 RPAR : ')';
 COMMENT : '/*' .*? '*/' -> skip ;
+SINGLECOMMENT : '//' .*? '\n' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);

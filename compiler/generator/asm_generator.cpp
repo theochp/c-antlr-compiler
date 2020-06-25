@@ -67,12 +67,24 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 break;
             case IROp::div:
                 res << TAB << generate_div(inst) << endl;
-            break;
+                break;
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
                 break;
             case IROp::call:
                 res << TAB << generate_call(inst) << endl;
+            break;
+            case IROp::bitwise_and:
+                res << TAB << generate_bitwise_and(inst) << endl;
+                break;
+            case IROp::bitwise_or:
+                res << TAB << generate_bitwise_or(inst) << endl;
+                break;
+            case IROp::bitwise_xor:
+                res << TAB << generate_bitwise_xor(inst) << endl;
+                break;
+            case IROp::logicalNot:
+                res << TAB << generate_not(inst) << endl;
                 break;
         }
     }
@@ -200,7 +212,60 @@ string AsmGenerator::generate_call(Instruction& inst) {
     return res.str();
 }
 
+string AsmGenerator::generate_bitwise_and(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "andl " + op2 + ", %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_bitwise_or(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "orl " + op2 + ", %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_bitwise_xor(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "xorl " + op2 + ", %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_not(Instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    res << "cmpl $0," + op1 << endl << TAB;
+    res << "sete %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
 string AsmGenerator::getOffsetRegister(string symbolTable, string symbolName) {
     int offset = symbolTables.at(symbolTable).at(symbolName);
     return to_string(offset) + "(%rbp)";
 }
+

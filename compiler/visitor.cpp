@@ -13,6 +13,7 @@
 #include "ast/expression.h"
 #include "ast/unexpression.h"
 #include "ast/return.h"
+#include "ast/logicalNot.h"
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
@@ -226,6 +227,23 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 	return nullptr;
 }
 
+antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
+    string opStr = ctx->BITWISE()->getText();
+
+    Operator opType = BITWISE_AND;
+    if (opStr == "|") {
+        opType = BITWISE_OR;
+    }
+    if (opStr == "^") {
+        opType = BITWISE_XOR;
+    }
+
+    auto leftExpr = visit(ctx->expr(0));
+    auto rightExpr = visit(ctx->expr(1));
+
+    return (Statement*) new Expression(opType, leftExpr, rightExpr);
+}
+
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return visit(ctx->expr());
 }
@@ -255,6 +273,10 @@ antlrcpp::Any Visitor::visitParamList(ifccParser::ParamListContext *ctx) {
 
 antlrcpp::Any Visitor::visitParam(ifccParser::ParamContext *ctx) {
 	// TODO: for declarations
+}
+
+antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
+	return (Statement *) new LogicalNot(visit(ctx->expr()).as<Statement*>());
 }
 
 string Visitor::allocateTempVar() {

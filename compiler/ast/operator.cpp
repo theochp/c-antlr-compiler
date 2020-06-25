@@ -21,6 +21,12 @@ std::string Operator::print() {
             return "/";
         case ASSIGN:
             return "=";
+        case BITWISE_AND:
+            return "&";
+        case BITWISE_OR:
+            return "|";
+        case BITWISE_XOR:
+            return "^";
         default: return "";
     }
 }
