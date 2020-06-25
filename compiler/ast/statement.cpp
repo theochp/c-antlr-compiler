@@ -1,5 +1,5 @@
-#include "statement.h"
+//
+// Created by Theo on 25/06/2020.
+//
 
-std::string Statement::print() {
-    return "";
-}
+#include "statement.h"

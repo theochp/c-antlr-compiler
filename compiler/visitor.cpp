@@ -1,28 +1,23 @@
 // Copied from a file generated from ifcc.g4 by ANTLR 4.7.2
 #include <map>
-#include <assert.h>
+#include <cassert>
 
 #include "visitor.h"
 #include "ast/block.h"
 #include "ast/constant.h"
 #include "ast/declaration.h"
-#include "ir/instruction.h"
 #include "ast/operator.h"
 #include "ast/unoperator.h"
 #include "ast/assignement.h"
-#include "ast/expression.h"
 #include "ast/unexpression.h"
 #include "ast/return.h"
 #include "ast/logicalNot.h"
+#include "ast/ifelse.h"
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
 #include "ast/func.h"
 #include "ast/funccall.h"
-#include "ast/funcparam.h"
-
-#define INDENT "\t"
-
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
 	antlrcpp::Any res = visit(ctx->prog()).as<vector<const Node *>>();
@@ -89,7 +84,7 @@ antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
-	return visit(ctx->expr()).as<Statement*>();
+	return (Statement*) visit(ctx->expr()).as<Expression*>();
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
@@ -101,10 +96,14 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 	return visit(ctx->ret()).as<Statement*>();
 }
 
+antlrcpp::Any Visitor::visitIfElseStatement(ifccParser::IfElseStatementContext *ctx) {
+    return (Statement*) visit(ctx->ifElse()).as<IfElse*>();
+}
+
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        pair<string, Statement*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Statement*>>();
+        pair<string, Expression*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Expression*>>();
         if (symbol.first != ""){
             declaration->addSymbol(symbol.first, symbol.second);
         }
@@ -114,7 +113,7 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	pair<string, Statement*> declaration;
+	pair<string, Expression*> declaration;
 	if (symbolTable().find(name) == symbolTable().end()) {
 		declaration.first = name;
 		int offset = stackOffset -= 4;
@@ -122,7 +121,7 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
         pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
         if (ctx->expr() != nullptr) {
-            Statement* stmnt = visit(ctx->expr()).as<Statement*>();
+            Expression* stmnt = visit(ctx->expr()).as<Expression*>();
             declaration.second = stmnt;
         } else {
             declaration.second = nullptr;
@@ -138,7 +137,7 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	return (Statement*) new Constant(stoi(ctx->CONST()->getText()));
+	return (Expression*) new Constant(stoi(ctx->CONST()->getText()));
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
@@ -156,37 +155,37 @@ antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 		errors.push_back(error);
 	}
 
-	return (Statement*) new Variable(name);
+	return (Expression*) new Variable(name);
 }
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 	string name = ctx->NAME()->getText();
 	if (symbolTable().find(name) != symbolTable().end()) {
-		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
+		Expression * statement = (Expression*) new Assignement(new Variable(name), visit(ctx->expr()).as<Expression*>());
 		return statement;
 	} else {
 		errorCount++;
 		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
         errors.push_back(error);
-		return (Statement*) nullptr;
+		return (Expression*) nullptr;
 	}
 }
 
 antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
-	Operator opType = MULT;
+	OpType opType = MULT;
 	if (ctx->MULTDIV()->getText() == "/") {
 		opType = DIV;
 	}
 	auto leftExpr = visit(ctx->expr(0));
 	auto rightExpr = visit(ctx->expr(1));
 
-	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
 	string opStr = ctx->ADDMINUS()->getText();
 	
-	Operator opType = ADD;
+	OpType opType = ADD;
 	if (opStr == "-") {
 		opType = MINUS;
 	}
@@ -194,12 +193,12 @@ antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
 	auto leftExpr = visit(ctx->expr(0));
 	auto rightExpr = visit(ctx->expr(1));
 
-	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 	string op = ctx->ADDMINUS()->getText();
-	auto expr = visit(ctx->expr()).as<Statement*>();
+	auto expr = visit(ctx->expr()).as<Expression*>();
 
 	if (const Constant * cst = dynamic_cast<const Constant*>(expr)) {
 		if (op == "+") {
@@ -208,7 +207,7 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 			// replace by negative value constant
 			auto newCst = new Constant(-cst->getValue());
 			delete cst;
-			return (Statement*) newCst;
+			return (Expression*) newCst;
 		} else {
 			assert("Need to handle new op");
 		}
@@ -221,7 +220,7 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 		} else {
 			assert("Need to handle new op");
 		}
-		return (Statement *) new UnExpression(opType, expr);
+		return (Expression *) new UnExpression(opType, expr);
 	}
 
 	return nullptr;
@@ -230,7 +229,7 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
     string opStr = ctx->BITWISE()->getText();
 
-    Operator opType = BITWISE_AND;
+    OpType opType = BITWISE_AND;
     if (opStr == "|") {
         opType = BITWISE_OR;
     }
@@ -241,7 +240,7 @@ antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
     auto leftExpr = visit(ctx->expr(0));
     auto rightExpr = visit(ctx->expr(1));
 
-    return (Statement*) new Expression(opType, leftExpr, rightExpr);
+    return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
@@ -249,22 +248,22 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
+	return (Statement*) new Return(visit(ctx->expr()).as<Expression*>());
 }
 
 antlrcpp::Any Visitor::visitFuncall(ifccParser::FuncallContext *ctx) {
 	string name = ctx->NAME()->getText();
-	auto paramList = visit(ctx->paramList()).as<const vector<Statement*>&>();
+	auto paramList = visit(ctx->paramList()).as<const vector<Expression*>&>();
 	FuncCall *fCall = new FuncCall(name);
 	fCall->addParamStatements(paramList);
-	return (Statement *) fCall;
+	return (Expression *) fCall;
 }
 
 antlrcpp::Any Visitor::visitParamList(ifccParser::ParamListContext *ctx) {
-	vector<Statement*> statements;
+	vector<Expression*> statements;
 
 	for (int i = 0; i < ctx->expr().size(); ++i) {
-		auto statement = visit(ctx->expr(i)).as<Statement*>();
+		auto statement = visit(ctx->expr(i)).as<Expression*>();
 		statements.push_back(statement);
 	}
 
@@ -276,8 +275,34 @@ antlrcpp::Any Visitor::visitParam(ifccParser::ParamContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
-	return (Statement *) new LogicalNot(visit(ctx->expr()).as<Statement*>());
+	return new LogicalNot(visit(ctx->expr()).as<Expression*>());
 }
+
+antlrcpp::Any Visitor::visitIfElse(ifccParser::IfElseContext *ctx) {
+	Block *ifBlock = visit(ctx->blocOrStatement()).as<Block *>();
+	Block *elseBlock = nullptr;
+	if (ctx->elsePart()) {
+		elseBlock = visit(ctx->elsePart()).as<Block*>();
+	}
+	Expression *condition = visit(ctx->expr()).as<Expression*>();
+
+	return new IfElse(ifBlock, elseBlock, condition);
+}
+
+antlrcpp::Any Visitor::visitElsePart(ifccParser::ElsePartContext *ctx) {
+	return visit(ctx->blocOrStatement()).as<Block*>();
+}
+
+antlrcpp::Any Visitor::visitBlocOrStatement(ifccParser::BlocOrStatementContext *ctx) {
+	if (ctx->bloc()) {
+		return visit(ctx->bloc()).as<Block*>();
+	} else {
+		auto block = new Block();
+		block->addStatement(visit(ctx->statement()).as<Statement*>());
+		return block;
+	}
+}
+
 
 string Visitor::allocateTempVar() {
 	int offset = stackOffset -= 4;

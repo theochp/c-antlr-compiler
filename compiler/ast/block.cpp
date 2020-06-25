@@ -5,8 +5,8 @@ void Block::addStatement(Statement *statement) {
 }
 
 Block::~Block() {
-    for (auto it = statements.begin(); it != statements.end() ; ++it) {
-        delete *it;
+    for (auto & statement : statements) {
+        delete statement;
     }
 }
 
@@ -16,9 +16,9 @@ const vector<Statement *>& Block::getStatements() const {
 
 std::string Block::print() {
     std::string res("{");
-    for (auto st = statements.begin(); st != statements.end(); ++st) {
+    for (auto & statement : statements) {
         res.append("\t");
-        res.append((*st)->print());
+        res.append(statement->print());
         res.append("\n");
     }
     res.append("}");

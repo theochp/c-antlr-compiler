@@ -2,9 +2,9 @@
 
 #include <string>
 
-LogicalNot::LogicalNot(Statement *expr) : expr(expr) { }
+LogicalNot::LogicalNot(Expression *expr) : expr(expr) { }
 
-const Statement *LogicalNot::getExpr() const {
+const Expression *LogicalNot::getExpr() const {
     return expr;
 }
 

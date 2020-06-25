@@ -66,6 +66,14 @@ public:
 
     virtual antlrcpp::Any visitNotExpr(ifccParser::NotExprContext *ctx) override;
 
+    virtual antlrcpp::Any visitIfElseStatement(ifccParser::IfElseStatementContext *ctx) override;
+
+    virtual antlrcpp::Any visitIfElse(ifccParser::IfElseContext *ctx) override;
+
+    virtual antlrcpp::Any visitElsePart(ifccParser::ElsePartContext *ctx) override;
+
+    virtual antlrcpp::Any visitBlocOrStatement(ifccParser::BlocOrStatementContext *ctx) override;
+
     string allocateTempVar();
 
     int getErrCount() {

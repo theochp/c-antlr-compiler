@@ -1,42 +1,33 @@
 #include "operator.h"
+#include <string>
 
-Operator::Operator (const OpType& opType) 
-    : opType(opType) {
+Operator::Operator(OpType op, Expression *left, Expression *right)
+    : op(op), left(left), right(right) {
 
 }
 
-const OpType& Operator::type() const {
-    return opType;
+const Expression *Operator::getLeft() const {
+    return left;
+}
+
+const Expression *Operator::getRight() const {
+    return right;
+}
+
+const OpType& Operator::getOp() const {
+    return op;
 }
 
 std::string Operator::print() {
-    switch(opType) {
-        case ADD:
-            return "+";
-        case MINUS:
-            return "-";
-        case MULT:
-            return "*";
-        case DIV:
-            return "/";
-        case ASSIGN:
-            return "=";
-        case BITWISE_AND:
-            return "&";
-        case BITWISE_OR:
-            return "|";
-        case BITWISE_XOR:
-            return "^";
-        default: return "";
-    }
+    std::string res("(");
+    res.append(left->print());
+    res.append(" operator ");
+    res.append(right->print());
+    res.append(")");
+    return res;
 }
 
-Operator& Operator::operator=(const OpType& opType) {
-    this->opType = opType;
-
-    return *this;
-}
-
-bool Operator::operator ==(const OpType &opType) const {
-    return this->opType == opType;
+Operator::~Operator() {
+    delete left;
+    delete right;
 }

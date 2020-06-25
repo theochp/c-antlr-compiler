@@ -15,11 +15,17 @@ bloc: '{' statement* '}';
 
 statement: expr ';'         # exprStatement
          | declaration 	    # declStatement
+		 | ifElse			# ifElseStatement
          | ret         	    # retStatement
          ;
 
 
 declaration: 'int' individualDeclaration? (',' individualDeclaration)* ';';
+
+ifElse : 'if' '(' expr ')' blocOrStatement elsePart?;
+elsePart: 'else' blocOrStatement;
+
+blocOrStatement: (bloc | statement);
 
 individualDeclaration: NAME ('=' expr)? ;
 

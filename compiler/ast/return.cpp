@@ -4,7 +4,7 @@ Return::Return() : statement(nullptr) {
 
 }
     
-Return::Return(Statement* statement) 
+Return::Return(Expression* statement)
     : statement(statement) {
 
 }
@@ -13,7 +13,7 @@ Return::~Return() {
     delete statement;
 }
 
-const Statement *Return::getStatement() const {
+const Expression *Return::getStatement() const {
     return statement;
 }
 

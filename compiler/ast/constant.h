@@ -1,11 +1,11 @@
 #pragma once
 
-#include "statement.h"
+#include "expression.h"
 
-class Constant : public Statement {
+class Constant : public Expression {
     int value;
 public:
-    Constant(int value);
+    explicit Constant(int value);
     int getValue() const;
-    virtual std::string print();
+    std::string print() override;
 };
