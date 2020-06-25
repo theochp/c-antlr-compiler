@@ -113,6 +113,12 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
             case OpType::ASSIGN:
                 assert("Le cas ASSIGN doit être géré d'une autre manière");
                 break;
+            case OpType::BITWISE_AND:
+                inst = new Instruction(IROp::bitwise_and, dest, {op1, op2});
+            case OpType::BITWISE_OR:
+                inst = new Instruction(IROp::bitwise_or, dest, {op1, op2});
+            case OpType::BITWISE_XOR:
+                inst = new Instruction(IROp::bitwise_xor, dest, {op1, op2});
             default:
                 assert("Missing type");
                 break;
