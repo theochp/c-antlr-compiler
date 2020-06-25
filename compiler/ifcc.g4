@@ -24,9 +24,9 @@ individualDeclaration: NAME ('=' expr)? ;
 expr: ADDMINUS expr 	 # unOp
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
+	| expr COMP expr     # compExpr
 	| NAME '=' expr		 # affectExpr
 	| '('expr')'		 # parExpr
-	| expr COMP expr     # compExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
 	;

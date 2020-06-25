@@ -14,6 +14,10 @@ using namespace std;
         mul,
         div,
         neg,
+        equalcomp,
+        diffcomp,
+        infcomp,
+        supcomp
     } IROp;
 
 class Instruction {
