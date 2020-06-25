@@ -19,7 +19,12 @@ statement: expr ';'         # exprStatement
 
 declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
-individualDeclaration: NAME ('=' expr)? ;
+individualDeclaration: NAME ('=' expr)? # valueDeclaration
+	| NAME'['CONST']' arrayAssignation? # arrayDeclaration
+	| NAME'[]' arrayAssignation 		# arrayDeclarationAssignation
+	;
+
+arrayAssignation: '=' '{'(CONST(','CONST)*)? '}';
 
 expr: ADDMINUS expr 	 # unOp
 	| expr MULTDIV expr  # multExpr

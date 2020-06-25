@@ -80,7 +80,7 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	return declaration;
 }
 
-antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
+antlrcpp::Any Visitor::visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
 	pair<string, Statement*> declaration;
 	if (symbolTable.find(name) == symbolTable.end()) {
@@ -201,6 +201,19 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
+}
+
+
+antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *context) {
+		
+}
+
+antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) {
+	
+}
+
+antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) {
+	
 }
 
 string Visitor::allocateTempVar() {

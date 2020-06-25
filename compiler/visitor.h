@@ -36,7 +36,7 @@ public:
 
     virtual antlrcpp::Any visitDeclaration(ifccParser::DeclarationContext *ctx) override;
 
-	virtual antlrcpp::Any visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) override;
+	virtual antlrcpp::Any visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) override;
 
 	virtual antlrcpp::Any visitNameExpr(ifccParser::NameExprContext *ctx) override;
 
@@ -54,6 +54,12 @@ public:
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
+    virtual antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *context) override;
+
+    virtual antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) override;
+
+    virtual antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *context) override;
+    
     string allocateTempVar();
 
     int getErrCount() {
