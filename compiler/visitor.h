@@ -60,6 +60,9 @@ public:
 
     virtual antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) override;
     
+    virtual antlrcpp::Any visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) override;
+
+    virtual antlrcpp::Any visitArrayValue(ifccParser::ArrayValueContext *ctx) override;
     string allocateTempVar();
 
     int getErrCount() {

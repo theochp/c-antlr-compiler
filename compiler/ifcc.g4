@@ -26,13 +26,15 @@ individualDeclaration: NAME ('=' expr)? # valueDeclaration
 
 arrayAssignation: '=' '{'(CONST(','CONST)*)? '}';
 
-expr: ADDMINUS expr 	 # unOp
-	| expr MULTDIV expr  # multExpr
-	| expr ADDMINUS expr # addExpr
-	| NAME '=' expr		 # affectExpr
-	| '('expr')'		 # parExpr
-	| NAME				 # nameExpr
-	| CONST				 # constExpr
+expr: ADDMINUS expr 	 			# unOp
+	| expr MULTDIV expr  			# multExpr
+	| expr ADDMINUS expr 			# addExpr
+	| NAME '=' expr		 			# affectExpr
+	| NAME '[' expr ']' '=' expr 	# affectArrayExpr
+	| '('expr')'		 			# parExpr
+	| NAME				 			# nameExpr
+	| CONST				 			# constExpr
+	| NAME '[' expr ']'				# arrayValue
 	;
 
 ret: RETURN expr? ';';

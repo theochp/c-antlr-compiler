@@ -204,16 +204,25 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 }
 
 
-antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {
+antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {
 		
 }
 
-antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) {
+antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) {
 	
 }
 
-antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) {
+antlrcpp::Any Visitor::visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) {
 	
+}
+
+
+antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) {
+		
+}
+
+antlrcpp::Any Visitor::visitArrayValue(ifccParser::ArrayValueContext *ctx) {
+		
 }
 
 string Visitor::allocateTempVar() {
