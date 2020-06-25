@@ -23,8 +23,12 @@ std::string Operator::print() {
             return "=";
         case INFCOMP:
             return "<";
+        case INFEQCOMP:
+            return "<=";
         case SUPCOMP:
             return ">";
+        case SUPEQCOMP:
+            return ">=";
         case EQUALCOMP:
             return "==";
         case DIFFCOMP:

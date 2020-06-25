@@ -17,7 +17,9 @@ using namespace std;
         equalcomp,
         diffcomp,
         infcomp,
-        supcomp
+        infeqcomp,
+        supcomp,
+        supeqcomp
     } IROp;
 
 class Instruction {

@@ -208,8 +208,14 @@ antlrcpp::Any Visitor::visitCompExpr(ifccParser::CompExprContext *ctx){
 	else if (ctx->COMP()->getText() == "<") {
 		opType = INFCOMP;
 	}
+	else if (ctx->COMP()->getText() == "<=") {
+		opType = INFEQCOMP;
+	}
 	else if (ctx->COMP()->getText() == ">") {
 		opType = SUPCOMP;
+	}
+	else if (ctx->COMP()->getText() == ">=") {
+		opType = SUPEQCOMP;
 	}
 	Statement* leftExpr = visit(ctx->expr(0));
 	Statement* rightExpr = visit(ctx->expr(1));

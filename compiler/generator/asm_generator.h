@@ -25,7 +25,9 @@ class AsmGenerator {
     string generate_equal_comp(Instruction& inst);
     string generate_diff_comp(Instruction& inst);
     string generate_inf_comp(Instruction& inst);
+    string generate_inf_eq_comp(Instruction& inst);
     string generate_sup_comp(Instruction& inst);
+    string generate_sup_eq_comp(Instruction& inst);
 
     string getOffsetRegister(string symbolName);
 

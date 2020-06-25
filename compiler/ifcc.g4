@@ -37,7 +37,7 @@ RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
-COMP : ('=='|'!='|'<'|'>');
+COMP : ('=='|'!='|'<='|'<'|'>='|'>');
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;

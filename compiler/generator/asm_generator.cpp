@@ -60,8 +60,14 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::infcomp:
                 res << TAB << generate_inf_comp(inst) << endl;
                 break;
+            case IROp::infeqcomp:
+                res << TAB << generate_inf_eq_comp(inst) << endl;
+                break;
             case IROp::supcomp:
                 res << TAB << generate_sup_comp(inst) << endl;
+                break;
+            case IROp::supeqcomp:
+                res << TAB << generate_sup_eq_comp(inst) << endl;
                 break;
         }
     }
@@ -210,6 +216,21 @@ string AsmGenerator::generate_inf_comp(Instruction &inst) {
     return res.str();
 }
 
+string AsmGenerator::generate_inf_eq_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setle %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
 string AsmGenerator::generate_sup_comp(Instruction &inst) {
     stringstream res;
 
@@ -219,6 +240,21 @@ string AsmGenerator::generate_sup_comp(Instruction &inst) {
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "cmpl " + op2 + ", %eax" << endl << TAB;
     res << "setg %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_sup_eq_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setge %al" << endl << TAB;
     res << "movzbl %al, %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
 

@@ -8,7 +8,9 @@ typedef enum {
     MINUS,
     ASSIGN,
     INFCOMP,
+    INFEQCOMP,
     SUPCOMP,
+    SUPEQCOMP,
     EQUALCOMP,
     DIFFCOMP
 } OpType;
