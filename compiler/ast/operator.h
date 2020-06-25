@@ -13,6 +13,9 @@ typedef enum {
     SUPEQCOMP,
     EQUALCOMP,
     DIFFCOMP
+    BITWISE_AND,
+    BITWISE_OR,
+    BITWISE_XOR,
 } OpType;
 
 class Operator {

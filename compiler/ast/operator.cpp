@@ -33,6 +33,12 @@ std::string Operator::print() {
             return "==";
         case DIFFCOMP:
             return "!=";
+        case BITWISE_AND:
+            return "&";
+        case BITWISE_OR:
+            return "|";
+        case BITWISE_XOR:
+            return "^";
         default: return "";
     }
 }
