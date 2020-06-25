@@ -11,9 +11,10 @@ class Func : public Node {
 public:
     string getName() const;
     const Block *getBlock() const;
+    void setBlock(Block * block);
     void addParam(const FuncParam *param);
     const vector<const FuncParam*>& getParams() const;
 
-    Func(string name, Block *block);
+    Func(string name);
     ~Func();
 };

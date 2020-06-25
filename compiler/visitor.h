@@ -84,8 +84,8 @@ public:
         return warnings;
     }
 
-    map<string, int> getSymbolTable() {
-        return symbolTable;
+    map<string, map<string, int>> getSymbolTables() {
+        return symbolTables;
     }
 
     int getStackOffset() {
@@ -102,7 +102,8 @@ public:
         }
     }
 private:
-	  map<string, int> symbolTable;
+    map<string, map<string, int>> symbolTables;
+    string activeSymbolTable; // function name or !global
     vector<tuple<string, int, pair<int, int>>> countUseVar; // variable name, variable nb of use, variable declaration line and position
     vector<Instruction *> instructions;
 	int stackOffset  = 0;
@@ -110,5 +111,9 @@ private:
     vector<Error *> errors;
     int warningCount = 0;
     vector<Warning *> warnings;
+
+    map<string, int>& symbolTable() {
+        return symbolTables.at(activeSymbolTable);
+    }
 };
 

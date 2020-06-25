@@ -51,13 +51,20 @@ antlrcpp::Any Visitor::visitToplevel(ifccParser::ToplevelContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitFuncdecl(ifccParser::FuncdeclContext *ctx) {
-	Block *block = visit(ctx->bloc()).as<Block*>();
 	string name = ctx->NAME()->getText();
+	symbolTables.emplace(name, map<string, int>());
+	activeSymbolTable = name;
 	vector<const FuncParam*> params = visit(ctx->paramDecl()).as<vector<const FuncParam*>>();
-	auto func = new Func(name, block);
+	auto func = new Func(name);
 	for (auto param : params) {
+		symbolTable().emplace(param->getName(), stackOffset -= 4);
 		func->addParam(param);
 	}
+	
+	Block *block = visit(ctx->bloc()).as<Block*>();
+	func->setBlock(block);
+
+	activeSymbolTable = "!global";
 
 	return func;
 }
@@ -107,10 +114,10 @@ antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
 	pair<string, Statement*> declaration;
-	if (symbolTable.find(name) == symbolTable.end()) {
+	if (symbolTable().find(name) == symbolTable().end()) {
 		declaration.first = name;
 		int offset = stackOffset -= 4;
-		symbolTable.emplace(name, offset);
+		symbolTable().emplace(name, offset);
         pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
         if (ctx->expr() != nullptr) {
@@ -142,7 +149,7 @@ antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 	if (it != countUseVar.end())
 		get<1>(*it)++;
 
-	if (symbolTable.find(name) == symbolTable.end()) {
+	if (symbolTable().find(name) == symbolTable().end()) {
 		errorCount++;
 		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		errors.push_back(error);
@@ -153,7 +160,7 @@ antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 	string name = ctx->NAME()->getText();
-	if (symbolTable.find(name) != symbolTable.end()) {
+	if (symbolTable().find(name) != symbolTable().end()) {
 		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
 		return statement;
 	} else {
@@ -275,7 +282,7 @@ string Visitor::allocateTempVar() {
 	int offset = stackOffset -= 4;
 	string name("0_"); // on met un 0 au début pour être sur que ça ne correspond à aucun variable c
 	name.append(to_string(rand()%1000000+100000));
-	symbolTable.emplace(name, offset);
+	symbolTable().emplace(name, offset);
 
 	return name;
 }

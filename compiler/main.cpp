@@ -62,9 +62,9 @@ int main(int argn, const char **argv) {
     }
 
     if (visitor.getErrCount() == 0)  {
-        IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
+        IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getStackOffset());
         irGen.generate();
-        AsmGenerator asmGen(irGen.getBlocks(), irGen.getSymbolTable());
+        AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
 
         asmGen.generate(cout);
 

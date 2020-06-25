@@ -1,9 +1,7 @@
-int toto() {
-    int a = 3;
-    int b = 1;
+int toto(int a, int b) {
     return a + b;
 }
 
 int main() {
-    return toto(3);
+    return toto(3,4);
 }
