@@ -13,7 +13,7 @@
 #include "ast/expression.h"
 #include "ast/unexpression.h"
 #include "ast/return.h"
-#include "ast/exclamationOperator.h"
+#include "ast/logicalNot.h"
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
@@ -204,8 +204,8 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
 }
 
-antlrcpp::Any Visitor::visitExclExpr(ifccParser::ExclExprContext *ctx){
-	return (Statement *) new ExclamationOperator(visit(ctx->expr()).as<Statement*>());
+antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
+	return (Statement *) new LogicalNot(visit(ctx->expr()).as<Statement*>());
 }
 
 string Visitor::allocateTempVar() {

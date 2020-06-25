@@ -48,8 +48,8 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
     else if(const UnExpression *el = dynamic_cast<const UnExpression *>(statement)) {
         return generateUnExpression(el, block);
     } 
-    else if (const ExclamationOperator *el = dynamic_cast<const ExclamationOperator *>(statement)){
-        return generateExclamationOperator(el, block);
+    else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(statement)){
+        return generateLogicalNot(el, block);
     }
     else {
         assert("Need to handle new types");
@@ -171,10 +171,10 @@ const Instruction *IRGenerator::generateVariable(const Variable *variable, IRBlo
     return instr;
 }
 
-const Instruction *IRGenerator::generateExclamationOperator(const ExclamationOperator *expr, IRBlock *block) {
+const Instruction *IRGenerator::generateLogicalNot(const LogicalNot *expr, IRBlock *block) {
     auto lastInstr = generateStatement(expr->getExpr(), block);
     string dest = newTempVar();
-    auto instr = new Instruction(IROp::notOpe, dest, {lastInstr->dest()});
+    auto instr = new Instruction(IROp::logicalNot, dest, {lastInstr->dest()});
     block->addInstruction(instr);
     return instr;
 }

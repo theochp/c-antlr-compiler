@@ -22,7 +22,7 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 individualDeclaration: NAME ('=' expr)? ;
 
 expr: ADDMINUS expr 	 # unOp
-	| '!' expr 			 # exclExpr
+	| '!' expr 			 # notExpr
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
 	| NAME '=' expr		 # affectExpr

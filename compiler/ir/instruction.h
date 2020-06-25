@@ -14,7 +14,7 @@ using namespace std;
         mul,
         div,
         neg,
-        notOpe,
+        logicalNot,
     } IROp;
 
 class Instruction {

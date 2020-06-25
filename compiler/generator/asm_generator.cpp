@@ -51,7 +51,7 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
             break;
-            case IROp::notOpe:
+            case IROp::logicalNot:
                 res << TAB << generate_not(inst) << endl;
             break;
         }
@@ -156,7 +156,6 @@ string AsmGenerator::generate_neg(Instruction& inst) {
     return res.str();
 }
 
-//Les registres al et exc bougent en fonction de ce qui est utilisé avant et après...
 string AsmGenerator::generate_not(Instruction& inst) {
     stringstream res;
     

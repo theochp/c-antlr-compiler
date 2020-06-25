@@ -54,7 +54,7 @@ public:
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
-    virtual antlrcpp::Any visitExclExpr(ifccParser::ExclExprContext *ctx) override;
+    virtual antlrcpp::Any visitNotExpr(ifccParser::NotExprContext *ctx) override;
 
     string allocateTempVar();
 
