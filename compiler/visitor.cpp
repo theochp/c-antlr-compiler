@@ -53,6 +53,7 @@ antlrcpp::Any Visitor::visitFuncdecl(ifccParser::FuncdeclContext *ctx) {
 	string name = ctx->NAME()->getText();
 	symbolTables.emplace(name, map<string, int>());
 	activeSymbolTable = name;
+	stackOffset = 0;
 	vector<const FuncParam*> params = visit(ctx->paramDecl()).as<vector<const FuncParam*>>();
 	auto func = new Func(name);
 	for (auto param : params) {
