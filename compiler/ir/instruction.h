@@ -14,6 +14,9 @@ using namespace std;
         mul,
         div,
         neg,
+        bitwise_and,
+        bitwise_or,
+        bitwise_xor,
         logicalNot,
     } IROp;
 

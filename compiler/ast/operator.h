@@ -7,6 +7,9 @@ typedef enum {
     ADD,
     MINUS,
     ASSIGN,
+    BITWISE_AND,
+    BITWISE_OR,
+    BITWISE_XOR,
 } OpType;
 
 class Operator {

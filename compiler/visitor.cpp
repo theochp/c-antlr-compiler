@@ -196,6 +196,23 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 	return nullptr;
 }
 
+antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
+    string opStr = ctx->BITWISE()->getText();
+
+    Operator opType = BITWISE_AND;
+    if (opStr == "|") {
+        opType = BITWISE_OR;
+    }
+    if (opStr == "^") {
+        opType = BITWISE_XOR;
+    }
+
+    auto leftExpr = visit(ctx->expr(0));
+    auto rightExpr = visit(ctx->expr(1));
+
+    return (Statement*) new Expression(opType, leftExpr, rightExpr);
+}
+
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return visit(ctx->expr());
 }

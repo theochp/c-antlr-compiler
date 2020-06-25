@@ -48,6 +48,8 @@ public:
 
     virtual antlrcpp::Any visitParExpr(ifccParser::ParExprContext *ctx) override;
 
+    virtual antlrcpp::Any visitBitwiseExpr(ifccParser::BitwiseExprContext *context) override;
+
     virtual antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
 
     virtual antlrcpp::Any visitUnOp(ifccParser::UnOpContext *ctx) override;
