@@ -4,6 +4,6 @@ FuncParam::FuncParam(string name) : name(name) {
 
 }
 
-string FuncParam::getName() {
+string FuncParam::getName() const {
     return name;
 }

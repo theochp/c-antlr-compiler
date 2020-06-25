@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+#include "irblock.h"
+
 using namespace std;
 
     typedef enum {
@@ -17,14 +19,17 @@ using namespace std;
         call,
     } IROp;
 
+class IRBlock;
+
 class Instruction {
 public:
-    Instruction(IROp op);
-    Instruction(IROp op, string dest);
-    Instruction(IROp op, string dest, const vector<string>& operands);
+    Instruction(IROp op, const IRBlock *block);
+    Instruction(IROp op, string dest, const IRBlock *block);
+    Instruction(IROp op, string dest, const vector<string>& operands, const IRBlock *block);
     IROp op() const;
     string dest() const;
     const vector<string>& operands();
+    const IRBlock *getBlock();
 
     /**
      * Allows to retrieve instructions operands.
@@ -41,4 +46,5 @@ private:
     IROp _op;
     string _dest;
     vector<string> _operands;
+    const IRBlock *block;
 };

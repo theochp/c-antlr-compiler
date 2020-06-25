@@ -10,5 +10,5 @@ class FuncParam {
 
 public:
     FuncParam(string name);
-    string getName();
+    string getName() const;
 };

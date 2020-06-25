@@ -2,15 +2,15 @@
 #include <vector>
 #include <map>
 #include "../ir/instruction.h"
-#include "../ir/irblock.h"
+#include "../ir/irfunc.h"
 #include "../ast/node.h"
 
 using namespace std;
 
 class AsmGenerator {
 
-    vector<IRBlock*> blocks;
-    map<string, int> symbolTable;
+    vector<IRFunc*> funcs;
+    map<string, map<string, int>> symbolTables;
 
     string generate_block(IRBlock& block);
 
@@ -24,11 +24,11 @@ class AsmGenerator {
     string generate_neg(Instruction& inst);
     string generate_call(Instruction& inst);
 
-    string getOffsetRegister(string symbolName);
+    string getOffsetRegister(string symbolTable, string symbolName);
 
 public:
     // constructor
-    AsmGenerator(vector<IRBlock*> blocks, map<string, int> symbolTable);
+    AsmGenerator(vector<IRFunc*> funcs, map<string, map<string, int>> symbolTables);
 
     void generate(ostream& os);
 };

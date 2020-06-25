@@ -3,8 +3,9 @@
 #include <map>
 #include <string>
 
-#include "../ir/instruction.h"
+#include "../ir/irfunc.h"
 #include "../ir/irblock.h"
+#include "../ir/instruction.h"
 #include "../ast/node.h"
 #include "../ast/block.h"
 #include "../ast/statement.h"
@@ -21,13 +22,13 @@ using namespace std;
 
 class IRGenerator {
     vector<const Node *> ast;
-    map<string, int> symbolTable;
-    vector<IRBlock*> blocks;
+    map<string, map<string, int>> symbolTables;
+    vector<IRFunc*> funcs;
     int tempVarCount = 0;
     int stackOffset;
 
-    const IRBlock *generateFunc(const Func *func);
-    const Instruction *generateBlock(const Block *block, IRBlock *irBlock);
+    const IRFunc *generateFunc(const Func *func);
+    const IRBlock *generateBlock(const Block *block, IRFunc *irFunc);
     const Instruction *generateStatement(const Statement *statement, IRBlock *block);
     const Instruction *generateConstant(const Constant *constant, IRBlock *block);
     const Instruction *generateDeclaration(const Declaration *declaration, IRBlock *block);
@@ -36,12 +37,12 @@ class IRGenerator {
     const Instruction *generateReturn(const Return *ret, IRBlock *block);
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
-    string newTempVar();
+    string newTempVar(string symbolTable);
 
 public:
     void generate();
-    IRGenerator(vector<const Node *>, map<string, int> symbolTable, int stackOffset);
-    const map<string, int>& getSymbolTable();
-    const vector<IRBlock*>& getBlocks();
+    IRGenerator(vector<const Node *>, map<string, map<string, int>> symbolTables, int stackOffset);
+    const map<string, map<string, int>>& getSymbolTables();
+    const vector<IRFunc*>& getFuncs();
     void genConstant(Constant *constant);
 };
