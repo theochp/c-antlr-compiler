@@ -25,7 +25,7 @@
 
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
-	antlrcpp::Any res = visit(ctx->prog()).as<Node*>();
+	antlrcpp::Any res = visit(ctx->prog()).as<vector<const Node *>>();
     for (tuple<string, int, pair<int, int>> varData : countUseVar){
         if (get<1>(varData) == 0){
             warnings.push_back(new UnusedVariable(get<0>(varData), get<2>(varData).first, get<2>(varData).second));
@@ -37,7 +37,13 @@ antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
 
 antlrcpp::Any Visitor::visitProg(ifccParser::ProgContext *ctx)  {
 	// TODO : handle many top level blocks
-	return visit(ctx->toplevel(0)).as<Node*>();
+	vector<const Node *> topLevelNodes;
+	for (int i = 0; i < ctx->toplevel().size(); ++i) {
+		const Node *topLevelNode = visit(ctx->toplevel(i)).as<Node*>();
+		topLevelNodes.push_back(topLevelNode);
+	}
+
+	return topLevelNodes;
 }
 
 antlrcpp::Any Visitor::visitToplevel(ifccParser::ToplevelContext *ctx) {
@@ -47,7 +53,22 @@ antlrcpp::Any Visitor::visitToplevel(ifccParser::ToplevelContext *ctx) {
 antlrcpp::Any Visitor::visitFuncdecl(ifccParser::FuncdeclContext *ctx) {
 	Block *block = visit(ctx->bloc()).as<Block*>();
 	string name = ctx->NAME()->getText();
-	return new Func(name, block);
+	vector<const FuncParam*> params = visit(ctx->paramDecl()).as<vector<const FuncParam*>>();
+	auto func = new Func(name, block);
+	for (auto param : params) {
+		func->addParam(param);
+	}
+
+	return func;
+}
+
+antlrcpp::Any Visitor::visitParamDecl(ifccParser::ParamDeclContext *ctx) {
+	vector<const FuncParam *> params;
+	for (int i = 0 ; i < ctx->NAME().size(); ++i) {
+		params.push_back(new FuncParam(ctx->NAME(i)->getText()));
+	}
+
+	return params;
 }
 
 antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
