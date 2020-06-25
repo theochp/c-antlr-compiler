@@ -1,4 +1,9 @@
+int toto() {
+    int a = 3;
+    int b = 1;
+    return a + b;
+}
+
 int main() {
-    putchar(97);
-    return 0;
+    return toto(3);
 }

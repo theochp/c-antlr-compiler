@@ -43,7 +43,7 @@ int main(int argn, const char **argv) {
 	}
 	
   Visitor visitor;
-  Node *ast = visitor.visit(tree).as<Node*>();
+  vector<const Node *> ast = visitor.visit(tree).as<vector<const Node *>>();
 
     if (visitor.getErrors().size() > 0){
         cout <<  "# " << to_string(visitor.getErrors().size()) << " error(s)" << endl;
@@ -75,7 +75,9 @@ int main(int argn, const char **argv) {
         return 0;
     }
 
-  delete ast;
+  for (auto it = ast.begin(); it != ast.end(); ++it) {
+    delete *it;
+  }
   delete tree;
 
   return 1;

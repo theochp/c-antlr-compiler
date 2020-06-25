@@ -7,7 +7,9 @@ prog : toplevel+ ;
 
 toplevel: funcdecl;
 
-funcdecl: 'int' NAME '()' bloc;
+funcdecl: 'int' NAME paramDecl bloc;
+
+paramDecl: LPAR ('int' NAME)? (',' 'int' NAME)* RPAR;
 
 bloc: '{' statement* '}';
 

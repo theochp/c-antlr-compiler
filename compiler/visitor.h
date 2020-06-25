@@ -26,6 +26,8 @@ public:
 
     virtual antlrcpp::Any visitFuncdecl(ifccParser::FuncdeclContext *ctx) override;
 
+    virtual antlrcpp::Any visitParamDecl(ifccParser::ParamDeclContext *ctx) override;
+
     virtual antlrcpp::Any visitBloc(ifccParser::BlocContext *ctx) override;
 
 	virtual antlrcpp::Any visitExprStatement(ifccParser::ExprStatementContext *ctx) override;

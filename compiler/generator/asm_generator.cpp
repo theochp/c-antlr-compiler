@@ -171,6 +171,7 @@ string AsmGenerator::generate_call(Instruction& inst) {
     }
     
     res << "call " << name << endl << TAB;
+    res << "movl %eax, " << getOffsetRegister(inst.dest()) << endl;
 
     return res.str();
 }

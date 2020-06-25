@@ -3,14 +3,16 @@
 #include "ir_generator.h"
 #include "../ast/func.h"
 
-IRGenerator::IRGenerator(Node *ast, map<string, int> symbolTable, int stackOffset)
+IRGenerator::IRGenerator(vector<const Node *> ast, map<string, int> symbolTable, int stackOffset)
     : ast(ast), symbolTable(symbolTable), stackOffset(stackOffset) {
 
 }
 
 void IRGenerator::generate() {
-    if (const Func *func = dynamic_cast<const Func *>(ast)) {
-        generateFunc(func);
+    for (auto it = ast.begin(); it != ast.end(); ++it) {
+        if (const Func *func = dynamic_cast<const Func *>(*it)) {
+            generateFunc(func);
+        }
     }
 }
 

@@ -20,7 +20,7 @@
 using namespace std;
 
 class IRGenerator {
-    Node *ast;
+    vector<const Node *> ast;
     map<string, int> symbolTable;
     vector<IRBlock*> blocks;
     int tempVarCount = 0;
@@ -40,7 +40,7 @@ class IRGenerator {
 
 public:
     void generate();
-    IRGenerator(Node *ast, map<string, int> symbolTable, int stackOffset);
+    IRGenerator(vector<const Node *>, map<string, int> symbolTable, int stackOffset);
     const map<string, int>& getSymbolTable();
     const vector<IRBlock*>& getBlocks();
     void genConstant(Constant *constant);
