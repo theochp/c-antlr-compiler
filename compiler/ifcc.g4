@@ -17,7 +17,7 @@ statement: expr ';'         # exprStatement
          ;
 
 
-declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
+declaration: ('int'|'char') individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' expr)? ;
 
@@ -28,6 +28,7 @@ expr: ADDMINUS expr 	 # unOp
 	| '('expr')'		 # parExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
+	| CHAR               # charExpr
 	;
 
 ret: RETURN expr? ';';
@@ -37,6 +38,7 @@ NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
 CONST : [0-9]+ ;
+CHAR : '\'' [a-zA-Z] '\'';
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
 WS    : [ \t\r\n] -> channel(HIDDEN);

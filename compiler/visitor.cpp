@@ -71,12 +71,15 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
-	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        pair<string, Statement*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Statement*>>();
-        if (symbol.first != ""){
-            declaration->addSymbol(symbol.first, symbol.second);
+ //   string type = ctx->TYPE()->getText();
+//	if(type == 'int'){
+        for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
+            pair<string, Statement*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Statement*>>();
+            if (symbol.first != ""){
+                declaration->addSymbol(symbol.first, symbol.second);
+            }
         }
-	}
+//	} else{	}
 	return declaration;
 }
 
