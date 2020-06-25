@@ -24,6 +24,7 @@ individualDeclaration: NAME ('=' expr)? ;
 expr: ADDMINUS expr 	 # unOp
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
+	| expr BITWISE expr  # bitwiseExpr
 	| NAME '=' expr		 # affectExpr
 	| '('expr')'		 # parExpr
 	| NAME				 # nameExpr
@@ -36,6 +37,7 @@ RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
+BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
 COMMENT : '/*' .*? '*/' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
