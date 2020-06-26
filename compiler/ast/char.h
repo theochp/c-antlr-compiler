@@ -4,10 +4,10 @@
 #import "statement.h"
 
 class Char : public Statement {
-    char value;
+    int value;
 public:
-    Char(char value);
-    char getValue () const;
+    Char(int value);
+    int getValue () const;
     virtual std::string print();
 };
 

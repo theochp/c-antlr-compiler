@@ -1,16 +1,16 @@
 #include "char.h"
 
-Char::Char(char value) : value(value) {
+Char::Char(int value) : value(value) {
 
 }
 
-char Char::getValue() const {
-
+int Char::getValue() const {
+    return value;
 }
 
 std::string Char::print() {
     std::string res("(");
-    res.append(std::string (1, value));
+    res.append(std::to_string(value));
     res.append(")");
     return res;
 }

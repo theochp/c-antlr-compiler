@@ -120,7 +120,7 @@ antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitCharExpr(ifccParser::CharExprContext *ctx) {
-    return (Statement*) new Char(ctx->CHAR()->getText().at(0));
+    return (Statement*) new Char((int) (ctx->CHAR()->getText().at(1)));
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {

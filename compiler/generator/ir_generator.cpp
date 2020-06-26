@@ -63,9 +63,13 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
 }
 
 const Instruction *IRGenerator::generateChar(const Char *character, IRBlock *block) {
+ //   cout << "Test de Cyrielle et Tania début de generateChar" << endl;
     string dest = newTempVar();
-    auto instr = new Instruction(IROp::ldcst, dest, {std::string(1, character->getValue())});
+  //  cout << "Test de Cyrielle et Tania milieu 1 de generateChar" << endl;
+    auto instr = new Instruction(IROp::ldcst, dest, {to_string(character->getValue())});
+  //  cout << "Test de Cyrielle et Tania milieu de generateChar" << endl;
     block->addInstruction(instr);
+ //   cout << "Test de Cyrielle et Tania fin de generateChar" << endl;
     return instr;
 }
 

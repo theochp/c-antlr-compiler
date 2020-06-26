@@ -60,23 +60,30 @@ int main(int argn, const char **argv) {
     for (int i=0; i<visitor.getWarnings().size(); i++){
         cout << visitor.getWarnings().at(i)->getMessage() << endl;
     }
-
+   // cout << "Test 1 de Cyrielle et Tania" << endl;
     if (visitor.getErrCount() == 0)  {
+       // cout << "Test 2 de Cyrielle et Tania" << endl;
         IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
+       // cout << "Test 3 de Cyrielle et Tania" << endl;
         irGen.generate();
+       // cout << "Test 4 de Cyrielle et Tania" << endl;
         AsmGenerator asmGen(irGen.getBlocks(), irGen.getSymbolTable());
-
+       // cout << "Test 5 de Cyrielle et Tania" << endl;
         asmGen.generate(cout);
-
+     //   cout << "Test 6 de Cyrielle et Tania" << endl;
         ofstream out("output.s");
+   //     cout << "Test 7 de Cyrielle et Tania" << endl;
         asmGen.generate(out);
+ //       cout << "Test 8 de Cyrielle et Tania" << endl;
         out.close();
-
+ //       cout << "Test 9 de Cyrielle et Tania" << endl;
         return 0;
     }
+//    cout << "Test 10 de Cyrielle et Tania" << endl;
 
   delete ast;
+//    cout << "Test 11 de Cyrielle et Tania" << endl;
   delete tree;
-
+//    cout << "Test 12 de Cyrielle et Tania" << endl;
   return 1;
 }
