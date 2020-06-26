@@ -17,10 +17,16 @@ using namespace std;
         div,
         neg,
         call,
+        equalcomp,
+        diffcomp,
+        infcomp,
+        infeqcomp,
+        supcomp,
+        supeqcomp,
         bitwise_and,
         bitwise_or,
         bitwise_xor,
-        logicalNot,
+        logicalNot
     } IROp;
 
 class IRBlock;

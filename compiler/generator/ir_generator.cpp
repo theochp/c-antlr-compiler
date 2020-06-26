@@ -122,6 +122,25 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
                 break;
             case OpType::DIV:
                 inst = new Instruction(IROp::div, dest, {op1, op2}, block);
+                break;
+            case OpType::EQUALCOMP:
+                inst =  new Instruction(IROp::equalcomp, dest, {op1, op2}, block);
+                break;
+            case OpType::DIFFCOMP:
+                inst =  new Instruction(IROp::diffcomp, dest, {op1, op2}, block);
+                break;
+            case OpType::INFCOMP:
+                inst =  new Instruction(IROp::infcomp, dest, {op1, op2}, block);
+                break;
+            case OpType::INFEQCOMP:
+                inst =  new Instruction(IROp::infeqcomp, dest, {op1, op2}, block);
+                break;
+            case OpType::SUPCOMP:
+                inst =  new Instruction(IROp::supcomp, dest, {op1, op2}, block);
+                break;
+            case OpType::SUPEQCOMP:
+                inst =  new Instruction(IROp::supeqcomp, dest, {op1, op2}, block);
+                break;
             case OpType::ASSIGN:
                 assert("Le cas ASSIGN doit être géré d'une autre manière");
                 break;

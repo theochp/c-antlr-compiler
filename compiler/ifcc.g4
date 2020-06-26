@@ -28,6 +28,8 @@ expr: NAME paramList     # funcall
 	| '!' expr 			 # notExpr
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
+	| expr COMP_PRIO expr # compPrioExpr
+	| expr COMP expr      # compExpr
 	| expr BITWISE expr  # bitwiseExpr
 	| NAME '=' expr		 # affectExpr
     | LPAR expr RPAR	 # parExpr
@@ -44,6 +46,8 @@ RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
+COMP_PRIO : ('<='|'<'|'>='|'>');
+COMP : ('=='|'!=');
 BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
 LPAR : '(';
