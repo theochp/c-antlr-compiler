@@ -18,6 +18,7 @@
 #include "../ast/func.h"
 #include "../ast/funccall.h"
 #include "../ast/ifelse.h"
+#include "../ast/while.h"
 
 using namespace std;
 
@@ -33,6 +34,7 @@ class IRGenerator {
     pair<IRBlock *, IRBlock *>generateBlock(const Block *block, IRFunc *irFunc, string name);
     IRBlock *generateStatement(const Statement* statement, IRBlock *block);
     IRBlock *generateIfElse(const IfElse *ifElse, IRBlock *block);
+    IRBlock *generateWhile(const While *aWhile, IRBlock *block);
     const Instruction *generateExpression(const Expression *statement, IRBlock *block);
     const Instruction *generateConstant(const Constant *constant, IRBlock *block);
     const Instruction *generateOperator(const Operator *pOperator, IRBlock *block);

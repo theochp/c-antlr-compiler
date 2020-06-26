@@ -16,9 +16,11 @@ bloc: '{' statement* '}';
 statement: expr ';'         # exprStatement
          | declaration 	    # declStatement
 		 | ifElse			# ifElseStatement
+		 | whileStmnt		# whileStatement
          | ret         	    # retStatement
          ;
 
+whileStmnt: 'while' '(' expr ')' blocOrStatement;
 
 declaration: 'int' individualDeclaration? (',' individualDeclaration)* ';';
 

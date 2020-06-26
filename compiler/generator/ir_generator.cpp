@@ -2,8 +2,6 @@
 #include <utility>
 
 #include "ir_generator.h"
-#include "../ast/func.h"
-#include "../ast/ifelse.h"
 
 IRGenerator::IRGenerator(vector<const Node *> ast, map<string, map<string, int>> symbolTables, map<string, int> symbolOffsets)
     : ast(std::move(ast)), symbolTables(std::move(symbolTables)), symbolOffsets(std::move(symbolOffsets)) {
@@ -43,9 +41,12 @@ IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *blo
         generateExpression(el, block);
     }
     else if (auto el = dynamic_cast<const IfElse *>(statement)) {
-        // return the continuation block
         return generateIfElse(el, block);
-    } else {
+    }
+    else if (auto el = dynamic_cast<const While *>(statement)) {
+        return generateWhile(el, block);
+    }
+    else {
         assert("Need to handle new types");
     }
     return block;
@@ -91,6 +92,33 @@ IRBlock *IRGenerator::generateIfElse(const IfElse *ifElse, IRBlock *block) {
     return continueBlock;
 }
 
+IRBlock *IRGenerator::generateWhile(const While *aWhile, IRBlock *block) {
+    // set condition var
+    auto conditionBlock = new IRBlock(newLabel(), block->getFunc());
+    auto conditionLastIntr = generateExpression(aWhile->getCondition(), conditionBlock);
+    block->setTestVarName(conditionLastIntr->dest());
+
+    block->getFunc()->addBlock(conditionBlock);
+
+    // create the while block
+    auto blockWhile = generateBlock(aWhile->getBlock(), block->getFunc(), newLabel());
+
+    // create the continuation block (after the while)
+    auto continueBlock = new IRBlock(newLabel(), block->getFunc());
+
+    conditionBlock->setExitTrue(blockWhile.first);
+    conditionBlock->setExitFalse(continueBlock);
+    blockWhile.second->setExitTrue(conditionBlock);
+
+    // generate instructions
+    conditionBlock->addInstruction(new Instruction(je, continueBlock->getLabel(), {conditionLastIntr->dest(), "0"}, block));
+    blockWhile.second->addInstruction(new Instruction(jmp, {conditionBlock->getLabel()}, blockWhile.second));
+
+    block->getFunc()->addBlock(continueBlock);
+
+    return continueBlock;
+}
+
 const Instruction *IRGenerator::generateExpression(const Expression *expression, IRBlock *block) {
     if (const Constant *el = dynamic_cast<const Constant *>(expression)) {
         return generateConstant(el, block);
@@ -103,11 +131,11 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     }
     else if (const Variable *el = dynamic_cast<const Variable *>(expression)) {
         return generateVariable(el, block);
-    } 
+    }
     else if(const UnExpression *el = dynamic_cast<const UnExpression *>(expression)) {
         return generateUnExpression(el, block);
-    } else if(const FuncCall *el = dynamic_cast<const FuncCall *>(expression)) { 
-           return generateCall(el, block); 
+    } else if(const FuncCall *el = dynamic_cast<const FuncCall *>(expression)) {
+           return generateCall(el, block);
     } else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(expression)){
         return generateLogicalNot(el, block);
     }
@@ -133,7 +161,7 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
             block->addInstruction(instr);
             return instr;
         } else {
-            assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici");
+            static_assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici", "");
             return nullptr;
         }
     } else {
@@ -142,8 +170,8 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
         string op1 = leftInstr->dest();
         string op2 = rightInstr->dest();
         string dest = newTempVar(block->getFunc()->getName());
-        
-        Instruction *inst;
+
+        Instruction *inst = nullptr;
         switch(pOperator->getOp()) {
             case OpType::ADD:
                 inst = new Instruction(IROp::add, dest, {op1, op2}, block);
@@ -176,7 +204,7 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
                 inst =  new Instruction(IROp::supeqcomp, dest, {op1, op2}, block);
                 break;
             case OpType::ASSIGN:
-                assert("Le cas ASSIGN doit être géré d'une autre manière");
+                static_assert("Le cas ASSIGN doit être géré d'une autre manière", "");
                 break;
             case OpType::BITWISE_AND:
                 inst = new Instruction(IROp::bitwise_and, dest, {op1, op2}, block);
@@ -188,7 +216,7 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
                 inst = new Instruction(IROp::bitwise_xor, dest, {op1, op2}, block);
                 break;
             default:
-                assert("Missing type");
+                static_assert("Missing type", "");
                 break;
         }
 
@@ -207,7 +235,7 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
 
     string op1 = instr->dest();
     string dest = newTempVar(block->getFunc()->getName());
-    
+
     Instruction *inst;
     switch(expression->getOp().type()) {
         case UnOpType::UN_PLUS:
