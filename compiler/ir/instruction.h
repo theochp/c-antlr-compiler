@@ -14,11 +14,17 @@ using namespace std;
         mul,
         div,
         neg,
+        equalcomp,
+        diffcomp,
+        infcomp,
+        infeqcomp,
+        supcomp,
+        supeqcomp,
         bitwise_and,
         bitwise_or,
         bitwise_xor,
         bitwise_not,
-        logicalNot,
+        logicalNot
     } IROp;
 
 class Instruction {

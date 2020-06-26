@@ -21,16 +21,18 @@ declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' expr)? ;
 
-expr: ADDMINUS expr 	 # unOp
-	| '!' expr 			 # notExpr
-	| expr MULTDIV expr  # multExpr
-	| expr ADDMINUS expr # addExpr
-	| expr BITWISE expr  # bitwiseExpr
+expr: ADDMINUS expr 	  # unOp
+	| '!' expr 			  # notExpr
+	| expr MULTDIV expr   # multExpr
+	| expr ADDMINUS expr  # addExpr
+  | expr COMP_PRIO expr # compPrioExpr
+	| expr COMP expr      # compExpr
+	| expr BITWISE expr   # bitwiseExpr
 	| BITNEG expr        # bitwiseNeg
-	| NAME '=' expr		 # affectExpr
-	| '('expr')'		 # parExpr
-	| NAME				 # nameExpr
-	| CONST				 # constExpr
+	| NAME '=' expr		  # affectExpr
+	| '('expr')'		  # parExpr
+	| NAME				  # nameExpr
+	| CONST				  # constExpr
 	;
 
 ret: RETURN expr? ';';
@@ -39,6 +41,8 @@ RETURN : 'return' ;
 NAME : [a-zA-Z_]+;
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
+COMP_PRIO : ('<='|'<'|'>='|'>');
+COMP : ('=='|'!=');
 BITWISE : ('&' | '|' | '^');
 BITNEG : '~';
 CONST : [0-9]+ ;

@@ -51,6 +51,24 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
                 break;
+            case IROp::equalcomp:
+                res << TAB << generate_equal_comp(inst) << endl;
+                break;
+            case IROp::diffcomp:
+                res << TAB << generate_diff_comp(inst) << endl;
+                break;
+            case IROp::infcomp:
+                res << TAB << generate_inf_comp(inst) << endl;
+                break;
+            case IROp::infeqcomp:
+                res << TAB << generate_inf_eq_comp(inst) << endl;
+                break;
+            case IROp::supcomp:
+                res << TAB << generate_sup_comp(inst) << endl;
+                break;
+            case IROp::supeqcomp:
+                res << TAB << generate_sup_eq_comp(inst) << endl;
+                break;
             case IROp::bitwise_and:
                 res << TAB << generate_bitwise_and(inst) << endl;
                 break;
@@ -165,6 +183,96 @@ string AsmGenerator::generate_neg(Instruction& inst) {
     res << "negl %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
 
+    return res.str();
+}
+
+string AsmGenerator::generate_equal_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "sete %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_diff_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setne %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_inf_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setl %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_inf_eq_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setle %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_sup_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setg %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+  
+string AsmGenerator::generate_sup_eq_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setge %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+    
     return res.str();
 }
 
