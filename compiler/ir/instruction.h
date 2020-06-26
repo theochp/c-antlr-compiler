@@ -26,6 +26,7 @@ using namespace std;
         bitwise_and,
         bitwise_or,
         bitwise_xor,
+        bitwise_not,
         logicalNot
     } IROp;
 

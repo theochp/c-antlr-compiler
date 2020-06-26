@@ -102,6 +102,9 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::bitwise_xor:
                 res << TAB << generate_bitwise_xor(inst) << endl;
                 break;
+            case IROp::bitwise_not:
+                res << TAB << generate_bitwise_not(inst) << endl;
+                break;
             case IROp::logicalNot:
                 res << TAB << generate_not(inst) << endl;
                 break;
@@ -249,20 +252,8 @@ string AsmGenerator::generate_equal_comp(Instruction &inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_bitwise_and(Instruction& inst) {
-    stringstream res;
-
-    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
-    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
-    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
-    res << "movl " + op1 + ", %eax" << endl << TAB;
-    res << "andl " + op2 + ", %eax" << endl << TAB;
-    res << "movl %eax, " << dest << endl;
-
-    return res.str();
-}
-
 string AsmGenerator::generate_diff_comp(Instruction &inst) {
+
     stringstream res;
 
     string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
@@ -307,20 +298,6 @@ string AsmGenerator::generate_inf_eq_comp(Instruction &inst) {
     return res.str();
 }
 
-
-string AsmGenerator::generate_bitwise_or(Instruction& inst) {
-    stringstream res;
-
-    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
-    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
-    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
-    res << "movl " + op1 + ", %eax" << endl << TAB;
-    res << "orl " + op2 + ", %eax" << endl << TAB;
-    res << "movl %eax, " << dest << endl;
-
-    return res.str();
-}
-
 string AsmGenerator::generate_sup_comp(Instruction &inst) {
     stringstream res;
 
@@ -331,6 +308,47 @@ string AsmGenerator::generate_sup_comp(Instruction &inst) {
     res << "cmpl " + op2 + ", %eax" << endl << TAB;
     res << "setg %al" << endl << TAB;
     res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+  
+string AsmGenerator::generate_sup_eq_comp(Instruction &inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "cmpl " + op2 + ", %eax" << endl << TAB;
+    res << "setge %al" << endl << TAB;
+    res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+    
+    return res.str();
+}
+
+string AsmGenerator::generate_bitwise_and(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "andl " + op2 + ", %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_bitwise_or(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "orl " + op2 + ", %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
 
     return res.str();
@@ -349,18 +367,15 @@ string AsmGenerator::generate_bitwise_xor(Instruction& inst) {
     return res.str();
 }
 
-string AsmGenerator::generate_sup_eq_comp(Instruction &inst) {
+string AsmGenerator::generate_bitwise_not(Instruction& inst) {
     stringstream res;
 
     string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
-    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
     string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
     res << "movl " + op1 + ", %eax" << endl << TAB;
-    res << "cmpl " + op2 + ", %eax" << endl << TAB;
-    res << "setge %al" << endl << TAB;
-    res << "movzbl %al, %eax" << endl << TAB;
+    res << "notl %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
-    
+
     return res.str();
 }
 
