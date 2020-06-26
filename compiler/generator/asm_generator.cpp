@@ -28,13 +28,13 @@ string AsmGenerator::generate_block(IRBlock& block) {
 
     if (block.getLabel() == block.getFunc()->getName()) {
         int pNum = block.getFunc()->getParams().size();
-        const int nRegisters = 6; 
-        string registers[nRegisters] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"}; // x86-64 ABI
+        const int N_REGISTERS = 6; 
+        string registers[N_REGISTERS] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"}; // x86-64 ABI
         auto params = block.getFunc()->getParams();
 
         for (int i = pNum; i >= 1; --i) {
             res << TAB;
-            if (i > nRegisters) {
+            if (i > N_REGISTERS) {
                 res << "popq %eax" << endl << TAB;
                 res << "movl %eax, " << getOffsetRegister(block.getFunc()->getName(), params[i-1]) << endl;
             } else {
@@ -200,10 +200,10 @@ string AsmGenerator::generate_call(Instruction& inst) {
     stringstream res;
     string name = inst.operand(0);
     int pNum = inst.operands().size() - 1;
-    const int nRegisters = 6; 
-    string registers[nRegisters] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"}; // x86-64 ABI
+    const int N_REGISTERS = 6; 
+    string registers[N_REGISTERS] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"}; // x86-64 ABI
     for (int i = pNum; i >= 1; --i) {
-        if (i > nRegisters) {
+        if (i > N_REGISTERS) {
             res << "pushq " << getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(i)) << endl << TAB;
         } else {
             res << "movl " << getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(i)) << ", " << registers[i - 1] << endl << TAB;
