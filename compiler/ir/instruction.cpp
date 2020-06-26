@@ -2,16 +2,16 @@
 
 #include "instruction.h"
 
-Instruction::Instruction(IROp op) {
+Instruction::Instruction(IROp op, const IRBlock *block) : block(block) {
     _op = op;
 }
 
-Instruction::Instruction(IROp op, string dest) {
+Instruction::Instruction(IROp op, string dest, const IRBlock *block) : block(block) {
     _op = op;
     _dest = dest;
 }
 
-Instruction::Instruction(IROp op, string dest, const vector<string>& operands) {
+Instruction::Instruction(IROp op, string dest, const vector<string>& operands, const IRBlock *block) : block(block) {
     _op = op;
     _dest = dest;
     
@@ -32,6 +32,10 @@ const vector<string>& Instruction::operands() {
 const string& Instruction::operand(int i) {
     assert(_operands.size() > i);
     return _operands[i];
+}
+
+const IRBlock *Instruction::getBlock() {
+    return block;
 }
 
 std::ostream& operator<<(std::ostream& os, const Instruction& obj)
