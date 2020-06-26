@@ -7,7 +7,9 @@ prog : toplevel+ ;
 
 toplevel: funcdecl;
 
-funcdecl: 'int' NAME '()' bloc;
+funcdecl: 'int' NAME paramDecl bloc;
+
+paramDecl: LPAR ('int' NAME)? (',' 'int' NAME)* RPAR;
 
 bloc: '{' statement* '}';
 
@@ -17,23 +19,26 @@ statement: expr ';'         # exprStatement
          ;
 
 
-declaration: 'int' individualDeclaration (',' individualDeclaration)* ';';
+declaration: 'int' individualDeclaration? (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' expr)? ;
 
-
-expr: ADDMINUS expr 	  # unOp
-	| '!' expr 			  # notExpr
-	| expr MULTDIV expr   # multExpr
-	| expr ADDMINUS expr  # addExpr
-    | expr COMP_PRIO expr # compPrioExpr
+expr: NAME paramList     # funcall
+	| ADDMINUS expr 	 # unOp
+	| '!' expr 			 # notExpr
+	| expr MULTDIV expr  # multExpr
+	| expr ADDMINUS expr # addExpr
+	| expr COMP_PRIO expr # compPrioExpr
 	| expr COMP expr      # compExpr
-	| expr BITWISE expr   # bitwiseExpr
-	| NAME '=' expr		  # affectExpr
-	| '('expr')'		  # parExpr
-	| NAME				  # nameExpr
-	| CONST				  # constExpr
+	| expr BITWISE expr  # bitwiseExpr
+	| NAME '=' expr		 # affectExpr
+    | LPAR expr RPAR	 # parExpr
+	| NAME				 # nameExpr
+	| CONST				 # constExpr
 	;
+
+paramList : LPAR expr (',' expr)* RPAR;
+param : 'int' NAME;
 
 ret: RETURN expr? ';';
 
@@ -45,6 +50,8 @@ COMP_PRIO : ('<='|'<'|'>='|'>');
 COMP : ('=='|'!=');
 BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
+LPAR : '(';
+RPAR : ')';
 COMMENT : '/*' .*? '*/' -> skip ;
 SINGLECOMMENT : '//' .*? '\n' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;
