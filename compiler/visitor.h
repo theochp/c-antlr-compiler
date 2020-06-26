@@ -50,8 +50,6 @@ public:
 
     virtual antlrcpp::Any visitBitwiseExpr(ifccParser::BitwiseExprContext *context) override;
 
-    virtual antlrcpp::Any visitBitwiseNeg(ifccParser::BitwiseNegContext *context) override;
-
     virtual antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
 
     virtual antlrcpp::Any visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx) override;

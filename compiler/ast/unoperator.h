@@ -4,7 +4,7 @@
 typedef enum {
     UN_PLUS,
     UN_MINUS,
-    BITWISE_NOT,
+    BITWISE_NOT
 } UnOpType;
 
 class UnOperator {

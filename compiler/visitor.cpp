@@ -213,10 +213,6 @@ antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
     return (Statement*) new Expression(opType, leftExpr, rightExpr);
 }
 
-antlrcpp::Any Visitor::visitBitwiseNeg(ifccParser::BitwiseNegContext *ctx){
-    return (Statement *) new UnExpression(UnOpType::BITWISE_NOT, visit(ctx->expr()).as<Statement*>());
-}
-
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return visit(ctx->expr());
 }
@@ -254,7 +250,18 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
-	return (Statement *) new LogicalNot(visit(ctx->expr()).as<Statement*>());
+    string op = ctx->NOT()->getText();
+    auto expr = visit(ctx->expr()).as<Statement*>();
+
+    if (op == "!") {
+        return (Statement *) new LogicalNot(expr);
+    } else if (op == "~") {
+        return (Statement *) new UnExpression(UnOpType::BITWISE_NOT, expr);
+    } else {
+        assert("Need to handle new op");
+    }
+
+    return nullptr;
 }
 
 string Visitor::allocateTempVar() {
