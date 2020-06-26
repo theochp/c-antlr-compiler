@@ -8,6 +8,7 @@ typedef enum {
     PREDECRE,
     POSTINCRE,
     POSTDECRE
+    BITWISE_NOT
 } UnOpType;
 
 class UnOperator {
