@@ -30,7 +30,7 @@ class IRGenerator {
     int labelCount = 0;
 
     const IRFunc *generateFunc(const Func *func);
-    IRBlock *generateBlock(const Block *block, IRFunc *irFunc, string name);
+    pair<IRBlock *, IRBlock *>generateBlock(const Block *block, IRFunc *irFunc, string name);
     IRBlock *generateStatement(const Statement* statement, IRBlock *block);
     IRBlock *generateIfElse(const IfElse *ifElse, IRBlock *block);
     const Instruction *generateExpression(const Expression *statement, IRBlock *block);

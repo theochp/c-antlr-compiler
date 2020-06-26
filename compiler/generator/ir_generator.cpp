@@ -28,13 +28,14 @@ const IRFunc *IRGenerator::generateFunc(const Func *func) {
     return irFunc;
 }
 
-IRBlock *IRGenerator::generateBlock(const Block *block, IRFunc *irFunc, string name) {
+pair<IRBlock *, IRBlock *> IRGenerator::generateBlock(const Block *block, IRFunc *irFunc, string name) {
     auto *irBlock = new IRBlock(name, irFunc);
+    IRBlock *lastBlock = irBlock;
     irFunc->addBlock(irBlock);
     for (auto it : block->getStatements()) {
-        irBlock = generateStatement(it, irBlock);
+        lastBlock = generateStatement(it, lastBlock);
     }
-    return irBlock;
+    return {irBlock, lastBlock};
 }
 
 IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *block) {
@@ -60,22 +61,22 @@ IRBlock *IRGenerator::generateIfElse(const IfElse *ifElse, IRBlock *block) {
 
     // create the if block
     auto blockIf = generateBlock(ifElse->getIfBlock(), block->getFunc(), newLabel());
-
+    
     // the if block exits to the continuation block
-    blockIf->setExitTrue(continueBlock);
+    blockIf.second->setExitTrue(continueBlock);
 
     // the block before the if/else exists to the if block if the condition succeed
-    block->setExitTrue(blockIf);
+    block->setExitTrue(blockIf.first);
 
     if (ifElse->getElseBlock() != nullptr) {
         // create else block
         auto blockElse = generateBlock(ifElse->getElseBlock(), block->getFunc(), newLabel());
 
         // the else block exits to the continuation block
-        blockElse->setExitTrue(continueBlock);
+        blockElse.second->setExitTrue(continueBlock);
 
         // the block before the if/else exits to the else block if the condition fails
-        block->setExitFalse(blockElse);
+        block->setExitFalse(blockElse.first);
     } else {
         // the block before the if exits to the continuation block if the condition fails
         block->setExitFalse(continueBlock);
@@ -85,7 +86,7 @@ IRBlock *IRGenerator::generateIfElse(const IfElse *ifElse, IRBlock *block) {
 
     // generate instructions
     block->addInstruction(new Instruction(je, block->getExitFalse()->getLabel(), {conditionLastIntr->dest(), "0"}, block));
-    blockIf->addInstruction(new Instruction(jmp, {continueBlock->getLabel()}, blockIf));
+    blockIf.second->addInstruction(new Instruction(jmp, {continueBlock->getLabel()}, blockIf.second));
 
     return continueBlock;
 }
