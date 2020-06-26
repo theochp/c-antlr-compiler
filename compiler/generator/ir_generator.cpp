@@ -33,6 +33,9 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
     if (const Constant *el = dynamic_cast<const Constant *>(statement)) {
         return generateConstant(el, block);
     }
+    else if (const Char *el = dynamic_cast<const Char *>(statement)) {
+        return generateChar(el, block);
+    }
     else if (const Declaration *el = dynamic_cast<const Declaration *>(statement)) {
         return generateDeclaration(el, block);
     }
