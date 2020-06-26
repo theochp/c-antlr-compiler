@@ -9,9 +9,15 @@ typedef enum {
     ADD,
     MINUS,
     ASSIGN,
+    INFCOMP,
+    INFEQCOMP,
+    SUPCOMP,
+    SUPEQCOMP,
+    EQUALCOMP,
+    DIFFCOMP,
     BITWISE_AND,
     BITWISE_OR,
-    BITWISE_XOR,
+    BITWISE_XOR
 } OpType;
 
 class Operator : public Expression {

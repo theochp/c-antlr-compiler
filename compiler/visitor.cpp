@@ -253,6 +253,34 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 	return visit(ctx->expr());
 }
 
+antlrcpp::Any Visitor::visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx){
+	OpType opType = INFCOMP;
+	if (ctx->COMP_PRIO()->getText() == "<=") {
+		opType = INFEQCOMP;
+	}
+	else if (ctx->COMP_PRIO()->getText() == ">") {
+		opType = SUPCOMP;
+	}
+	else if (ctx->COMP_PRIO()->getText() == ">=") {
+		opType = SUPEQCOMP;
+	}
+	Expression* leftExpr = visit(ctx->expr(0));
+	Expression* rightExpr = visit(ctx->expr(1));
+
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
+}
+
+antlrcpp::Any Visitor::visitCompExpr(ifccParser::CompExprContext *ctx){
+	OpType opType = EQUALCOMP;
+	if (ctx->COMP()->getText() == "!=") {
+		opType = DIFFCOMP;
+	}
+	Expression* leftExpr = visit(ctx->expr(0));
+	Expression* rightExpr = visit(ctx->expr(1));
+
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
+}
+
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 	return (Statement*) new Return(visit(ctx->expr()).as<Expression*>());
 }
@@ -281,7 +309,18 @@ antlrcpp::Any Visitor::visitParam(ifccParser::ParamContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
-	return (Expression*) new LogicalNot(visit(ctx->expr()).as<Expression*>());
+	string op = ctx->NOT()->getText();
+    auto expr = visit(ctx->expr()).as<Expression*>();
+
+    if (op == "!") {
+        return (Expression *) new LogicalNot(expr);
+    } else if (op == "~") {
+        return (Expression *) new UnExpression(UnOpType::BITWISE_NOT, expr);
+    } else {
+        assert("Need to handle new op");
+    }
+
+    return nullptr;
 }
 
 antlrcpp::Any Visitor::visitIfElse(ifccParser::IfElseContext *ctx) {

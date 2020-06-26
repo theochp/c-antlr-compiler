@@ -53,6 +53,10 @@ public:
     antlrcpp::Any visitBitwiseExpr(ifccParser::BitwiseExprContext *context) override;
 
     antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
+    
+    antlrcpp::Any visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx) override;
+
+    antlrcpp::Any visitCompExpr(ifccParser::CompExprContext *ctx) override;
 
     antlrcpp::Any visitUnOp(ifccParser::UnOpContext *ctx) override;
 
