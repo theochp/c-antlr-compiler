@@ -24,10 +24,10 @@ using namespace std;
 class IRGenerator {
     vector<const Node *> ast;
     map<string, map<string, int>> symbolTables;
+    map<string, int> symbolOffsets;
     vector<IRFunc*> funcs;
     int tempVarCount = 0;
     int labelCount = 0;
-    int stackOffset;
 
     const IRFunc *generateFunc(const Func *func);
     IRBlock *generateBlock(const Block *block, IRFunc *irFunc, string name);
@@ -41,11 +41,16 @@ class IRGenerator {
     const Instruction *generateReturn(const Return *ret, IRBlock *block);
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
-    string newTempVar(string symbolTable);
+    string newTempVar(const string& symbolTable);
     string newLabel();
+    int incrementOffset(string func, int size) {
+        int newOffset = symbolOffsets.at(func) -= size;
+        symbolOffsets.emplace(func, newOffset);
+        return newOffset;
+    }
 public:
     void generate();
-    IRGenerator(vector<const Node *>, map<string, map<string, int>> symbolTables, int stackOffset);
+    IRGenerator(vector<const Node *>, map<string, map<string, int>> symbolTables, map<string, int> symbolOffsets);
     const map<string, map<string, int>>& getSymbolTables();
     const vector<IRFunc*>& getFuncs();
 };

@@ -47,12 +47,12 @@ antlrcpp::Any Visitor::visitToplevel(ifccParser::ToplevelContext *ctx) {
 antlrcpp::Any Visitor::visitFuncdecl(ifccParser::FuncdeclContext *ctx) {
 	string name = ctx->NAME()->getText();
 	symbolTables.emplace(name, map<string, int>());
+	symbolOffsets.emplace(name, 0);
 	activeSymbolTable = name;
-	stackOffset = 0;
 	vector<const FuncParam*> params = visit(ctx->paramDecl()).as<vector<const FuncParam*>>();
 	auto func = new Func(name);
 	for (auto param : params) {
-		symbolTable().emplace(param->getName(), stackOffset -= 4);
+		symbolTable().emplace(param->getName(), incrementOffset(func->getName(), 4));
 		func->addParam(param);
 	}
 	
@@ -80,7 +80,7 @@ antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 		try {
 			auto statement = visited.as<Statement*>();
 			block->addStatement(statement);
-		} catch(bad_cast e) {
+		} catch(bad_cast& e) {
 			auto statements = visited.as<vector<Assignement*>>();
 			for (auto assign : statements) {
 				block->addStatement(assign);
@@ -122,7 +122,7 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 	pair<string, Expression*> declaration;
 	if (symbolTable().find(name) == symbolTable().end()) {
 		declaration.first = name;
-		int offset = stackOffset -= 4;
+		int offset = incrementOffset(activeSymbolTable, 4);
 		symbolTable().emplace(name, offset);
         pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
@@ -308,14 +308,3 @@ antlrcpp::Any Visitor::visitBlocOrStatement(ifccParser::BlocOrStatementContext *
 		return block;
 	}
 }
-
-
-string Visitor::allocateTempVar() {
-	int offset = stackOffset -= 4;
-	string name("0_"); // on met un 0 au début pour être sur que ça ne correspond à aucun variable c
-	name.append(to_string(rand()%1000000+100000));
-	symbolTable().emplace(name, offset);
-
-	return name;
-}
-

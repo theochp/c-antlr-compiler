@@ -5,8 +5,8 @@
 #include "../ast/func.h"
 #include "../ast/ifelse.h"
 
-IRGenerator::IRGenerator(vector<const Node *> ast, map<string, map<string, int>> symbolTables, int stackOffset)
-    : ast(std::move(ast)), symbolTables(std::move(symbolTables)), stackOffset(stackOffset) {
+IRGenerator::IRGenerator(vector<const Node *> ast, map<string, map<string, int>> symbolTables, map<string, int> symbolOffsets)
+    : ast(std::move(ast)), symbolTables(std::move(symbolTables)), symbolOffsets(std::move(symbolOffsets)) {
 
 }
 
@@ -250,8 +250,8 @@ const vector<IRFunc*>& IRGenerator::getFuncs() {
     return funcs;
 }
 
-string IRGenerator::newTempVar(string symbolTable) {
-    int offset = stackOffset -= 4;
+string IRGenerator::newTempVar(const string& symbolTable) {
+    int offset = incrementOffset(symbolTable, 4);
 	string name("0_");
 	name.append(to_string(1000 + tempVarCount++));
 	symbolTables.at(symbolTable).emplace(name, offset);
