@@ -207,7 +207,6 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 
 
 antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {
-	//cout << "r" << endl;
 	string name = ctx->NAME()->getText();
 	int size = atoi(ctx->CONST()->getText().c_str());
 
@@ -220,29 +219,16 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 		int i = 0;
 
         if (ctx->arrayAssignation() != nullptr) {
-			//cout << "-1" << endl;
             ArrayDeclaration* stmnt = visit(ctx->arrayAssignation()).as<ArrayDeclaration*>();
-		//	cout << "0" << endl;
 			std::vector<std::string> names;
-		//	cout << "1" << endl;
-		//	cout << "size pour nom:"<<size<<endl;
+			
 			for(; i <size -1; i++)
 				names.push_back(allocateTempVar());
-			std::string res("{");
-			for (auto it = names.begin(); it != names.end(); ++it) {
-	
-			res.append("\t");
-			res.append((*it));
-			res.append("\n");
-			}
-			//cout << res<<endl;
-			//cout << "2" << endl;
+				
 			stmnt->SetFirstName(name);
 			stmnt->AddNames(names);
 			stmnt->SetSize(size);
             declaration.second = stmnt;
-			//cout << "3 size name :" << stmnt->Names().size() <<"value size :" << stmnt->Values().size()<< endl;
-			//cout << stmnt->print() << endl;
         } else {
             declaration.second = new ArrayDeclaration(size);
         }
@@ -256,24 +242,28 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 		declaration.first = "";
 		declaration.second = nullptr;
 	}
-    //cout << "r end " << name <<" " << size << endl;
+	
 	return make_tuple(declaration.first, declaration.second, size);
 }
 
 antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) {
-	cout << "rr" << endl;
 	ArrayDeclaration* stm = visit(ctx->arrayAssignation()).as<ArrayDeclaration*>();
 
-	int size = stm->Size();
+	int size = 0;
 	string name = ctx->NAME()->getText();
 
 	pair<string, Statement*> declaration;
 	if (symbolTable.find(name) == symbolTable.end()) {
+		
 		declaration.first = name;
-
+		stm->SetSize(stm->Values().size());
+		size = stm->Size();
 		std::vector<std::string> names;
+
 		for(int i = 0; i <size -1 ; i++)
 			names.push_back(allocateTempVar());
+		
+		stm->SetFirstName(name);
 		stm->AddNames(names);
 
 		int offset = stackOffset -= 4;
@@ -289,21 +279,18 @@ antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclara
 		declaration.first = "";
 		declaration.second = nullptr;
 	}
-    cout << "rr end" << name << " " << size << endl;
+	
 	return make_tuple(declaration.first, declaration.second, size);
 }
 
 antlrcpp::Any Visitor::visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) {
-	//cout << "rer" << endl;
 	ArrayDeclaration* stm = new ArrayDeclaration();
 	
-	for (int i = 0; i < ctx->CONST().size(); i++) {
+	for (int i = 0; i < ctx->CONST().size(); i++)
 		stm->AddValue(ctx->CONST(i)->getText());
-	}
-	//cout << "rer end" << endl;
+	
 	return stm;
 }
-
 
 antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) {
 	string name = ctx->NAME()->getText();

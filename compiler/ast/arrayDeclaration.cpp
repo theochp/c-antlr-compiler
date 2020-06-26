@@ -22,14 +22,6 @@ void ArrayDeclaration::SetSize(size_t size){
 
 std::string ArrayDeclaration::print(){
     std::string res("{");
-res.append("name size");
-    res.append(std::to_string(names.size()));
-    for (auto it = values.begin(); it != values.end(); ++it) {
-        
-        res.append("\t");
-        res.append((*it));
-        res.append("\n");
-    }
     for (auto it = names.begin(); it != names.end(); ++it) {
         
         res.append("\t");

@@ -175,27 +175,10 @@ const Instruction *IRGenerator::generateVariable(const Variable *variable, IRBlo
 }
 
 const Instruction *IRGenerator::generateArray(ArrayDeclaration *array, IRBlock *block) {
-    //newTempVar();
-    int i = 1;
-    Instruction * instr;
-    //cout << "test" << endl;
-    //cout << array->Names().size() << " " << array->Values().size() << endl;
-    
-    for(; i < array->Size() && i < array->Values().size(); i++)
+    for(int i = 0; i < array->Size() && i < array->Values().size(); i++)
     {
-        //cout << i << endl;
         auto stm = new Constant(atoi(array->Values().at(i).c_str()));
-        //cout << i << "ok1"<<endl;
-        //instr = new Instruction(IROp::store,newTempVar() , {array->Names().at(i)});
-        cout <<"#" <<array->Names().at(i) << endl;
-        instr = new Instruction(IROp::store, array->Names().at(i), {generateStatement(stm, block)->dest()});
-        //cout << i << "ok2"<<endl;
-        block->addInstruction(instr);
-    }
-    if(array->Values().size()>0){
-        cout << "#"<<array->Values().at(0).c_str() << endl;
-        auto cste = new Constant(atoi(array->Values().at(0).c_str()));
-        instr = new Instruction(IROp::store, array->Names().at(0), {generateStatement(cste, block)->dest()});
+        auto instr = new Instruction(IROp::store, array->Names().at(i), {generateStatement(stm, block)->dest()});
         block->addInstruction(instr);
     }
     
