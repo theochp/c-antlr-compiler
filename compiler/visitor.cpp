@@ -5,6 +5,7 @@
 #include "visitor.h"
 #include "ast/block.h"
 #include "ast/constant.h"
+#include "ast/Char.h"
 #include "ast/declaration.h"
 #include "ir/instruction.h"
 #include "ast/operator.h"
@@ -88,16 +89,21 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 	pair<string, Statement*> declaration;
 	if (symbolTable.find(name) == symbolTable.end()) {
 		declaration.first = name;
-		int offset = stackOffset -= 4;
-		symbolTable.emplace(name, offset);
-        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
-		countUseVar.push_back(make_tuple(name, 0, positionPair));
         if (ctx->expr() != nullptr) {
             Statement* stmnt = visit(ctx->expr()).as<Statement*>();
             declaration.second = stmnt;
         } else {
             declaration.second = nullptr;
         }
+        if(Char* c = dynamic_cast<Char*>(declaration.second)){
+            int offset = stackOffset -= 1;
+        } else {
+            int offset = stackOffset -= 4;
+        }
+		symbolTable.emplace(name, offset);
+        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		countUseVar.push_back(make_tuple(name, 0, positionPair));
+
 	} else {
 		errorCount++;
 		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
@@ -110,6 +116,10 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 	return (Statement*) new Constant(stoi(ctx->CONST()->getText()));
+}
+
+antlrcpp::Any Visitor::visitCharExpr(ifccParser::CharCharContext *ctx) {
+    return (Statement*) new Char(ctx->CHAR()->getText());
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
