@@ -1,7 +1,7 @@
 #pragma once
 #include "expression.h"
 
-class LogicalNot : public Expression{
+class LogicalNot : public Expression {
     Expression *expr;
 public:
     LogicalNot(Expression *expr);

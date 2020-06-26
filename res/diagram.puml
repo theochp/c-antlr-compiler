@@ -54,7 +54,6 @@ package ast{
     Assignement --|> Operator
     Block --|> Node
     Constant --|> Expression
-    Declaration --|> Expression
     Operator --|> Expression
     Return --|> Expression
     Variable --|> Expression
@@ -76,10 +75,6 @@ package ast{
     
     class Constant{
         -value : int
-    }
-    
-    class Declaration{
-        -symbols : map<string, Expression *>
     }
     
     class Operator{

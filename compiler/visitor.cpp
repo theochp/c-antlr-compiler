@@ -5,7 +5,6 @@
 #include "visitor.h"
 #include "ast/block.h"
 #include "ast/constant.h"
-#include "ast/declaration.h"
 #include "ast/operator.h"
 #include "ast/unoperator.h"
 #include "ast/assignement.h"
@@ -77,8 +76,16 @@ antlrcpp::Any Visitor::visitParamDecl(ifccParser::ParamDeclContext *ctx) {
 antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 	Block *block = new Block();
 	for (int i = 0; i < ctx->statement().size(); ++i) {
-		auto statement = visit(ctx->statement(i)).as<Statement*>();
-		block->addStatement(statement);
+		auto visited = visit(ctx->statement(i));
+		try {
+			auto statement = visited.as<Statement*>();
+			block->addStatement(statement);
+		} catch(bad_cast e) {
+			auto statements = visited.as<vector<Assignement*>>();
+			for (auto assign : statements) {
+				block->addStatement(assign);
+			}
+		}
     }
     return block;
 }
@@ -88,8 +95,7 @@ antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx)
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	auto decl = visit(ctx->declaration()).as<Declaration*>();
-	return (Statement*) decl;
+	return visit(ctx->declaration()).as<vector<Assignement*>>();
 }
 
 antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
@@ -101,14 +107,14 @@ antlrcpp::Any Visitor::visitIfElseStatement(ifccParser::IfElseStatementContext *
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
-	Declaration *declaration = new Declaration();
+	vector<Assignement*> assignements;
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
         pair<string, Expression*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Expression*>>();
-        if (symbol.first != ""){
-            declaration->addSymbol(symbol.first, symbol.second);
-        }
+		if (symbol.second != nullptr) {
+			assignements.push_back(new Assignement(new Variable(symbol.first), symbol.second));
+		}
 	}
-	return declaration;
+	return assignements;
 }
 
 antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
@@ -275,7 +281,7 @@ antlrcpp::Any Visitor::visitParam(ifccParser::ParamContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
-	return new LogicalNot(visit(ctx->expr()).as<Expression*>());
+	return (Expression*) new LogicalNot(visit(ctx->expr()).as<Expression*>());
 }
 
 antlrcpp::Any Visitor::visitIfElse(ifccParser::IfElseContext *ctx) {

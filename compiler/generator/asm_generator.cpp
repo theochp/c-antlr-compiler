@@ -13,21 +13,37 @@ void AsmGenerator::generate(ostream& os) {
     os << ".global main" << endl;
     
     for (auto func : funcs) {
+        int totalSymbolTableSize = 0;
+        for(auto block : func->getBlocks()) {
+            try {
+                totalSymbolTableSize += symbolTables.at(block->getLabel()).size() * 4;
+            } catch(std::out_of_range e) {
+
+            }
+        }
+        os << func->getName() << ":" << endl << TAB;
+        os << "pushq	%rbp" << endl << TAB;
+        os << "movq	%rsp, %rbp" << endl << TAB;
+        os << "subq $" << totalSymbolTableSize << ", %rsp" << endl;
         for (auto block : func->getBlocks()) {
             os << generate_block(*block) << endl;
         }   
+        os << TAB;
+        if (func->getReturnValueLoc() != "") {
+            os << "movl " << func->getReturnValueLoc() << ", %eax" << endl << TAB;
+        } else {
+            os << "movl $0, %eax" << endl << TAB;
+        }
+        os << "addq $" << totalSymbolTableSize << ", %rsp" << endl << TAB;
+        os << "popq %rbp" << endl << TAB;
+        os << "ret" << endl;
     }
 }
 
 string AsmGenerator::generate_block(const IRBlock& block) {
     stringstream res;
-    res << block.getLabel() << ":" << endl << TAB;
-
+    
     if (block.getLabel() == block.getFunc()->getName()) {
-        res  << "pushq	%rbp" << endl << TAB;
-        res  << "movq	%rsp, %rbp" << endl << TAB;
-        res << "subq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl;
-
         int pNum = block.getFunc()->getParams().size();
         const int nRegisters = 6; 
         string registers[nRegisters] = {"%edi", "%esi", "%edx", "%ecx", "%r8d", "%r9d"}; // x86-64 ABI
@@ -43,11 +59,11 @@ string AsmGenerator::generate_block(const IRBlock& block) {
             }
         }
         res << endl;
+    } else {
+        res << block.getLabel() << ":" << endl << TAB;
     }
-    bool hasRet = false;
     for (auto it : block.getInstructions()) {
         Instruction& inst = *it;
-
         switch (inst.op()) {
             case IROp::ldcst:
                 res << TAB << generate_ldcst(inst) << endl;
@@ -58,7 +74,6 @@ string AsmGenerator::generate_block(const IRBlock& block) {
             case IROp::ret:
                 // TODO: handle return inside other blocks
                 res << TAB << generate_ret(inst) << endl;
-                hasRet = true;
                 break;
             case IROp::add:
                 res << TAB << generate_add(inst) << endl;
@@ -99,16 +114,6 @@ string AsmGenerator::generate_block(const IRBlock& block) {
         }
     }
 
-    if (block.getLabel() == block.getFunc()->getName()) {
-        res << TAB;
-        if (!hasRet) {
-            res << "movl $0, %eax" << endl << TAB;
-        }
-        res << "addq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl << TAB;
-        res << "popq %rbp" << endl << TAB;
-        res << "ret" << endl;
-    }
-
     return res.str();
 }
 
@@ -131,7 +136,7 @@ string AsmGenerator::generate_ret(Instruction& inst) {
     stringstream res;
     if (inst.operand(0) != "") {
         string source = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
-        res << "movl " + source + ", %eax" << endl;
+        inst.getBlock()->getFunc()->setReturnValueLoc(source);
     }
 
     return res.str();

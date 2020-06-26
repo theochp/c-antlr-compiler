@@ -44,8 +44,7 @@ IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *blo
     else if (auto el = dynamic_cast<const IfElse *>(statement)) {
         // return the continuation block
         return generateIfElse(el, block);
-    }
-    else {
+    } else {
         assert("Need to handle new types");
     }
     return block;
@@ -95,9 +94,6 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     if (const Constant *el = dynamic_cast<const Constant *>(expression)) {
         return generateConstant(el, block);
     }
-    else if (const Declaration *el = dynamic_cast<const Declaration *>(expression)) {
-        return generateDeclaration(el, block);
-    }
     else if (const Operator *el = dynamic_cast<const Operator *>(expression)) {
         return generateOperator(el, block);
     }
@@ -124,25 +120,6 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
     string dest = newTempVar(block->getFunc()->getName());
     auto instr = new Instruction(IROp::ldcst, dest, {to_string(constant->getValue())}, block);
     block->addInstruction(instr);
-    return instr;
-}
-
-// TODO: changer la manière dont on gère les déclarations
-const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration, IRBlock *block) {
-    string dest = newTempVar(block->getFunc()->getName());
-    Instruction *instr = nullptr;
-    for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
-        auto assignement = *it;
-        string name = (*it).first;
-        Expression *value = (*it).second;
-        if (value != nullptr) {
-            auto assignStmnt = generateExpression(value, block);
-            string dest = newTempVar(block->getFunc()->getName());
-            instr = new Instruction(IROp::store, name, {assignStmnt->dest()}, block);
-            block->addInstruction(instr);
-        }
-    }
-
     return instr;
 }
 
