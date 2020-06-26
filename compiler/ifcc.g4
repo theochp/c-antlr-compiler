@@ -17,10 +17,13 @@ statement: expr ';'         # exprStatement
          | declaration 	    # declStatement
 		 | ifElse			# ifElseStatement
 		 | whileStmnt		# whileStatement
+		 | forStmnt         # forStatement
          | ret         	    # retStatement
          ;
 
 whileStmnt: 'while' '(' expr ')' blocOrStatement;
+
+forStmnt: 'for' '(' expr ';' expr ';' expr ')' blocOrStatement;
 
 declaration: 'int' individualDeclaration? (',' individualDeclaration)* ';';
 
@@ -46,7 +49,6 @@ expr: NAME paramList     # funcall
 	;
 
 paramList : LPAR expr (',' expr)* RPAR;
-param : 'int' NAME;
 
 ret: RETURN expr? ';';
 

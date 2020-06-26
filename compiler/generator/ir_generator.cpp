@@ -37,14 +37,17 @@ pair<IRBlock *, IRBlock *> IRGenerator::generateBlock(const Block *block, IRFunc
 }
 
 IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *block) {
-    if (auto el = dynamic_cast<const Expression *>(statement)) {
-        generateExpression(el, block);
+    if (auto expr = dynamic_cast<const Expression *>(statement)) {
+        generateExpression(expr, block);
     }
-    else if (auto el = dynamic_cast<const IfElse *>(statement)) {
-        return generateIfElse(el, block);
+    else if (auto ifElse = dynamic_cast<const IfElse *>(statement)) {
+        return generateIfElse(ifElse, block);
     }
-    else if (auto el = dynamic_cast<const While *>(statement)) {
-        return generateWhile(el, block);
+    else if (auto aWhile = dynamic_cast<const While *>(statement)) {
+        return generateWhile(aWhile, block);
+    }
+    else if (auto aFor = dynamic_cast<const For *>(statement)) {
+        return generateFor(aFor, block);
     }
     else {
         assert("Need to handle new types");
@@ -113,6 +116,39 @@ IRBlock *IRGenerator::generateWhile(const While *aWhile, IRBlock *block) {
     // generate instructions
     conditionBlock->addInstruction(new Instruction(je, continueBlock->getLabel(), {conditionLastIntr->dest(), "0"}, block));
     blockWhile.second->addInstruction(new Instruction(jmp, {conditionBlock->getLabel()}, blockWhile.second));
+
+    block->getFunc()->addBlock(continueBlock);
+
+    return continueBlock;
+}
+
+IRBlock *IRGenerator::generateFor(const For *aFor, IRBlock *block) {
+
+    // 1st for argument
+    generateExpression(aFor->getExpressions()[0], block);
+
+    // 2nd for argument
+    auto conditionBlock = new IRBlock(newLabel(), block->getFunc());
+    auto conditionLastIntr = generateExpression(aFor->getExpressions()[1], conditionBlock);
+    block->setTestVarName(conditionLastIntr->dest());
+
+    block->getFunc()->addBlock(conditionBlock);
+
+    // create the for block
+    auto blockFor = generateBlock(aFor->getBlock(), block->getFunc(), newLabel());
+
+    // 3rd for argument
+    generateExpression(aFor->getExpressions()[2], blockFor.second);
+
+    auto continueBlock = new IRBlock(newLabel(), block->getFunc());
+
+    conditionBlock->setExitTrue(blockFor.first);
+    conditionBlock->setExitFalse(continueBlock);
+    blockFor.second->setExitTrue(conditionBlock);
+
+    // generate instructions
+    conditionBlock->addInstruction(new Instruction(je, continueBlock->getLabel(), {conditionLastIntr->dest(), "0"}, block));
+    blockFor.second->addInstruction(new Instruction(jmp, {conditionBlock->getLabel()}, blockFor.second));
 
     block->getFunc()->addBlock(continueBlock);
 

@@ -38,6 +38,8 @@ public:
 
     antlrcpp::Any visitWhileStatement(ifccParser::WhileStatementContext *ctx) override;
 
+    antlrcpp::Any visitForStatement(ifccParser::ForStatementContext *ctx) override;
+
     antlrcpp::Any visitDeclaration(ifccParser::DeclarationContext *ctx) override;
 
 	antlrcpp::Any visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) override;
@@ -68,8 +70,6 @@ public:
 
     antlrcpp::Any visitParamList(ifccParser::ParamListContext *ctx) override;
 
-    antlrcpp::Any visitParam(ifccParser::ParamContext *ctx) override;
-
     antlrcpp::Any visitNotExpr(ifccParser::NotExprContext *ctx) override;
 
     antlrcpp::Any visitIfElseStatement(ifccParser::IfElseStatementContext *ctx) override;
@@ -79,6 +79,8 @@ public:
     antlrcpp::Any visitElsePart(ifccParser::ElsePartContext *ctx) override;
 
     antlrcpp::Any visitWhileStmnt(ifccParser::WhileStmntContext *ctx) override;
+
+    antlrcpp::Any visitForStmnt(ifccParser::ForStmntContext *ctx) override;
 
     antlrcpp::Any visitBlocOrStatement(ifccParser::BlocOrStatementContext *ctx) override;
 
