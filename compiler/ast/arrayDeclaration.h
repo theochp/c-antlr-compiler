@@ -8,14 +8,18 @@ class ArrayDeclaration : public Statement{
     Variable * lvalue;
     std::vector<std::string> values;
     std::vector<std::string> names;
+    size_t size;
 
 public:
     ArrayDeclaration();
+    ArrayDeclaration(size_t size);
     ~ArrayDeclaration();
     void AddValue(string value);
-    std::size_t Size();
+    const std::size_t& Size();
+    void SetSize(size_t size);
     virtual std::string print();
-    void SetNames(std::vector<std::string> names);
+    void AddNames(std::vector<std::string> names);
+    void SetFirstName(std::string name);
     const std::vector<std::string>& Values();
     const std::vector<std::string>& Names();
 };

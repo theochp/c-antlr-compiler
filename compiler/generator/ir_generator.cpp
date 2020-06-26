@@ -46,6 +46,8 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
         return generateVariable(el, block);
     } else if(const UnExpression *el = dynamic_cast<const UnExpression *>(statement)) {
         return generateUnExpression(el, block);
+    } else if (const ArrayDeclaration *el = dynamic_cast<const ArrayDeclaration *>(statement)){
+        return generateArray((ArrayDeclaration *)el , block);
     } else {
         assert("Need to handle new types");
     }
@@ -61,25 +63,23 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
 
 // TODO: changer la manière dont on gère les déclarations
 const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration, IRBlock *block) {
+    newTempVar();
     Instruction *instr = nullptr;
     for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
+        newTempVar();
         auto assignement = *it;
         string name = (*it).first;
         Statement *value = (*it).second.first;
         if (value != nullptr) {
-            if(const Declaration *el = dynamic_cast<const Declaration *>(value))
-            {
+            
+    //cout << "rry" << endl;
                 auto assignStmnt = generateStatement(value, block);
-                instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
+                
+    //cout << "rrv" << endl;
+instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
                 block->addInstruction(instr);
-            }else if(ArrayDeclaration *el = dynamic_cast<ArrayDeclaration*>(value)){
-                int i = 0;
-                for(; i < (*it).second.second && i < el->Size(); i++)
-                {
-                    auto stm = new Constant(atoi(el->Values().at(i).c_str()));
-                    block->addInstruction(new Instruction(IROp::store, el->Names().at(i), {generateStatement(stm, block)->dest()}));
-                }
-            }
+    
+                
         }
     }
 
@@ -172,6 +172,40 @@ const Instruction *IRGenerator::generateVariable(const Variable *variable, IRBlo
     auto instr = new Instruction(IROp::store, dest, {variable->getName()});
     block->addInstruction(instr);
     return instr;
+}
+
+const Instruction *IRGenerator::generateArray(ArrayDeclaration *array, IRBlock *block) {
+    /*
+    cout << "rr" << endl;
+    newTempVar();
+    int i = 1;
+    Instruction * instr;
+    //cout << "test" << endl;
+    //cout << array->Names().size() << " " << array->Values().size() << endl;
+    
+    for(; i < array->Size() && i < array->Values().size(); i++)
+    {
+        //cout << i << endl;
+        auto stm = new Constant(atoi(array->Values().at(i).c_str()));
+        //cout << i << "ok1"<<endl;
+        //instr = new Instruction(IROp::store,newTempVar() , {array->Names().at(i)});
+        cout << array->Names().at(i) << endl;
+        instr = new Instruction(IROp::store, array->Names().at(i), {generateStatement(stm, block)->dest()});
+        //cout << i << "ok2"<<endl;
+        block->addInstruction(instr);
+    }
+    if(array->Values().size()>0){
+        cout << array->Values().at(0).c_str() << endl;
+        auto cste = new Constant(atoi(array->Values().at(0).c_str()));
+        instr = new Instruction(IROp::store, array->Names().at(0), {generateStatement(cste, block)->dest()});
+        block->addInstruction(instr);
+    }
+        
+    //cout << "ret"<<endl;
+    
+    cout << "rr end" << endl;*/
+    //return instr;
+    return nullptr;
 }
 
 const map<string, int>& IRGenerator::getSymbolTable() {

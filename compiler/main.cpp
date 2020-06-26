@@ -64,8 +64,11 @@ int main(int argn, const char **argv) {
     if (visitor.getErrCount() == 0)  {
         IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
         irGen.generate();
+        
+    //cout << "rre" << endl;
         AsmGenerator asmGen(irGen.getBlocks(), irGen.getSymbolTable());
 
+    //cout << "rrt" << endl;
         asmGen.generate(cout);
 
         ofstream out("output.s");

@@ -35,6 +35,7 @@ class IRGenerator {
     const Instruction *generateUnExpression(const UnExpression *expression, IRBlock *block);
     const Instruction *generateReturn(const Return *ret, IRBlock *block);
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
+    const Instruction *generateArray(ArrayDeclaration *variable, IRBlock *block);
 
     string newTempVar();
     string newRangeTempVar(size_t size);
