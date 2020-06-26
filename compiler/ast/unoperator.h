@@ -7,7 +7,7 @@ typedef enum {
     PREINCRE,
     PREDECRE,
     POSTINCRE,
-    POSTDECRE
+    POSTDECRE,
     BITWISE_NOT
 } UnOpType;
 

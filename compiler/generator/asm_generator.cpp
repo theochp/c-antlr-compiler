@@ -407,8 +407,8 @@ string AsmGenerator::generate_not(Instruction& inst) {
 string AsmGenerator::generate_preincre(Instruction& inst) {
     stringstream res;
 
-    string op1 = getOffsetRegister(inst.operand(0));
-    string dest = getOffsetRegister(inst.dest());
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
     res << "addl $1," + op1 << endl << TAB;
     res << "movl " + op1 + ", %eax"<< endl << TAB;
     res << "movl %eax, " << dest << endl;
@@ -419,8 +419,8 @@ string AsmGenerator::generate_preincre(Instruction& inst) {
 string AsmGenerator::generate_postincre(Instruction& inst) {
     stringstream res;
 
-    string op1 = getOffsetRegister(inst.operand(0));
-    string dest = getOffsetRegister(inst.dest());
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
 
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "leal 1(%rax), %edx" << endl << TAB;
@@ -433,8 +433,8 @@ string AsmGenerator::generate_postincre(Instruction& inst) {
 string AsmGenerator::generate_predecre(Instruction& inst) {
     stringstream res;
 
-    string op1 = getOffsetRegister(inst.operand(0));
-    string dest = getOffsetRegister(inst.dest());
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
     res << "subl $1," + op1 << endl << TAB;
     res << "movl " + op1 + ", %eax"<< endl << TAB;
     res << "movl %eax, " << dest << endl;
@@ -445,8 +445,8 @@ string AsmGenerator::generate_predecre(Instruction& inst) {
 string AsmGenerator::generate_postdecre(Instruction& inst) {
     stringstream res;
 
-    string op1 = getOffsetRegister(inst.operand(0));
-    string dest = getOffsetRegister(inst.dest());
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
 
     res << "movl " + op1 + ", %eax" << endl << TAB;
     res << "leal -1(%rax), %edx" << endl << TAB;

@@ -186,16 +186,16 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
             inst = new Instruction(IROp::bitwise_not, dest, {op1}, block);
             break;
         case UnOpType::POSTINCRE:
-            inst = new Instruction(IROp::postincre, dest, {op1});
+            inst = new Instruction(IROp::postincre, dest, {op1}, block);
             break;
         case UnOpType::PREINCRE:
-            inst = new Instruction(IROp::preincre, dest, {op1});
+            inst = new Instruction(IROp::preincre, dest, {op1}, block);
             break;
         case UnOpType::POSTDECRE:
-            inst = new Instruction(IROp::postdecre, dest, {op1});
+            inst = new Instruction(IROp::postdecre, dest, {op1}, block);
             break;
         case UnOpType::PREDECRE:
-            inst = new Instruction(IROp::predecre, dest, {op1});
+            inst = new Instruction(IROp::predecre, dest, {op1}, block);
             break;
         default:
             assert("Missing type");

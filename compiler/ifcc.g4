@@ -26,18 +26,18 @@ individualDeclaration: NAME ('=' expr)? ;
 
 expr: expr IN_DECREMENT  # postInDecrExpr
     | NAME paramList     # funcall
-    | ADDMINUS expr 	   # unOp
-	  | NOT expr 			     # notExpr
-	  | IN_DECREMENT expr  # preInDecrExpr
-	  | expr MULTDIV expr  # multExpr
-	  | expr ADDMINUS expr # addExpr
+    | ADDMINUS expr 	 # unOp
+    | NOT expr 		 # notExpr
+    | IN_DECREMENT expr  # preInDecrExpr
+    | expr MULTDIV expr  # multExpr
+    | expr ADDMINUS expr # addExpr
     | expr COMP_PRIO expr# compPrioExpr
-	  | expr COMP expr     # compExpr
-	  | expr BITWISE expr  # bitwiseExpr
-	  | NAME '=' expr		   # affectExpr
-    | LPAR expr RPAR	   # parExpr
-	  | NAME				       # nameExpr
-	  | CONST				       # constExpr
+    | expr COMP expr     # compExpr
+    | expr BITWISE expr  # bitwiseExpr
+    | NAME '=' expr	 # affectExpr
+    | LPAR expr RPAR	 # parExpr
+    | NAME		 # nameExpr
+    | CONST		 # constExpr
 	;
 
 paramList : LPAR expr (',' expr)* RPAR;
