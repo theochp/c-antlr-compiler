@@ -27,10 +27,6 @@ using namespace std;
         bitwise_or,
         bitwise_xor,
         bitwise_not,
-        preincre,
-        predecre,
-        postincre,
-        postdecre,
         logicalNot
     } IROp;
 
