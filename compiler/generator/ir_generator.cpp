@@ -72,12 +72,12 @@ const Instruction *IRGenerator::generateDeclaration(const Declaration *declarati
         Statement *value = (*it).second.first;
         if (value != nullptr) {
             
-    //cout << "rry" << endl;
                 auto assignStmnt = generateStatement(value, block);
                 
-    //cout << "rrv" << endl;
-instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
-                block->addInstruction(instr);
+                if(assignStmnt != nullptr){
+                    instr = new Instruction(IROp::store, name, {assignStmnt->dest()});
+                    block->addInstruction(instr);
+                }
     
                 
         }
@@ -175,9 +175,7 @@ const Instruction *IRGenerator::generateVariable(const Variable *variable, IRBlo
 }
 
 const Instruction *IRGenerator::generateArray(ArrayDeclaration *array, IRBlock *block) {
-    /*
-    cout << "rr" << endl;
-    newTempVar();
+    //newTempVar();
     int i = 1;
     Instruction * instr;
     //cout << "test" << endl;
@@ -189,22 +187,18 @@ const Instruction *IRGenerator::generateArray(ArrayDeclaration *array, IRBlock *
         auto stm = new Constant(atoi(array->Values().at(i).c_str()));
         //cout << i << "ok1"<<endl;
         //instr = new Instruction(IROp::store,newTempVar() , {array->Names().at(i)});
-        cout << array->Names().at(i) << endl;
+        cout <<"#" <<array->Names().at(i) << endl;
         instr = new Instruction(IROp::store, array->Names().at(i), {generateStatement(stm, block)->dest()});
         //cout << i << "ok2"<<endl;
         block->addInstruction(instr);
     }
     if(array->Values().size()>0){
-        cout << array->Values().at(0).c_str() << endl;
+        cout << "#"<<array->Values().at(0).c_str() << endl;
         auto cste = new Constant(atoi(array->Values().at(0).c_str()));
         instr = new Instruction(IROp::store, array->Names().at(0), {generateStatement(cste, block)->dest()});
         block->addInstruction(instr);
     }
-        
-    //cout << "ret"<<endl;
     
-    cout << "rr end" << endl;*/
-    //return instr;
     return nullptr;
 }
 
