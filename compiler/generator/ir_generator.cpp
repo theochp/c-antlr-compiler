@@ -64,7 +64,7 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
 
 const Instruction *IRGenerator::generateChar(const Char *character, IRBlock *block) {
     string dest = newTempVar();
-    auto instr = new Instruction(IROp::ldcst, dest, {character->getValue()});
+    auto instr = new Instruction(IROp::ldcst, dest, {std::string(1, character->getValue())});
     block->addInstruction(instr);
     return instr;
 }

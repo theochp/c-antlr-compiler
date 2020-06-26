@@ -10,7 +10,7 @@ char Char::getValue() const {
 
 std::string Char::print() {
     std::string res("(");
-    res.append(value);
+    res.append(std::string (1, value));
     res.append(")");
     return res;
 }

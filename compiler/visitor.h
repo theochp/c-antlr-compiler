@@ -42,6 +42,8 @@ public:
 
     virtual antlrcpp::Any visitConstExpr(ifccParser::ConstExprContext *ctx) override;
 
+    virtual antlrcpp::Any visitCharExpr(ifccParser::CharExprContext *ctx) override;
+
     virtual antlrcpp::Any visitMultExpr(ifccParser::MultExprContext *ctx) override;
 
     virtual antlrcpp::Any visitAddExpr(ifccParser::AddExprContext *ctx) override;
