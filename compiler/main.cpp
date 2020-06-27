@@ -43,7 +43,7 @@ int main(int argn, const char **argv) {
 	}
 	
   Visitor visitor;
-  Node *ast = visitor.visit(tree).as<Node*>();
+  vector<const Node *> ast = visitor.visit(tree).as<vector<const Node *>>();
 
     if (visitor.getErrors().size() > 0){
         cout <<  "# " << to_string(visitor.getErrors().size()) << " error(s)" << endl;
@@ -62,10 +62,9 @@ int main(int argn, const char **argv) {
     }
 
     if (visitor.getErrCount() == 0)  {
-        IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
+        IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getStackOffset());
         irGen.generate();
-        
-        AsmGenerator asmGen(irGen.getBlocks(), irGen.getSymbolTable());
+        AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
 
         asmGen.generate(cout);
 
@@ -76,7 +75,9 @@ int main(int argn, const char **argv) {
         return 0;
     }
 
-  delete ast;
+  for (auto it = ast.begin(); it != ast.end(); ++it) {
+    delete *it;
+  }
   delete tree;
 
   return 1;
