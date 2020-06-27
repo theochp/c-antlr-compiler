@@ -161,7 +161,7 @@ string AsmGenerator::generate_neg(Instruction& inst) {
 
 string AsmGenerator::generate_loadT(Instruction& inst) {
     stringstream res;
-    cout <<"#load###############"<<endl;
+    
     string op1 = getOffset(inst.operand(0));
     string op2 = getOffsetRegister(inst.operand(1));
     string dest = getOffsetRegister(inst.dest());
