@@ -14,6 +14,8 @@ using namespace std;
         mul,
         div,
         neg,
+        loadT,
+        storeT,
     } IROp;
 
 class Instruction {

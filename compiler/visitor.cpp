@@ -296,7 +296,7 @@ antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *
 	string name = ctx->NAME()->getText();
 
 	if (symbolTable.find(name) != symbolTable.end()) {
-		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr(1)).as<Statement*>(), visit(ctx->expr(0)).as<Expression*>());
+		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr(1)).as<Statement*>(), visit(ctx->expr(0)).as<Statement*>());
 		return statement;
 	} else {
 		errorCount++;
@@ -308,7 +308,7 @@ antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *
 
 antlrcpp::Any Visitor::visitArrayValue(ifccParser::ArrayValueContext *ctx) {
 		string name = ctx->NAME()->getText();
-		auto offset = visit(ctx->expr()).as<Expression*>();
+		auto offset = visit(ctx->expr());
 		return (Statement *) new ArrayValue(new Variable(name), offset);
 }
 

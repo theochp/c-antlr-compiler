@@ -6,10 +6,12 @@
 
 class ArrayValue : public Statement{
     Variable * arrayBegin;
-    Expression * offset;
+    Statement * offset;
 
 public:
-    ArrayValue(Variable * arrayBegin, Expression * offset);
+    ArrayValue(Variable * arrayBegin, Statement * offset);
     ~ArrayValue();
     virtual std::string print();
+    const Variable& getArrayBegin();
+    const Statement* getOffset();
 };

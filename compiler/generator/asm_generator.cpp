@@ -47,9 +47,15 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 break;
             case IROp::div:
                 res << TAB << generate_div(inst) << endl;
-            break;
+                break;
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
+                break;
+            case IROp::loadT:
+                res << TAB << generate_loadT(inst) << endl;
+                break;
+            case IROp::storeT:
+                res << TAB << generate_storeT(inst) << endl;
                 break;
         }
     }
@@ -153,7 +159,42 @@ string AsmGenerator::generate_neg(Instruction& inst) {
     return res.str();
 }
 
+string AsmGenerator::generate_loadT(Instruction& inst) {
+    stringstream res;
+    cout <<"#load###############"<<endl;
+    string op1 = getOffset(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    
+    res << "movl " + op2 + ", %eax" << endl << TAB;
+    res << "cltq" << endl << TAB;
+    res << "movl " + op1 + "(%rbp,%rax,4), %eax"<< endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_storeT(Instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffset(inst.operand(0));
+    string op2 = getOffsetRegister(inst.operand(1));
+    string dest = getOffsetRegister(inst.dest());
+    
+    res << "movl " + op2 + ", %eax" << endl << TAB;
+    res << "cltq" << endl << TAB;
+    res << "movl " + dest + ", %edx" << endl << TAB;
+    res << "movl %edx, " + op1 + "(%rbp,%rax,4)"<< endl << TAB;
+
+    return res.str();
+}
+
 string AsmGenerator::getOffsetRegister(string symbolName) {
     int offset = symbolTable.at(symbolName);
     return to_string(offset) + "(%rbp)";
+}
+
+string AsmGenerator::getOffset(string symbolName) {
+    int offset = symbolTable.at(symbolName);
+    return to_string(offset);
 }

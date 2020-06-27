@@ -6,15 +6,16 @@
 class Expression : public Statement {
     Statement *left;
     Statement *right;
-    Expression *offset;
+    Statement *offset;
     Operator op;
 
 public:
-    Expression(Operator op, Statement *left, Statement *right, Expression *Expression);
+    Expression(Operator op, Statement *left, Statement *right, Statement *Expression);
     Expression(Operator op, Statement *left, Statement *right);
     ~Expression();
     const Statement *getLeft() const;
     const Statement *getRight() const;
     const Operator& getOp() const;
+    const Statement * getOffSet() const;
     virtual std::string print();
 };

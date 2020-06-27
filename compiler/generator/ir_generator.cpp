@@ -48,7 +48,9 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
         return generateUnExpression(el, block);
     } else if (const ArrayDeclaration *el = dynamic_cast<const ArrayDeclaration *>(statement)){
         return generateArray((ArrayDeclaration *)el , block);
-    } else {
+    } else if(const ArrayValue *el = dynamic_cast<const ArrayValue *>(statement)){
+        return generateArrayValue((ArrayValue*)el, block);
+    }else{
         assert("Need to handle new types");
     }
     return nullptr;
@@ -89,11 +91,24 @@ const Instruction *IRGenerator::generateDeclaration(const Declaration *declarati
 const Instruction *IRGenerator::generateExpression(const Expression *expression, IRBlock *block) {
     if (expression->getOp().type() == OpType::ASSIGN) {
         if(const Variable *dest = dynamic_cast<const Variable *>(expression->getLeft())) {
-            string destName = dest->getName();
-            auto rightInstr = generateStatement(expression->getRight(), block);
-            auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()});
-            block->addInstruction(instr);
-            return instr;
+            
+            if(expression->getOffSet() != nullptr){
+                auto offset = generateStatement(expression->getOffSet(), block);
+                
+                string tempVar = newTempVar();
+                
+                auto rightInstr = generateStatement(expression->getRight(), block);
+                auto instr = new Instruction(IROp::storeT, rightInstr->dest(), {dest->getName(), offset->dest()});
+                block->addInstruction(instr);
+                return instr;
+
+            }else{
+                string destName = dest->getName();
+                auto rightInstr = generateStatement(expression->getRight(), block);
+                auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()});
+                block->addInstruction(instr);
+                return instr;
+            } 
         } else {
             assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici");
             return nullptr;
@@ -183,6 +198,16 @@ const Instruction *IRGenerator::generateArray(ArrayDeclaration *array, IRBlock *
     }
     
     return nullptr;
+}
+
+const Instruction *IRGenerator::generateArrayValue(ArrayValue *variable, IRBlock *block){
+    auto expr = generateStatement(variable->getOffset(), block);
+    string dest = newTempVar();
+    auto instr = new Instruction(IROp::loadT, dest, {variable->getArrayBegin().getName(), expr->dest()});
+    
+    block->addInstruction(instr);
+    
+    return instr;
 }
 
 const map<string, int>& IRGenerator::getSymbolTable() {

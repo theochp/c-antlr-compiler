@@ -22,8 +22,11 @@ class AsmGenerator {
     string generate_mul(Instruction& inst);
     string generate_div(Instruction& inst);
     string generate_neg(Instruction& inst);
+    string generate_loadT(Instruction& inst);
+    string generate_storeT(Instruction& inst);
 
     string getOffsetRegister(string symbolName);
+    string getOffset(string symbolName);
 
 public:
     // constructor

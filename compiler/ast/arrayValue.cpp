@@ -1,6 +1,6 @@
 #include "arrayValue.h"
 
-ArrayValue::ArrayValue(Variable * arrayBegin, Expression * offset) 
+ArrayValue::ArrayValue(Variable * arrayBegin, Statement * offset) 
     : arrayBegin(arrayBegin), offset(offset){
 
 }
@@ -18,4 +18,13 @@ std::string ArrayValue::print(){
     res.append("]");
 
     return res;
+}
+
+
+const Variable& ArrayValue::getArrayBegin(){
+    return *arrayBegin;
+}
+
+const Statement * ArrayValue::getOffset(){
+    return offset;
 }

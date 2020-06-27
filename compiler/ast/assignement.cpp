@@ -1,6 +1,6 @@
 #include "assignement.h"
 
-Assignement::Assignement(Variable *lvalue, Statement *rvalue, Expression * offset) 
+Assignement::Assignement(Variable *lvalue, Statement *rvalue, Statement * offset) 
     : Expression(ASSIGN, lvalue, rvalue, offset) {
 }
 
