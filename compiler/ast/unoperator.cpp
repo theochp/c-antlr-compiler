@@ -15,7 +15,10 @@ std::string UnOperator::print() {
             return "+";
         case UN_MINUS:
             return "-";
-        default: return "";
+        case BITWISE_NOT:
+            return "~";
+        default:
+            return "";
     }
 }
 
