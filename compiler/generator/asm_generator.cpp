@@ -77,6 +77,7 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 break;
             case IROp::storeT:
                 res << TAB << generate_storeT(inst) << endl;
+                break;
             case IROp::call:
                 res << TAB << generate_call(inst) << endl;
                 break;
