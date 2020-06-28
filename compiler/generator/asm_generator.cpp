@@ -77,6 +77,7 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 break;
             case IROp::storeT:
                 res << TAB << generate_storeT(inst) << endl;
+                break;
             case IROp::call:
                 res << TAB << generate_call(inst) << endl;
                 break;
@@ -232,6 +233,7 @@ string AsmGenerator::generate_loadT(Instruction& inst) {
     res << "movl " + op2 + ", %eax" << endl << TAB;
     res << "cltq" << endl << TAB;
     res << "movl " + op1 + "(%rbp,%rax,4), %eax"<< endl << TAB;
+    res << "movl %eax, " << dest << endl;
 
     return res.str();
 }

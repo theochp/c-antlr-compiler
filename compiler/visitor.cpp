@@ -282,7 +282,6 @@ antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
 }
 
-
 antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
 	int size = atoi(ctx->CONST()->getText().c_str());
@@ -372,7 +371,7 @@ antlrcpp::Any Visitor::visitArrayAssignation(ifccParser::ArrayAssignationContext
 antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) {
 	string name = ctx->NAME()->getText();
 
-	if (symbolTable().find(name) == symbolTable().end()) {
+	if (symbolTable().find(name) != symbolTable().end()) {
 		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr(1)).as<Statement*>(), visit(ctx->expr(0)).as<Statement*>());
 		return statement;
 	} else {

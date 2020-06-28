@@ -42,8 +42,8 @@ class IRGenerator {
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
     const Instruction *generateArray(ArrayDeclaration *variable, IRBlock *block);
     const Instruction *generateArrayValue(ArrayValue *variable, IRBlock *block);
-
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
+    
     string newTempVar(string symbolTable);
 
 public:

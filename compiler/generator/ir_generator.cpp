@@ -78,22 +78,19 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
 // TODO: changer la manière dont on gère les déclarations
 const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration, IRBlock *block) {
     string dest = newTempVar(block->getFunc()->getName());
-
     Instruction *instr = nullptr;
     for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
         auto assignement = *it;
         string name = (*it).first;
         Statement *value = (*it).second.first;
         if (value != nullptr) {
-            Instruction * instr;
-
             auto assignStmnt = generateStatement(value, block);
             if(assignStmnt != nullptr){
+        
                 string dest = newTempVar(block->getFunc()->getName());
                 instr = new Instruction(IROp::store, name, {assignStmnt->dest()}, block);
+                block->addInstruction(instr);
             }
-        
-            block->addInstruction(instr);
         }
     }
 
@@ -103,20 +100,18 @@ const Instruction *IRGenerator::generateDeclaration(const Declaration *declarati
 const Instruction *IRGenerator::generateExpression(const Expression *expression, IRBlock *block) {
     if (expression->getOp().type() == OpType::ASSIGN) {
         if(const Variable *dest = dynamic_cast<const Variable *>(expression->getLeft())) {
-            
             if(expression->getOffSet() != nullptr){
                 string destName = dest->getName();
                 auto offset = generateStatement(expression->getOffSet(), block);
-                                
                 auto rightInstr = generateStatement(expression->getRight(), block);
-                auto instr = new Instruction(IROp::storeT, rightInstr->dest(), {dest->getName(), offset->dest()}, block);
+                auto instr = new Instruction(IROp::storeT, rightInstr->dest(), {dest->getName(), offset->dest()},block);
                 block->addInstruction(instr);
                 return instr;
 
             }else{
                 string destName = dest->getName();
                 auto rightInstr = generateStatement(expression->getRight(), block);
-                auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()}, block);
+                auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()},block);
                 block->addInstruction(instr);
                 return instr;
             } 

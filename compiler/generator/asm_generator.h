@@ -24,7 +24,6 @@ class AsmGenerator {
     string generate_neg(Instruction& inst);
     string generate_loadT(Instruction& inst);
     string generate_storeT(Instruction& inst);
-
     string generate_call(Instruction& inst);
     string generate_equal_comp(Instruction& inst);
     string generate_diff_comp(Instruction& inst);
