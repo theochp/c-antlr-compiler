@@ -6,7 +6,9 @@ ArrayDeclaration::ArrayDeclaration(size_t size)
 ArrayDeclaration::ArrayDeclaration() 
 { }
 
-ArrayDeclaration::~ArrayDeclaration(){ }
+ArrayDeclaration::~ArrayDeclaration(){ 
+    delete lvalue;
+}
 
 void ArrayDeclaration::AddValue(std::string value){
     values.push_back(value);

@@ -11,6 +11,7 @@ Assignement::Assignement(Variable *lvalue, Statement *rvalue)
 Assignement::~Assignement() {
     delete lvalue;
     delete rvalue;
+    delete offset;
 }
 
 std::string Assignement::print() {

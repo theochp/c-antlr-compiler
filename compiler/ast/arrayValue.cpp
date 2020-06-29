@@ -6,7 +6,8 @@ ArrayValue::ArrayValue(Variable * arrayBegin, Statement * offset)
 }
 
 ArrayValue::~ArrayValue(){
-
+    delete arrayBegin;
+    delete offset;
 }
 
 std::string ArrayValue::print(){
