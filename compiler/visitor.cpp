@@ -290,31 +290,31 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 	if (symbolTable().find(name) == symbolTable().end()) {
 		
 		declaration.first = name;
-        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        	pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
 		int i = 0;
 
-        if (ctx->arrayAssignation() != nullptr) {
-            ArrayDeclaration* stmnt = visit(ctx->arrayAssignation()).as<ArrayDeclaration*>();
+		if (ctx->arrayAssignation() != nullptr) {
+			ArrayDeclaration* stmnt = visit(ctx->arrayAssignation()).as<ArrayDeclaration*>();
 			std::vector<std::string> names;
-			
+
 			for(; i <size -1; i++)
 				names.push_back(allocateTempVar());
-				
+
 			stmnt->SetFirstName(name);
 			stmnt->AddNames(names);
 			stmnt->SetSize(size);
-            declaration.second = stmnt;
-        } else {
-            declaration.second = new ArrayDeclaration(size);
-        }
+			declaration.second = stmnt;
+		} else {
+	    		declaration.second = new ArrayDeclaration(size);
+		}
 
 		int offset = stackOffset -= 4*(size-i);
 		symbolTable().emplace(name, offset);
 	} else {
 		errorCount++;
 		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
-        errors.push_back(error);
+        	errors.push_back(error);
 		declaration.first = "";
 		declaration.second = nullptr;
 	}
