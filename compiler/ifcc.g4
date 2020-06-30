@@ -21,27 +21,27 @@ statement: expr ';'         # exprStatement
 
 declaration: 'int' individualDeclaration? (',' individualDeclaration)* ';';
 
-individualDeclaration: NAME ('=' expr)? 	# valueDeclaration
-	| NAME'['CONST']' arrayAssignation? 	# arrayDeclaration
-	| NAME'[]' arrayAssignation 		# arrayDeclarationAssignation
+individualDeclaration: NAME ('=' expr)?		# valueDeclaration
+	| NAME'['CONST']' arrayAssignation?		# arrayDeclaration
+	| NAME'[]' arrayAssignation				# arrayDeclarationAssignation
 	;
 
 arrayAssignation: '=' '{'(CONST(','CONST)*)? '}';
 
-expr: NAME paramList     		# funcall
-    	| ADDMINUS expr 	  	# unOp
-	| NOT expr 	  		# notExpr
-	| expr MULTDIV expr   		# multExpr
-	| expr ADDMINUS expr  		# addExpr
-    	| expr COMP_PRIO expr 		# compPrioExpr
-	| expr COMP expr      		# compExpr
-	| expr BITWISE expr  		# bitwiseExpr
-	| NAME '=' expr			# affectExpr
-	| NAME '[' expr ']' '=' expr 	# affectArrayExpr
-	| LPAR expr RPAR	 	# parExpr
-	| NAME				# nameExpr
-	| CONST				# constExpr
-	| NAME '[' expr ']'		# arrayValue
+expr: NAME paramList				# funcall
+	| ADDMINUS expr					# unOp
+	| NOT expr						# notExpr
+	| expr MULTDIV expr				# multExpr
+	| expr ADDMINUS expr			# addExpr
+	| expr COMP_PRIO expr			# compPrioExpr
+	| expr COMP expr				# compExpr
+	| expr BITWISE expr				# bitwiseExpr
+	| NAME '=' expr					# affectExpr
+	| NAME '[' expr ']' '=' expr	# affectArrayExpr
+	| LPAR expr RPAR				# parExpr
+	| NAME							# nameExpr
+	| CONST							# constExpr
+	| NAME '[' expr ']'				# arrayValue
 	;
 
 paramList : LPAR expr (',' expr)* RPAR;
