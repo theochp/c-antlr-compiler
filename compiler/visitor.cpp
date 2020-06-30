@@ -308,7 +308,7 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 	if (symbolTable().find(name) == symbolTable().end()) {
 		
 		declaration.first = name;
-        	pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
 		int i = 0;
 
@@ -407,7 +407,7 @@ antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *
 antlrcpp::Any Visitor::visitArrayValue(ifccParser::ArrayValueContext *ctx) {
 		string name = ctx->NAME()->getText();
 		auto offset = visit(ctx->expr());
-		return (Statement *) new ArrayValue(new Variable(name), offset);
+		return (Expression *) new ArrayValue(new Variable(name), offset);
 }
 
 antlrcpp::Any Visitor::visitFuncall(ifccParser::FuncallContext *ctx) {

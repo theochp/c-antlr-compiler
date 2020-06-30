@@ -45,6 +45,8 @@ IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *blo
     else if (auto el = dynamic_cast<const IfElse *>(statement)) {
         // return the continuation block
         return generateIfElse(el, block);
+    } else if(auto el = dynamic_cast<const Declaration *>(statement)) {
+        generateDeclaration(el, block);
     } else {
         assert("Need to handle new types");
     }

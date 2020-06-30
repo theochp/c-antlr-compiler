@@ -5,7 +5,7 @@ Assignement::Assignement(Variable *lvalue, Expression *rvalue, Expression * offs
 }
 
 Assignement::Assignement(Variable *lvalue, Expression *rvalue) 
-    : Operator (ASSIGN, lvalue, rvalue) {
+    : Operator (ASSIGN, lvalue, rvalue, nullptr) {
 }
 
 Assignement::~Assignement() {
