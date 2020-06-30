@@ -63,7 +63,7 @@ int main(int argn, const char **argv) {
    // cout << "Test 1 de Cyrielle et Tania" << endl;
     if (visitor.getErrCount() == 0)  {
        // cout << "Test 2 de Cyrielle et Tania" << endl;
-        IRGenerator irGen(ast, visitor.getSymbolTable(), visitor.getStackOffset());
+        IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getStackOffset());
        // cout << "Test 3 de Cyrielle et Tania" << endl;
         irGen.generate();
        // cout << "Test 4 de Cyrielle et Tania" << endl;
