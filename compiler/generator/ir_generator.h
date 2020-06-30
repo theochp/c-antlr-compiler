@@ -10,6 +10,7 @@
 #include "../ast/block.h"
 #include "../ast/statement.h"
 #include "../ast/constant.h"
+#include "../ast/char.h"
 #include "../ast/declaration.h"
 #include "../ast/expression.h"
 #include "../ast/unexpression.h"
@@ -32,6 +33,7 @@ class IRGenerator {
     const IRBlock *generateBlock(const Block *block, IRFunc *irFunc);
     const Instruction *generateStatement(const Statement *statement, IRBlock *block);
     const Instruction *generateConstant(const Constant *constant, IRBlock *block);
+    const Instruction *generateChar(const Char *character, IRBlock *block);
     const Instruction *generateDeclaration(const Declaration *declaration, IRBlock *block);
     const Instruction *generateExpression(const Expression *expression, IRBlock *block);
     const Instruction *generateUnExpression(const UnExpression *expression, IRBlock *block);

@@ -19,7 +19,7 @@ statement: expr ';'         # exprStatement
          ;
 
 
-declaration: 'int' individualDeclaration? (',' individualDeclaration)* ';';
+declaration: ('int'|'char') individualDeclaration? (',' individualDeclaration)* ';';
 
 individualDeclaration: NAME ('=' expr)? ;
 
@@ -36,6 +36,7 @@ expr: NAME paramList     # funcall
     | LPAR expr RPAR	 # parExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
+	| CHAR               # charExpr
 	;
 
 paramList : LPAR expr (',' expr)* RPAR;
@@ -52,6 +53,7 @@ COMP_PRIO : ('<='|'<'|'>='|'>');
 COMP : ('=='|'!=');
 BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
+CHAR : '\'' [a-zA-Z] '\'';
 LPAR : '(';
 RPAR : ')';
 COMMENT : '/*' .*? '*/' -> skip ;
