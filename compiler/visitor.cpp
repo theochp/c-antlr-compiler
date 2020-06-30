@@ -315,7 +315,7 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 	string name = ctx->NAME()->getText();
 	int size = atoi(ctx->CONST()->getText().c_str());
 
-	pair<string, Statement*> declaration;
+	pair<string, Expression*> declaration;
 	if (symbolTable().find(name) == symbolTable().end()) {
 		
 		declaration.first = name;
@@ -357,7 +357,7 @@ antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclara
 	int size = 0;
 	string name = ctx->NAME()->getText();
 
-	pair<string, Statement*> declaration;
+	pair<string, Expression*> declaration;
 	if (symbolTable().find(name) == symbolTable().end()) {
 		
 		declaration.first = name;

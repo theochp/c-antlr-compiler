@@ -4,7 +4,7 @@
 #include "statement.h"
 #include <vector>
 
-class ArrayDeclaration : public Statement {
+class ArrayDeclaration : public Expression {
     Variable * lvalue;
     std::vector<Expression *> expressions;
     std::vector<std::string> names;
