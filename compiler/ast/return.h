@@ -1,14 +1,14 @@
 #pragma once
 
-#include "statement.h"
+#include "expression.h"
 
-class Return : public Statement {
+class Return : public Expression {
 
-    Statement *statement;
+    Expression *statement;
 public:
     Return();
-    Return(Statement* statement);
+    Return(Expression* statement);
     ~Return();
-    const Statement *getStatement() const;
+    const Expression *getStatement() const;
     virtual std::string print();
 };

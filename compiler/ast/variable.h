@@ -2,11 +2,11 @@
 
 #include <string>
 
-#include "statement.h"
+#include "expression.h"
 
 using namespace std;
 
-class Variable : public Statement {
+class Variable : public Expression {
     string name;
 
 public:

@@ -1,6 +1,6 @@
 #include "arrayValue.h"
 
-ArrayValue::ArrayValue(Variable * arrayBegin, Statement * offset) 
+ArrayValue::ArrayValue(Variable * arrayBegin, Expression * offset) 
     : arrayBegin(arrayBegin), offset(offset){
 
 }
@@ -26,6 +26,6 @@ const Variable& ArrayValue::getArrayBegin(){
     return *arrayBegin;
 }
 
-const Statement * ArrayValue::getOffset(){
+const Expression * ArrayValue::getOffset(){
     return offset;
 }

@@ -19,6 +19,8 @@ using namespace std;
         loadT,
         storeT,
         call,
+        je,
+        jmp,
         equalcomp,
         diffcomp,
         infcomp,

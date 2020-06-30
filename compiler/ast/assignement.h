@@ -1,16 +1,17 @@
 #pragma once
 
-#include "expression.h"
+#include "operator.h"
 #include "variable.h"
+#include "expression.h"
 
-class Assignement : public Expression {
+class Assignement : public Operator {
     Variable *lvalue;
-    Statement *offset;
-    Statement *rvalue;
+    Expression *offset;
+    Expression *rvalue;
 
 public:
-    Assignement(Variable *lvalue, Statement *rvalue, Statement *offset);
-    Assignement(Variable *lvalue, Statement *rvalue);
+    Assignement(Variable *lvalue, Expression *rvalue, Expression *offset);
+    Assignement(Variable *lvalue, Expression *rvalue);
     ~Assignement();
     virtual std::string print();
 };

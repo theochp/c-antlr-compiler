@@ -4,14 +4,14 @@
 #include "variable.h"
 
 
-class ArrayValue : public Statement{
+class ArrayValue : public Expression {
     Variable * arrayBegin;
-    Statement * offset;
+    Expression * offset;
 
 public:
-    ArrayValue(Variable * arrayBegin, Statement * offset);
+    ArrayValue(Variable * arrayBegin, Expression * offset);
     ~ArrayValue();
     virtual std::string print();
     const Variable& getArrayBegin();
-    const Statement* getOffset();
+    const Expression* getOffset();
 };

@@ -12,7 +12,7 @@ class AsmGenerator {
     vector<IRFunc*> funcs;
     map<string, map<string, int>> symbolTables;
 
-    string generate_block(IRBlock& block);
+    string generate_block(const IRBlock& block);
 
     string generate_ldcst(Instruction& inst);
     string generate_store(Instruction& inst);
@@ -36,6 +36,8 @@ class AsmGenerator {
     string generate_bitwise_xor(Instruction& inst);
     string generate_bitwise_not(Instruction& inst);
     string generate_not(Instruction& inst);
+    string generate_je(Instruction& inst);
+    string generate_jmp(Instruction& inst);
 
     string getOffsetRegister(string symbolTable, string symbolName);
     string getOffset(string symbolTable, string symbolName);

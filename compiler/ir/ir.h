@@ -13,6 +13,7 @@ class BasicBlock;
 class CFG;
 class DefFonction;
 
+using namespace std;
 
 //! The class for one 3-address instruction
 class IRInstr {

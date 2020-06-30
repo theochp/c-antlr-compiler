@@ -1,5 +1,7 @@
 #pragma once
-#include <string>
+
+#include "expression.h"
+#include "operator.h"
 
 typedef enum {
     MULT,
@@ -18,13 +20,19 @@ typedef enum {
     BITWISE_XOR
 } OpType;
 
-class Operator {
-    OpType opType;
+class Operator : public Expression {
+    Expression *left;
+    Expression *right;
+    Expression *offset;
+    OpType op;
 
 public:
-    Operator (const OpType& opType);
-    const OpType& type() const;
-    Operator& operator=(const OpType& opType);
-    bool operator ==(const OpType &opType) const;
-    virtual std::string print();
+    Operator(OpType op, Expression *left, Expression *right, Expression *Expression);
+    Operator(OpType op, Expression *left, Expression *right);
+    ~Operator() override;
+    const Expression *getLeft() const;
+    const Expression *getRight() const;
+    const Expression * getOffset() const;
+    const OpType& getOp() const;
+    std::string print() override;
 };

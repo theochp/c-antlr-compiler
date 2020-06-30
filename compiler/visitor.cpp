@@ -1,6 +1,6 @@
 // Copied from a file generated from ifcc.g4 by ANTLR 4.7.2
 #include <map>
-#include <assert.h>
+#include <cassert>
 
 #include "visitor.h"
 #include "ast/block.h"
@@ -11,21 +11,17 @@
 #include "ast/operator.h"
 #include "ast/unoperator.h"
 #include "ast/assignement.h"
-#include "ast/expression.h"
 #include "ast/unexpression.h"
 #include "ast/arrayDeclaration.h"
 #include "ast/arrayValue.h"
 #include "ast/return.h"
 #include "ast/logicalNot.h"
+#include "ast/ifelse.h"
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
 #include "ast/func.h"
 #include "ast/funccall.h"
-#include "ast/funcparam.h"
-
-#define INDENT "\t"
-
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
 	antlrcpp::Any res = visit(ctx->prog()).as<vector<const Node *>>();
@@ -56,12 +52,12 @@ antlrcpp::Any Visitor::visitToplevel(ifccParser::ToplevelContext *ctx) {
 antlrcpp::Any Visitor::visitFuncdecl(ifccParser::FuncdeclContext *ctx) {
 	string name = ctx->NAME()->getText();
 	symbolTables.emplace(name, map<string, int>());
+	symbolOffsets.emplace(name, 0);
 	activeSymbolTable = name;
-	stackOffset = 0;
 	vector<const FuncParam*> params = visit(ctx->paramDecl()).as<vector<const FuncParam*>>();
 	auto func = new Func(name);
 	for (auto param : params) {
-		symbolTable().emplace(param->getName(), stackOffset -= 4);
+		symbolTable().emplace(param->getName(), incrementOffset(func->getName(), 4));
 		func->addParam(param);
 	}
 	
@@ -85,57 +81,68 @@ antlrcpp::Any Visitor::visitParamDecl(ifccParser::ParamDeclContext *ctx) {
 antlrcpp::Any Visitor::visitBloc(ifccParser::BlocContext *ctx) {
 	Block *block = new Block();
 	for (int i = 0; i < ctx->statement().size(); ++i) {
-		auto statement = visit(ctx->statement(i)).as<Statement*>();
-		block->addStatement(statement);
+		auto visited = visit(ctx->statement(i));
+		try {
+			auto statement = visited.as<Statement*>();
+			block->addStatement(statement);
+		} catch(bad_cast& e) {
+			auto statements = visited.as<vector<Assignement*>>();
+			for (auto assign : statements) {
+				block->addStatement(assign);
+			}
+		}
     }
     return block;
 }
 
 antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx) {
-	return visit(ctx->expr()).as<Statement*>();
+	return (Statement*) visit(ctx->expr()).as<Expression*>();
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	auto decl = visit(ctx->declaration()).as<Declaration*>();
-	return (Statement*) decl;
+	return visit(ctx->declaration()).as<Statement*>();
 }
 
 antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 	return visit(ctx->ret()).as<Statement*>();
 }
 
+antlrcpp::Any Visitor::visitIfElseStatement(ifccParser::IfElseStatementContext *ctx) {
+    return (Statement*) visit(ctx->ifElse()).as<IfElse*>();
+}
+
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
 	Declaration *declaration = new Declaration();
+	vector<Assignement*> assignements;
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        tuple<string, Statement*, int> symbol = visit(ctx->individualDeclaration(i)).as<tuple<string, Statement*, int>>();
+        tuple<string, Expression*, int> symbol = visit(ctx->individualDeclaration(i)).as<tuple<string, Expression*, int>>();
         if (get<0>(symbol) != ""){
             declaration->addSymbol(get<0>(symbol), get<1>(symbol), get<2>(symbol));
         }
 	}
-	return declaration;
+	return (Statement*) declaration;
 }
 
 antlrcpp::Any Visitor::visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
-	pair<string, Statement*> declaration;
+	pair<string, Expression*> declaration;
 	if (symbolTable().find(name) == symbolTable().end()) {
 		declaration.first = name;
+		
+		int size = 4;
         if (ctx->expr() != nullptr) {
-            Statement* stmnt = visit(ctx->expr()).as<Statement*>();
+            Expression* stmnt = visit(ctx->expr()).as<Expression*>();
             declaration.second = stmnt;
+			if(Char* c = dynamic_cast<Char*>(declaration.second)){
+            	size = 1;
+			}
         } else {
             declaration.second = nullptr;
         }
-        int offset;
-        if(Char* c = dynamic_cast<Char*>(declaration.second)){
-            offset = stackOffset -= 1;
-        } else {
-            offset = stackOffset -= 4;
-        }
-		symbolTable().emplace(name, offset);
+
+		symbolTable().emplace(name, incrementOffset(activeSymbolTable, size));
         pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
-
 	} else {
 		errorCount++;
 		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
@@ -147,11 +154,11 @@ antlrcpp::Any Visitor::visitValueDeclaration(ifccParser::ValueDeclarationContext
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
-	return (Statement*) new Constant(stoi(ctx->CONST()->getText()));
+	return (Expression*) new Constant(stoi(ctx->CONST()->getText()));
 }
 
 antlrcpp::Any Visitor::visitCharExpr(ifccParser::CharExprContext *ctx) {
-    return (Statement*) new Char((int) (ctx->CHAR()->getText().at(1)));
+    return (Expression*) new Char((int) (ctx->CHAR()->getText().at(1)));
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
@@ -169,37 +176,37 @@ antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
 		errors.push_back(error);
 	}
 
-	return (Statement*) new Variable(name);
+	return (Expression*) new Variable(name);
 }
 
 antlrcpp::Any Visitor::visitAffectExpr(ifccParser::AffectExprContext *ctx) {
 	string name = ctx->NAME()->getText();
 	if (symbolTable().find(name) != symbolTable().end()) {
-		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr()).as<Statement*>());
+		Expression * statement = (Expression*) new Assignement(new Variable(name), visit(ctx->expr()).as<Expression*>());
 		return statement;
 	} else {
 		errorCount++;
 		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
         errors.push_back(error);
-		return (Statement*) nullptr;
+		return (Expression*) nullptr;
 	}
 }
 
 antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
-	Operator opType = MULT;
+	OpType opType = MULT;
 	if (ctx->MULTDIV()->getText() == "/") {
 		opType = DIV;
 	}
 	auto leftExpr = visit(ctx->expr(0));
 	auto rightExpr = visit(ctx->expr(1));
 
-	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
 	string opStr = ctx->ADDMINUS()->getText();
 	
-	Operator opType = ADD;
+	OpType opType = ADD;
 	if (opStr == "-") {
 		opType = MINUS;
 	}
@@ -207,12 +214,12 @@ antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
 	auto leftExpr = visit(ctx->expr(0));
 	auto rightExpr = visit(ctx->expr(1));
 
-	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 	string op = ctx->ADDMINUS()->getText();
-	auto expr = visit(ctx->expr()).as<Statement*>();
+	auto expr = visit(ctx->expr()).as<Expression*>();
 
 	if (const Constant * cst = dynamic_cast<const Constant*>(expr)) {
 		if (op == "+") {
@@ -221,7 +228,7 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 			// replace by negative value constant
 			auto newCst = new Constant(-cst->getValue());
 			delete cst;
-			return (Statement*) newCst;
+			return (Expression*) newCst;
 		} else {
 			assert("Need to handle new op");
 		}
@@ -234,7 +241,7 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 		} else {
 			assert("Need to handle new op");
 		}
-		return (Statement *) new UnExpression(opType, expr);
+		return (Expression *) new UnExpression(opType, expr);
 	}
 
 	return nullptr;
@@ -243,7 +250,7 @@ antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
 antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
     string opStr = ctx->BITWISE()->getText();
 
-    Operator opType = BITWISE_AND;
+    OpType opType = BITWISE_AND;
     if (opStr == "|") {
         opType = BITWISE_OR;
     }
@@ -254,7 +261,7 @@ antlrcpp::Any Visitor::visitBitwiseExpr(ifccParser::BitwiseExprContext *ctx) {
     auto leftExpr = visit(ctx->expr(0));
     auto rightExpr = visit(ctx->expr(1));
 
-    return (Statement*) new Expression(opType, leftExpr, rightExpr);
+    return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
@@ -262,7 +269,7 @@ antlrcpp::Any Visitor::visitParExpr(ifccParser::ParExprContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx){
-	Operator opType = INFCOMP;
+	OpType opType = INFCOMP;
 	if (ctx->COMP_PRIO()->getText() == "<=") {
 		opType = INFEQCOMP;
 	}
@@ -272,25 +279,25 @@ antlrcpp::Any Visitor::visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx){
 	else if (ctx->COMP_PRIO()->getText() == ">=") {
 		opType = SUPEQCOMP;
 	}
-	Statement* leftExpr = visit(ctx->expr(0));
-	Statement* rightExpr = visit(ctx->expr(1));
+	Expression* leftExpr = visit(ctx->expr(0));
+	Expression* rightExpr = visit(ctx->expr(1));
 
-	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitCompExpr(ifccParser::CompExprContext *ctx){
-	Operator opType = EQUALCOMP;
+	OpType opType = EQUALCOMP;
 	if (ctx->COMP()->getText() == "!=") {
 		opType = DIFFCOMP;
 	}
-	Statement* leftExpr = visit(ctx->expr(0));
-	Statement* rightExpr = visit(ctx->expr(1));
+	Expression* leftExpr = visit(ctx->expr(0));
+	Expression* rightExpr = visit(ctx->expr(1));
 
-	return (Statement*) new Expression(opType, leftExpr, rightExpr);
+	return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	return (Statement*) new Return(visit(ctx->expr()).as<Statement*>());
+	return (Statement*) new Return(visit(ctx->expr()).as<Expression*>());
 }
 
 antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {
@@ -301,7 +308,7 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 	if (symbolTable().find(name) == symbolTable().end()) {
 		
 		declaration.first = name;
-        	pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
 		int i = 0;
 
@@ -310,7 +317,7 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 			std::vector<std::string> names;
 
 			for(; i <size -1; i++)
-				names.push_back(allocateTempVar());
+				names.push_back(allocateTempVar(4));
 
 			stmnt->SetFirstName(name);
 			stmnt->AddNames(names);
@@ -320,7 +327,7 @@ antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext
 	    		declaration.second = new ArrayDeclaration(size);
 		}
 
-		int offset = stackOffset -= 4*(size-i);
+		int offset = incrementOffset(activeSymbolTable, 4*(size-i));
 		symbolTable().emplace(name, offset);
 	} else {
 		errorCount++;
@@ -348,12 +355,12 @@ antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclara
 		std::vector<std::string> names;
 
 		for(int i = 0; i <size -1 ; i++)
-			names.push_back(allocateTempVar());
+			names.push_back(allocateTempVar(4));
 		
 		stm->SetFirstName(name);
 		stm->AddNames(names);
 
-		int offset = stackOffset -= 4;
+		int offset = incrementOffset(activeSymbolTable, 4);
 		symbolTable().emplace(name, offset);
 
         pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
@@ -374,7 +381,7 @@ antlrcpp::Any Visitor::visitArrayAssignation(ifccParser::ArrayAssignationContext
 	ArrayDeclaration* stm = new ArrayDeclaration();
 	
 	for (int i = 0; i < ctx->expr().size(); i++)
-		stm->AddExpression(visit(ctx->expr(i)).as<Statement *>());
+		stm->AddExpression(visit(ctx->expr(i)).as<Expression *>());
 	
 	return stm;
 }
@@ -383,53 +390,53 @@ antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *
 	string name = ctx->NAME()->getText();
 
 	if (symbolTable().find(name) != symbolTable().end()) {
-		Statement * statement = (Statement*) new Assignement(new Variable(name), visit(ctx->expr(1)).as<Statement*>(), visit(ctx->expr(0)).as<Statement*>());
-		return statement;
+		Expression * expr = (Expression*) new Assignement(
+			new Variable(name), 
+			visit(ctx->expr(1)).as<Expression*>(), 
+			visit(ctx->expr(0)).as<Expression*>()
+		);
+		return expr;
 	} else {
 		errorCount++;
 		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
         errors.push_back(error);
-		return (Statement*) nullptr;
+		return (Expression*) nullptr;
 	}
 }
 
 antlrcpp::Any Visitor::visitArrayValue(ifccParser::ArrayValueContext *ctx) {
 		string name = ctx->NAME()->getText();
 		auto offset = visit(ctx->expr());
-		return (Statement *) new ArrayValue(new Variable(name), offset);
+		return (Expression *) new ArrayValue(new Variable(name), offset);
 }
 
 antlrcpp::Any Visitor::visitFuncall(ifccParser::FuncallContext *ctx) {
 	string name = ctx->NAME()->getText();
-	auto paramList = visit(ctx->paramList()).as<const vector<Statement*>&>();
+	auto paramList = visit(ctx->paramList()).as<const vector<Expression*>&>();
 	FuncCall *fCall = new FuncCall(name);
 	fCall->addParamStatements(paramList);
-	return (Statement *) fCall;
+	return (Expression *) fCall;
 }
 
 antlrcpp::Any Visitor::visitParamList(ifccParser::ParamListContext *ctx) {
-	vector<Statement*> statements;
+	vector<Expression*> statements;
 
 	for (int i = 0; i < ctx->expr().size(); ++i) {
-		auto statement = visit(ctx->expr(i)).as<Statement*>();
+		auto statement = visit(ctx->expr(i)).as<Expression*>();
 		statements.push_back(statement);
 	}
 
 	return statements;
 }
 
-antlrcpp::Any Visitor::visitParam(ifccParser::ParamContext *ctx) {
-	// TODO: for declarations
-}
-
 antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
-    string op = ctx->NOT()->getText();
-    auto expr = visit(ctx->expr()).as<Statement*>();
+	string op = ctx->NOT()->getText();
+    auto expr = visit(ctx->expr()).as<Expression*>();
 
     if (op == "!") {
-        return (Statement *) new LogicalNot(expr);
+        return (Expression *) new LogicalNot(expr);
     } else if (op == "~") {
-        return (Statement *) new UnExpression(UnOpType::BITWISE_NOT, expr);
+        return (Expression *) new UnExpression(UnOpType::BITWISE_NOT, expr);
     } else {
         assert("Need to handle new op");
     }
@@ -437,12 +444,27 @@ antlrcpp::Any Visitor::visitNotExpr(ifccParser::NotExprContext *ctx){
     return nullptr;
 }
 
-string Visitor::allocateTempVar() {
-	int offset = stackOffset -= 4;
-	string name("0_"); // on met un 0 au début pour être sur que ça ne correspond à aucun variable c
-	name.append(to_string(rand()%1000000+100000));
-	symbolTable().emplace(name, offset);
+antlrcpp::Any Visitor::visitIfElse(ifccParser::IfElseContext *ctx) {
+	Block *ifBlock = visit(ctx->blocOrStatement()).as<Block *>();
+	Block *elseBlock = nullptr;
+	if (ctx->elsePart()) {
+		elseBlock = visit(ctx->elsePart()).as<Block*>();
+	}
+	Expression *condition = visit(ctx->expr()).as<Expression*>();
 
-	return name;
+	return new IfElse(ifBlock, elseBlock, condition);
 }
 
+antlrcpp::Any Visitor::visitElsePart(ifccParser::ElsePartContext *ctx) {
+	return visit(ctx->blocOrStatement()).as<Block*>();
+}
+
+antlrcpp::Any Visitor::visitBlocOrStatement(ifccParser::BlocOrStatementContext *ctx) {
+	if (ctx->bloc()) {
+		return visit(ctx->bloc()).as<Block*>();
+	} else {
+		auto block = new Block();
+		block->addStatement(visit(ctx->statement()).as<Statement*>());
+		return block;
+	}
+}

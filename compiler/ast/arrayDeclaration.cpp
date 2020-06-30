@@ -10,7 +10,7 @@ ArrayDeclaration::~ArrayDeclaration(){
     delete lvalue;
 }
 
-void ArrayDeclaration::AddExpression(Statement * expr){
+void ArrayDeclaration::AddExpression(Expression * expr){
     expressions.push_back(expr);
 }
 
@@ -46,7 +46,7 @@ void ArrayDeclaration::SetFirstName(std::string name){
     }
 }
 
-const std::vector<Statement *>& ArrayDeclaration::Expressions(){
+const std::vector<Expression *>& ArrayDeclaration::Expressions(){
     return expressions;
 }
 
