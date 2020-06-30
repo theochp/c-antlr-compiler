@@ -95,6 +95,12 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     if (const Constant *el = dynamic_cast<const Constant *>(expression)) {
         return generateConstant(el, block);
     }
+    else if (const Char *el = dynamic_cast<const Char *>(expression)) {
+        return generateChar(el, block);
+    }
+    /*else if (const Declaration *el = dynamic_cast<const Declaration *>(statement)) {
+        return generateDeclaration(el, block);
+    }*/
     else if (const Operator *el = dynamic_cast<const Operator *>(expression)) {
         return generateOperator(el, block);
     }
@@ -120,6 +126,13 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
 const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlock *block) {
     string dest = newTempVar(block->getFunc()->getName());
     auto instr = new Instruction(IROp::ldcst, dest, {to_string(constant->getValue())}, block);
+    block->addInstruction(instr);
+    return instr;
+}
+
+const Instruction *IRGenerator::generateChar(const Char *character, IRBlock *block) {
+    string dest = newTempVar(block->getFunc()->getName());
+    auto instr = new Instruction(IROp::ldcst, dest, {to_string(character->getValue())}, block);
     block->addInstruction(instr);
     return instr;
 }

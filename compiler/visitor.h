@@ -44,6 +44,8 @@ public:
 
     antlrcpp::Any visitConstExpr(ifccParser::ConstExprContext *ctx) override;
 
+    antlrcpp::Any visitCharExpr(ifccParser::CharExprContext *ctx) override;
+
     antlrcpp::Any visitMultExpr(ifccParser::MultExprContext *ctx) override;
 
     antlrcpp::Any visitAddExpr(ifccParser::AddExprContext *ctx) override;

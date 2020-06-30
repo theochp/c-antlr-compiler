@@ -64,8 +64,8 @@ int main(int argn, const char **argv) {
     if (visitor.getErrCount() == 0)  {
         IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getSymbolOffsets());
         irGen.generate();
-        AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
 
+        AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
         asmGen.generate(cout);
 
         ofstream out("output.s");
@@ -74,7 +74,6 @@ int main(int argn, const char **argv) {
 
         return 0;
     }
-
   for (auto it = ast.begin(); it != ast.end(); ++it) {
     delete *it;
   }

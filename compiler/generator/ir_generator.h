@@ -8,8 +8,10 @@
 #include "../ir/instruction.h"
 #include "../ast/node.h"
 #include "../ast/block.h"
-#include "../ast/expression.h"
+#include "../ast/statement.h"
 #include "../ast/constant.h"
+#include "../ast/char.h"
+#include "../ast/expression.h"
 #include "../ast/operator.h"
 #include "../ast/unexpression.h"
 #include "../ast/logicalNot.h"
@@ -36,6 +38,7 @@ class IRGenerator {
     const Instruction *generateExpression(const Expression *statement, IRBlock *block);
     const Instruction *generateConstant(const Constant *constant, IRBlock *block);
     const Instruction *generateOperator(const Operator *pOperator, IRBlock *block);
+    const Instruction *generateChar(const Char *character, IRBlock *block);
     const Instruction *generateUnExpression(const UnExpression *expression, IRBlock *block);
     const Instruction *generateLogicalNot(const LogicalNot *expression, IRBlock *block);
     const Instruction *generateReturn(const Return *ret, IRBlock *block);

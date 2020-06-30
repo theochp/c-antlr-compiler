@@ -5,6 +5,8 @@
 #include "visitor.h"
 #include "ast/block.h"
 #include "ast/constant.h"
+#include "ast/char.h"
+#include "ir/instruction.h"
 #include "ast/operator.h"
 #include "ast/unoperator.h"
 #include "ast/assignement.h"
@@ -122,7 +124,12 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 	pair<string, Expression*> declaration;
 	if (symbolTable().find(name) == symbolTable().end()) {
 		declaration.first = name;
-		int offset = incrementOffset(activeSymbolTable, 4);
+		int offset;
+        if(Char* c = dynamic_cast<Char*>(declaration.second)){
+            offset = incrementOffset(activeSymbolTable, 1);
+        } else {
+            offset = incrementOffset(activeSymbolTable, 4);
+        }
 		symbolTable().emplace(name, offset);
         pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
@@ -144,6 +151,10 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 	return (Expression*) new Constant(stoi(ctx->CONST()->getText()));
+}
+
+antlrcpp::Any Visitor::visitCharExpr(ifccParser::CharExprContext *ctx) {
+    return (Expression*) new Char((int) (ctx->CHAR()->getText().at(1)));
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
