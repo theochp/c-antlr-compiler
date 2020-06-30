@@ -130,6 +130,11 @@ if args.debug:
 
 jobs=[]
 
+if os.path.exists(DEST):
+    shutil.rmtree('pld-test-output')
+    print("rm pld-test-output")
+    os.mkdir(DEST)
+
 for inputfilename in inputfilenames:
     if args.debug>=2:
         print("debug: PREPARING "+inputfilename)
