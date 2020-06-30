@@ -67,7 +67,7 @@ int main(int argn, const char **argv) {
        // cout << "Test 3 de Cyrielle et Tania" << endl;
         irGen.generate();
        // cout << "Test 4 de Cyrielle et Tania" << endl;
-        AsmGenerator asmGen(irGen.getBlocks(), irGen.getSymbolTable());
+        AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
        // cout << "Test 5 de Cyrielle et Tania" << endl;
         asmGen.generate(cout);
      //   cout << "Test 6 de Cyrielle et Tania" << endl;

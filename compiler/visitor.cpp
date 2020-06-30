@@ -133,7 +133,7 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
         } else {
             offset = stackOffset -= 4;
         }
-		symbolTable.emplace(name, offset);
+		symbolTable().emplace(name, offset);
         pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
 		countUseVar.push_back(make_tuple(name, 0, positionPair));
 
