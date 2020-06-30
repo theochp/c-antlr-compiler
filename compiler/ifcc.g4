@@ -26,7 +26,7 @@ individualDeclaration: NAME ('=' expr)?		# valueDeclaration
 	| NAME'[]' arrayAssignation				# arrayDeclarationAssignation
 	;
 
-arrayAssignation: '=' '{'(CONST(','CONST)*)? '}';
+arrayAssignation: '=' '{'(expr(','expr)*)? '}';
 
 expr: NAME paramList				# funcall
 	| ADDMINUS expr					# unOp

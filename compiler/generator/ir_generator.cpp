@@ -249,10 +249,9 @@ const Instruction *IRGenerator::generateLogicalNot(const LogicalNot *expr, IRBlo
 }
 
 const Instruction *IRGenerator::generateArray(ArrayDeclaration *array, IRBlock *block) {
-    for(int i = 0; i < array->Size() && i < array->Values().size(); i++)
+    for(int i = 0; i < array->Size() && i < array->Expressions().size(); i++)
     {
-        auto stm = new Constant(atoi(array->Values().at(i).c_str()));
-        auto instr = new Instruction(IROp::store, array->Names().at(i), {generateStatement(stm, block)->dest()}, block);
+        auto instr = new Instruction(IROp::store, array->Names().at(i), {generateStatement(array->Expressions().at(i), block)->dest()}, block);
         block->addInstruction(instr);
     }
     

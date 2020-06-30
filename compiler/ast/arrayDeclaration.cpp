@@ -10,8 +10,8 @@ ArrayDeclaration::~ArrayDeclaration(){
     delete lvalue;
 }
 
-void ArrayDeclaration::AddValue(std::string value){
-    values.push_back(value);
+void ArrayDeclaration::AddExpression(Statement * expr){
+    expressions.push_back(expr);
 }
 
 const std::size_t& ArrayDeclaration::Size(){
@@ -46,8 +46,8 @@ void ArrayDeclaration::SetFirstName(std::string name){
     }
 }
 
-const std::vector<std::string>& ArrayDeclaration::Values(){
-    return values;
+const std::vector<Statement *>& ArrayDeclaration::Expressions(){
+    return expressions;
 }
 
 const std::vector<std::string>& ArrayDeclaration::Names(){

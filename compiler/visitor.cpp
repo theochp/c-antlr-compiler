@@ -332,7 +332,7 @@ antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclara
 	if (symbolTable().find(name) == symbolTable().end()) {
 		
 		declaration.first = name;
-		stm->SetSize(stm->Values().size());
+		stm->SetSize(stm->Expressions().size());
 		size = stm->Size();
 		std::vector<std::string> names;
 
@@ -362,8 +362,8 @@ antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclara
 antlrcpp::Any Visitor::visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) {
 	ArrayDeclaration* stm = new ArrayDeclaration();
 	
-	for (int i = 0; i < ctx->CONST().size(); i++)
-		stm->AddValue(ctx->CONST(i)->getText());
+	for (int i = 0; i < ctx->expr().size(); i++)
+		stm->AddExpression(visit(ctx->expr(i)).as<Statement *>());
 	
 	return stm;
 }
