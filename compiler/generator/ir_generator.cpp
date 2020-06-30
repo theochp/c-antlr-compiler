@@ -39,15 +39,22 @@ pair<IRBlock *, IRBlock *> IRGenerator::generateBlock(const Block *block, IRFunc
 }
 
 IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *block) {
-    if (auto el = dynamic_cast<const Expression *>(statement)) {
-        generateExpression(el, block);
+    if (auto expr = dynamic_cast<const Expression *>(statement)) {
+        generateExpression(expr, block);
     }
-    else if (auto el = dynamic_cast<const IfElse *>(statement)) {
-        // return the continuation block
-        return generateIfElse(el, block);
-    } else if(auto el = dynamic_cast<const Declaration *>(statement)) {
+    else if (auto ifElse = dynamic_cast<const IfElse *>(statement)) {
+        return generateIfElse(ifElse, block);
+    }
+    else if (auto aWhile = dynamic_cast<const While *>(statement)) {
+        return generateWhile(aWhile, block);
+    }
+    else if (auto aFor = dynamic_cast<const For *>(statement)) {
+        return generateFor(aFor, block);
+    }
+    else if(auto el = dynamic_cast<const Declaration *>(statement)) {
         generateDeclaration(el, block);
-    } else {
+    }
+    else {
         assert("Need to handle new types");
     }
     return block;
@@ -89,6 +96,66 @@ IRBlock *IRGenerator::generateIfElse(const IfElse *ifElse, IRBlock *block) {
     // generate instructions
     block->addInstruction(new Instruction(je, block->getExitFalse()->getLabel(), {conditionLastIntr->dest(), "0"}, block));
     blockIf.second->addInstruction(new Instruction(jmp, {continueBlock->getLabel()}, blockIf.second));
+
+    return continueBlock;
+}
+
+IRBlock *IRGenerator::generateWhile(const While *aWhile, IRBlock *block) {
+    // set condition var
+    auto conditionBlock = new IRBlock(newLabel(), block->getFunc());
+    auto conditionLastIntr = generateExpression(aWhile->getCondition(), conditionBlock);
+    block->setTestVarName(conditionLastIntr->dest());
+
+    block->getFunc()->addBlock(conditionBlock);
+
+    // create the while block
+    auto blockWhile = generateBlock(aWhile->getBlock(), block->getFunc(), newLabel());
+
+    // create the continuation block (after the while)
+    auto continueBlock = new IRBlock(newLabel(), block->getFunc());
+
+    conditionBlock->setExitTrue(blockWhile.first);
+    conditionBlock->setExitFalse(continueBlock);
+    blockWhile.second->setExitTrue(conditionBlock);
+
+    // generate instructions
+    conditionBlock->addInstruction(new Instruction(je, continueBlock->getLabel(), {conditionLastIntr->dest(), "0"}, block));
+    blockWhile.second->addInstruction(new Instruction(jmp, {conditionBlock->getLabel()}, blockWhile.second));
+
+    block->getFunc()->addBlock(continueBlock);
+
+    return continueBlock;
+}
+
+IRBlock *IRGenerator::generateFor(const For *aFor, IRBlock *block) {
+
+    // 1st for argument
+    generateExpression(aFor->getExpressions()[0], block);
+
+    // 2nd for argument
+    auto conditionBlock = new IRBlock(newLabel(), block->getFunc());
+    auto conditionLastIntr = generateExpression(aFor->getExpressions()[1], conditionBlock);
+    block->setTestVarName(conditionLastIntr->dest());
+
+    block->getFunc()->addBlock(conditionBlock);
+
+    // create the for block
+    auto blockFor = generateBlock(aFor->getBlock(), block->getFunc(), newLabel());
+
+    // 3rd for argument
+    generateExpression(aFor->getExpressions()[2], blockFor.second);
+
+    auto continueBlock = new IRBlock(newLabel(), block->getFunc());
+
+    conditionBlock->setExitTrue(blockFor.first);
+    conditionBlock->setExitFalse(continueBlock);
+    blockFor.second->setExitTrue(conditionBlock);
+
+    // generate instructions
+    conditionBlock->addInstruction(new Instruction(je, continueBlock->getLabel(), {conditionLastIntr->dest(), "0"}, block));
+    blockFor.second->addInstruction(new Instruction(jmp, {conditionBlock->getLabel()}, blockFor.second));
+
+    block->getFunc()->addBlock(continueBlock);
 
     return continueBlock;
 }
@@ -164,7 +231,7 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
                 return instr;
             } 
         } else {
-            assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici");
+            static_assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici", "");
             return nullptr;
         }
     } else {
@@ -207,7 +274,7 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
                 inst =  new Instruction(IROp::supeqcomp, dest, {op1, op2}, block);
                 break;
             case OpType::ASSIGN:
-                assert("Le cas ASSIGN doit être géré d'une autre manière");
+                static_assert("Le cas ASSIGN doit être géré d'une autre manière", "");
                 break;
             case OpType::BITWISE_AND:
                 inst = new Instruction(IROp::bitwise_and, dest, {op1, op2}, block);
@@ -219,7 +286,7 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
                 inst = new Instruction(IROp::bitwise_xor, dest, {op1, op2}, block);
                 break;
             default:
-                assert("Missing type");
+                static_assert("Missing type", "");
                 break;
         }
 
@@ -259,7 +326,7 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
 
     string op1 = instr->dest();
     string dest = newTempVar(block->getFunc()->getName());
-    
+
     Instruction *inst;
     switch(expression->getOp().type()) {
         case UnOpType::UN_PLUS:

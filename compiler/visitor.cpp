@@ -22,6 +22,8 @@
 #include "static-analysis/unusedVariable.h"
 #include "ast/func.h"
 #include "ast/funccall.h"
+#include "ast/while.h"
+#include "ast/for.h"
 
 antlrcpp::Any Visitor::visitAxiom(ifccParser::AxiomContext *ctx) {
 	antlrcpp::Any res = visit(ctx->prog()).as<vector<const Node *>>();
@@ -109,6 +111,14 @@ antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
 
 antlrcpp::Any Visitor::visitIfElseStatement(ifccParser::IfElseStatementContext *ctx) {
     return (Statement*) visit(ctx->ifElse()).as<IfElse*>();
+}
+
+antlrcpp::Any Visitor::visitWhileStatement(ifccParser::WhileStatementContext *ctx) {
+    return (Statement*) visit(ctx->whileStmnt()).as<While*>();
+}
+
+antlrcpp::Any Visitor::visitForStatement(ifccParser::ForStatementContext *ctx) {
+    return (Statement*) visit(ctx->forStmnt()).as<For*>();
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
@@ -457,6 +467,23 @@ antlrcpp::Any Visitor::visitIfElse(ifccParser::IfElseContext *ctx) {
 
 antlrcpp::Any Visitor::visitElsePart(ifccParser::ElsePartContext *ctx) {
 	return visit(ctx->blocOrStatement()).as<Block*>();
+}
+
+antlrcpp::Any Visitor::visitWhileStmnt(ifccParser::WhileStmntContext *ctx) {
+    auto block = visit(ctx->blocOrStatement()).as<Block *>();
+    auto condition = visit(ctx->expr()).as<Expression*>();
+
+    return new While(block, condition);
+}
+
+antlrcpp::Any Visitor::visitForStmnt(ifccParser::ForStmntContext *ctx) {
+    auto block = visit(ctx->blocOrStatement()).as<Block *>();
+    vector<Expression *> expressions;
+    for (int i = 0; i < ctx->expr().size(); ++i) {
+        expressions.push_back(visit(ctx->expr(i)).as<Expression*>());
+    }
+
+    return new For(block, expressions);
 }
 
 antlrcpp::Any Visitor::visitBlocOrStatement(ifccParser::BlocOrStatementContext *ctx) {
