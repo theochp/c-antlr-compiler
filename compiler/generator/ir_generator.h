@@ -11,9 +11,12 @@
 #include "../ast/statement.h"
 #include "../ast/constant.h"
 #include "../ast/char.h"
+#include "../ast/declaration.h"
 #include "../ast/expression.h"
 #include "../ast/operator.h"
 #include "../ast/unexpression.h"
+#include "../ast/arrayDeclaration.h"
+#include "../ast/arrayValue.h"
 #include "../ast/logicalNot.h"
 #include "../ast/return.h"
 #include "../ast/variable.h"
@@ -39,10 +42,13 @@ class IRGenerator {
     const Instruction *generateConstant(const Constant *constant, IRBlock *block);
     const Instruction *generateOperator(const Operator *pOperator, IRBlock *block);
     const Instruction *generateChar(const Char *character, IRBlock *block);
+    const Instruction *generateDeclaration(const Declaration *declaration, IRBlock *block);
     const Instruction *generateUnExpression(const UnExpression *expression, IRBlock *block);
     const Instruction *generateLogicalNot(const LogicalNot *expression, IRBlock *block);
     const Instruction *generateReturn(const Return *ret, IRBlock *block);
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
+    const Instruction *generateArray(ArrayDeclaration *variable, IRBlock *block);
+    const Instruction *generateArrayValue(ArrayValue *variable, IRBlock *block);
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
     string newTempVar(const string& symbolTable);
     string newLabel();

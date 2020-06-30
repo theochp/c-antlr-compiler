@@ -67,7 +67,7 @@ int main(int argn, const char **argv) {
 
         AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
         asmGen.generate(cout);
-
+  
         ofstream out("output.s");
         asmGen.generate(out);
         out.close();

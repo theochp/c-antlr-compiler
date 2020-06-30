@@ -27,7 +27,10 @@ elsePart: 'else' blocOrStatement;
 
 blocOrStatement: (bloc | statement);
 
-individualDeclaration: NAME ('=' expr)? ;
+individualDeclaration: NAME ('=' expr)?		# valueDeclaration
+	| NAME'['CONST']' arrayAssignation?		# arrayDeclaration
+	| NAME'[]' arrayAssignation				# arrayDeclarationAssignation
+	;
 
 expr: NAME paramList     # funcall
 	| ADDMINUS expr 	 # unOp
@@ -38,14 +41,17 @@ expr: NAME paramList     # funcall
 	| expr COMP expr      # compExpr
 	| expr BITWISE expr  # bitwiseExpr
 	| NAME '=' expr		 # affectExpr
+	| NAME '[' expr ']' '=' expr	# affectArrayExpr
     | LPAR expr RPAR	 # parExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
+	| NAME '[' expr ']'				# arrayValue
 	| CHAR               # charExpr
 	;
 
+arrayAssignation: '=' '{'(expr(','expr)*)? '}';
+
 paramList : LPAR expr (',' expr)* RPAR;
-param : 'int' NAME;
 
 ret: RETURN expr? ';';
 

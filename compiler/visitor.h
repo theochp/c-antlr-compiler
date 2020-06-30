@@ -38,7 +38,7 @@ public:
 
     antlrcpp::Any visitDeclaration(ifccParser::DeclarationContext *ctx) override;
 
-	antlrcpp::Any visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) override;
+	antlrcpp::Any visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) override;
 
 	antlrcpp::Any visitNameExpr(ifccParser::NameExprContext *ctx) override;
 
@@ -68,7 +68,15 @@ public:
 
     antlrcpp::Any visitParamList(ifccParser::ParamListContext *ctx) override;
 
-    antlrcpp::Any visitParam(ifccParser::ParamContext *ctx) override;
+    antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) override;
+
+    antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) override;
+
+    antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) override;
+    
+    antlrcpp::Any visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) override;
+
+    antlrcpp::Any visitArrayValue(ifccParser::ArrayValueContext *ctx) override;
 
     antlrcpp::Any visitNotExpr(ifccParser::NotExprContext *ctx) override;
 
@@ -109,6 +117,7 @@ private:
     map<string, map<string, int>> symbolTables;
     map<string, int> symbolOffsets;
     string activeSymbolTable; // function name or !global
+    int visitorCreatedSymbols = 0;
     vector<tuple<string, int, pair<int, int>>> countUseVar; // variable name, variable nb of use, variable declaration line and position
     vector<Instruction *> instructions;
     int errorCount = 0;
@@ -125,5 +134,13 @@ private:
         symbolOffsets.emplace(func, newOffset);
         return newOffset;
     }
+
+    string allocateTempVar(int size) {
+        string name = "!vis_";
+        name.append(to_string(visitorCreatedSymbols++));
+        symbolTable().emplace(name, incrementOffset(activeSymbolTable, size));
+        return name;
+    }
+
 };
 

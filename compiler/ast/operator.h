@@ -23,13 +23,16 @@ typedef enum {
 class Operator : public Expression {
     Expression *left;
     Expression *right;
+    Expression *offset;
     OpType op;
 
 public:
+    Operator(OpType op, Expression *left, Expression *right, Expression *Expression);
     Operator(OpType op, Expression *left, Expression *right);
     ~Operator() override;
     const Expression *getLeft() const;
     const Expression *getRight() const;
+    const Expression * getOffset() const;
     const OpType& getOp() const;
     std::string print() override;
 };
