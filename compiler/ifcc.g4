@@ -37,9 +37,11 @@ individualDeclaration: NAME ('=' expr)?		# valueDeclaration
 	| NAME'[]' arrayAssignation				# arrayDeclarationAssignation
 	;
 
-expr: NAME paramList     # funcall
+expr: NAME IN_DECREMENT  # postInDecrExpr
+	| NAME paramList     # funcall
 	| ADDMINUS expr 	 # unOp
 	| NOT expr 	  		 # notExpr
+    | IN_DECREMENT NAME  # preInDecrExpr
 	| expr MULTDIV expr  # multExpr
 	| expr ADDMINUS expr # addExpr
     | expr COMP_PRIO expr # compPrioExpr
@@ -65,6 +67,7 @@ NAME : [a-zA-Z_]+;
 NOT : ('!' | '~');
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
+IN_DECREMENT : ('++' | '--');
 COMP_PRIO : ('<='|'<'|'>='|'>');
 COMP : ('=='|'!=');
 BITWISE : ('&' | '|' | '^');

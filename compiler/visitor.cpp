@@ -17,6 +17,7 @@
 #include "ast/return.h"
 #include "ast/logicalNot.h"
 #include "ast/ifelse.h"
+#include "ast/incexpression.h"
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
@@ -495,3 +496,39 @@ antlrcpp::Any Visitor::visitBlocOrStatement(ifccParser::BlocOrStatementContext *
 		return block;
 	}
 }
+
+antlrcpp::Any Visitor::visitPreInDecrExpr(ifccParser::PreInDecrExprContext *ctx) {
+    string op = ctx->IN_DECREMENT()->getText();
+    string name = ctx->NAME()->getText();
+	symbolTable().emplace(name, incrementOffset(activeSymbolTable, 4));
+	string temp = allocateTempVar(4);
+
+    UnOpType opType;
+    if (op == "++") {
+        opType = UnOpType::PREINCRE;
+    } else if (op == "--") {
+        opType = UnOpType::PREDECRE;
+    } else {
+        assert("Need to handle new op");
+    }
+	
+    return (Expression*) new IncExpression(opType, new Variable(name), temp);
+}
+
+antlrcpp::Any Visitor::visitPostInDecrExpr(ifccParser::PostInDecrExprContext *ctx) {
+    string op = ctx->IN_DECREMENT()->getText();
+    string name = ctx->NAME()->getText();
+	symbolTable().emplace(name, incrementOffset(activeSymbolTable, 4));
+	string temp = allocateTempVar(4);
+
+    UnOpType opType;
+    if (op == "++") {
+        opType = UnOpType::POSTINCRE;
+    } else if (op == "--") {
+        opType = UnOpType::POSTDECRE;
+    } else {
+        assert("Need to handle new op");
+    }
+    return (Expression*) new IncExpression(opType, new Variable(name), temp);
+}
+

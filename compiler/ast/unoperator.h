@@ -4,6 +4,10 @@
 typedef enum {
     UN_PLUS,
     UN_MINUS,
+    PREINCRE,
+    PREDECRE,
+    POSTINCRE,
+    POSTDECRE,
     BITWISE_NOT
 } UnOpType;
 
