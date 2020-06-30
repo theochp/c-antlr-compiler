@@ -39,6 +39,9 @@ const Instruction *IRGenerator::generateStatement(const Statement *statement, IR
     if (const Constant *el = dynamic_cast<const Constant *>(statement)) {
         return generateConstant(el, block);
     }
+    else if (const Char *el = dynamic_cast<const Char *>(statement)) {
+        return generateChar(el, block);
+    }
     else if (const Declaration *el = dynamic_cast<const Declaration *>(statement)) {
         return generateDeclaration(el, block);
     }
@@ -72,6 +75,17 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
     string dest = newTempVar(block->getFunc()->getName());
     auto instr = new Instruction(IROp::ldcst, dest, {to_string(constant->getValue())}, block);
     block->addInstruction(instr);
+    return instr;
+}
+
+const Instruction *IRGenerator::generateChar(const Char *character, IRBlock *block) {
+ //   cout << "Test de Cyrielle et Tania début de generateChar" << endl;
+    string dest = newTempVar(block->getFunc()->getName());
+  //  cout << "Test de Cyrielle et Tania milieu 1 de generateChar" << endl;
+    auto instr = new Instruction(IROp::ldcst, dest, {to_string(character->getValue())}, block);
+  //  cout << "Test de Cyrielle et Tania milieu de generateChar" << endl;
+    block->addInstruction(instr);
+ //   cout << "Test de Cyrielle et Tania fin de generateChar" << endl;
     return instr;
 }
 
