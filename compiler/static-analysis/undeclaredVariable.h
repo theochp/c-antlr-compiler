@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "error.h"
 
 class UndeclaredVariable : public Error{

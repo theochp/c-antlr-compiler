@@ -1,14 +1,18 @@
 #include "irblock.h"
 
-IRBlock::IRBlock(string label) : label(label) {
+IRBlock::IRBlock(string label, const IRFunc *func) : label(label), func(func) {
     
 }
 
-string IRBlock::getLabel() {
+string IRBlock::getLabel() const {
     return label;
 }
 
-const vector<Instruction*> &IRBlock::getInstructions() {
+const IRFunc *IRBlock::getFunc() const {
+    return func;
+}
+
+const vector<Instruction*> &IRBlock::getInstructions() const {
     return instructions;
 }
 
