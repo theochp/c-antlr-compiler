@@ -38,7 +38,7 @@ public:
 
     virtual antlrcpp::Any visitDeclaration(ifccParser::DeclarationContext *ctx) override;
 
-	virtual antlrcpp::Any visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) override;
+	virtual antlrcpp::Any visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) override;
 
 	virtual antlrcpp::Any visitNameExpr(ifccParser::NameExprContext *ctx) override;
 
@@ -64,6 +64,15 @@ public:
 
     virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
+    virtual antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) override;
+
+    virtual antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) override;
+
+    virtual antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) override;
+    
+    virtual antlrcpp::Any visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) override;
+
+    virtual antlrcpp::Any visitArrayValue(ifccParser::ArrayValueContext *ctx) override;
     virtual antlrcpp::Any visitFuncall(ifccParser::FuncallContext *ctx) override;
 
     virtual antlrcpp::Any visitParamList(ifccParser::ParamListContext *ctx) override;

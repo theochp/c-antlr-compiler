@@ -14,6 +14,8 @@
 #include "../ast/declaration.h"
 #include "../ast/expression.h"
 #include "../ast/unexpression.h"
+#include "../ast/arrayDeclaration.h"
+#include "../ast/arrayValue.h"
 #include "../ast/logicalNot.h"
 #include "../ast/return.h"
 #include "../ast/variable.h"
@@ -40,7 +42,10 @@ class IRGenerator {
     const Instruction *generateLogicalNot(const LogicalNot *expression, IRBlock *block);
     const Instruction *generateReturn(const Return *ret, IRBlock *block);
     const Instruction *generateVariable(const Variable *variable, IRBlock *block);
+    const Instruction *generateArray(ArrayDeclaration *variable, IRBlock *block);
+    const Instruction *generateArrayValue(ArrayValue *variable, IRBlock *block);
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
+    
     string newTempVar(string symbolTable);
 
 public:

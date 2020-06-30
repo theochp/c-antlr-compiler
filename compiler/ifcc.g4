@@ -21,22 +21,28 @@ statement: expr ';'         # exprStatement
 
 declaration: ('int'|'char') individualDeclaration? (',' individualDeclaration)* ';';
 
-individualDeclaration: NAME ('=' expr)? ;
+individualDeclaration: NAME ('=' expr)?		# valueDeclaration
+	| NAME'['CONST']' arrayAssignation?		# arrayDeclaration
+	| NAME'[]' arrayAssignation				# arrayDeclarationAssignation
+	;
 
+arrayAssignation: '=' '{'(expr(','expr)*)? '}';
 
-expr: NAME paramList     # funcall
-    | ADDMINUS expr 	  # unOp
-	| NOT expr 	  # notExpr
-	| expr MULTDIV expr   # multExpr
-	| expr ADDMINUS expr  # addExpr
-    | expr COMP_PRIO expr # compPrioExpr
-	| expr COMP expr      # compExpr
-	| expr BITWISE expr  # bitwiseExpr
-	| NAME '=' expr		 # affectExpr
-    | LPAR expr RPAR	 # parExpr
-	| NAME				 # nameExpr
-	| CONST				 # constExpr
-	| CHAR               # charExpr
+expr: NAME paramList				# funcall
+	| ADDMINUS expr					# unOp
+	| NOT expr						# notExpr
+	| expr MULTDIV expr				# multExpr
+	| expr ADDMINUS expr			# addExpr
+	| expr COMP_PRIO expr			# compPrioExpr
+	| expr COMP expr				# compExpr
+	| expr BITWISE expr				# bitwiseExpr
+	| NAME '=' expr					# affectExpr
+	| NAME '[' expr ']' '=' expr	# affectArrayExpr
+	| LPAR expr RPAR				# parExpr
+	| NAME							# nameExpr
+	| CONST							# constExpr
+	| NAME '[' expr ']'				# arrayValue
+	| CHAR               			# charExpr
 	;
 
 paramList : LPAR expr (',' expr)* RPAR;

@@ -16,6 +16,8 @@ using namespace std;
         mul,
         div,
         neg,
+        loadT,
+        storeT,
         call,
         equalcomp,
         diffcomp,

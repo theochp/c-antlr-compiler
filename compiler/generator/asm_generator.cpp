@@ -72,6 +72,12 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::neg:
                 res << TAB << generate_neg(inst) << endl;
                 break;
+            case IROp::loadT:
+                res << TAB << generate_loadT(inst) << endl;
+                break;
+            case IROp::storeT:
+                res << TAB << generate_storeT(inst) << endl;
+                break;
             case IROp::call:
                 res << TAB << generate_call(inst) << endl;
                 break;
@@ -217,6 +223,21 @@ string AsmGenerator::generate_neg(Instruction& inst) {
     return res.str();
 }
 
+string AsmGenerator::generate_loadT(Instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffset(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    
+    res << "movl " + op2 + ", %eax" << endl << TAB;
+    res << "cltq" << endl << TAB;
+    res << "movl " + op1 + "(%rbp,%rax,4), %eax"<< endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
 string AsmGenerator::generate_call(Instruction& inst) {
     stringstream res;
     string name = inst.operand(0);
@@ -279,6 +300,21 @@ string AsmGenerator::generate_inf_comp(Instruction &inst) {
     res << "setl %al" << endl << TAB;
     res << "movzbl %al, %eax" << endl << TAB;
     res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_storeT(Instruction& inst) {
+    stringstream res;
+    
+    string op1 = getOffset(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string op2 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(1));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+    
+    res << "movl " + op2 + ", %eax" << endl << TAB;
+    res << "cltq" << endl << TAB;
+    res << "movl " + dest + ", %edx" << endl << TAB;
+    res << "movl %edx, " + op1 + "(%rbp,%rax,4)"<< endl << TAB;
 
     return res.str();
 }
@@ -397,3 +433,7 @@ string AsmGenerator::getOffsetRegister(string symbolTable, string symbolName) {
     return to_string(offset) + "(%rbp)";
 }
 
+string AsmGenerator::getOffset(string symbolTable, string symbolName) {
+    int offset = symbolTables.at(symbolTable).at(symbolName);
+    return to_string(offset);
+}

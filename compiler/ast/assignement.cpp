@@ -1,5 +1,9 @@
 #include "assignement.h"
 
+Assignement::Assignement(Variable *lvalue, Statement *rvalue, Statement * offset) 
+    : Expression(ASSIGN, lvalue, rvalue, offset) {
+}
+
 Assignement::Assignement(Variable *lvalue, Statement *rvalue) 
     : Expression(ASSIGN, lvalue, rvalue) {
 }
@@ -7,6 +11,7 @@ Assignement::Assignement(Variable *lvalue, Statement *rvalue)
 Assignement::~Assignement() {
     delete lvalue;
     delete rvalue;
+    delete offset;
 }
 
 std::string Assignement::print() {
