@@ -138,6 +138,18 @@ string AsmGenerator::generate_block(const IRBlock& block) {
             case IROp::jmp:
                 res << TAB << generate_jmp(inst) << endl;
                 break;
+            case IROp::preincre:
+                res << TAB << generate_preincre(inst) << endl;
+                break;
+            case IROp::postincre:
+                res << TAB << generate_postincre(inst) << endl;
+                break;
+            case IROp::predecre:
+                res << TAB << generate_predecre(inst) << endl;
+                break;
+            case IROp::postdecre:
+                res << TAB << generate_postdecre(inst) << endl;
+                break;
         }
     }
 
@@ -456,6 +468,60 @@ string AsmGenerator::generate_jmp(Instruction& inst) {
     stringstream res;
 
     res << "jmp " << inst.dest() << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_preincre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+
+    res << "addl $1," + op1 << endl << TAB;
+    res << "movl " + op1 + ", %eax"<< endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_predecre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+
+    res << "subl $1," + op1 << endl << TAB;
+    res << "movl " + op1 + ", %eax"<< endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_postincre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+   
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "leal 1(%rax), %edx" << endl << TAB;
+    res << "movl %edx, " + op1 << endl<< TAB;
+    res << "movl %eax, " << dest << endl;
+    
+    return res.str();
+}
+
+string AsmGenerator::generate_postdecre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "leal -1(%rax), %edx" << endl << TAB;
+    res << "movl %edx, " + op1 << endl<< TAB;
+    res << "movl %eax, " << dest << endl;
 
     return res.str();
 }

@@ -192,6 +192,8 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
            return generateCall(el, block); 
     } else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(expression)){
         return generateLogicalNot(el, block);
+    }else if(auto el = dynamic_cast<const IncExpression *>(expression)) {
+        generateInc((IncExpression*)expression, block);
     }
     else {
         assert("Need to handle new types");
@@ -401,6 +403,34 @@ const Instruction *IRGenerator::generateArrayValue(ArrayValue *variable, IRBlock
     block->addInstruction(instr);
     
     return instr;
+}
+
+const Instruction *IRGenerator::generateInc(IncExpression * expression, IRBlock *block){
+    string var = expression->getVariable()->getName();
+    string dest = expression->getDest();
+    cout <<"#ok"<<endl;
+    Instruction *inst;
+    switch(expression->getOptype()) {
+        case UnOpType::POSTINCRE:
+            inst = new Instruction(IROp::postincre, dest, {var}, block);
+            break;
+        case UnOpType::POSTDECRE:
+            inst = new Instruction(IROp::postdecre, dest, {var}, block);
+            break;
+        case UnOpType::PREINCRE:
+            inst = new Instruction(IROp::preincre, dest, {var}, block);
+            break;
+        case UnOpType::PREDECRE:
+            inst = new Instruction(IROp::predecre, dest, {var}, block);
+            break;
+        default:
+            assert("Missing type");
+            break;
+    }
+
+    block->addInstruction(inst);
+
+    return inst;
 }
 
 const map<string, map<string, int>>& IRGenerator::getSymbolTables() {

@@ -20,6 +20,7 @@
 #include "../ast/logicalNot.h"
 #include "../ast/return.h"
 #include "../ast/variable.h"
+#include "../ast/incexpression.h"
 #include "../ast/func.h"
 #include "../ast/funccall.h"
 #include "../ast/ifelse.h"
@@ -54,6 +55,7 @@ class IRGenerator {
     const Instruction *generateArray(ArrayDeclaration *variable, IRBlock *block);
     const Instruction *generateArrayValue(ArrayValue *variable, IRBlock *block);
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
+    const Instruction *generateInc(IncExpression * expression, IRBlock *block);
     string newTempVar(const string& symbolTable);
     string newLabel();
     int incrementOffset(string func, int size) {

@@ -96,6 +96,10 @@ public:
 
     antlrcpp::Any visitBlocOrStatement(ifccParser::BlocOrStatementContext *ctx) override;
 
+    antlrcpp::Any visitPreInDecrExpr(ifccParser::PreInDecrExprContext *ctx) override;
+
+    antlrcpp::Any visitPostInDecrExpr(ifccParser::PostInDecrExprContext *ctx) override;
+
     int getErrCount() {
         return errorCount;
     }

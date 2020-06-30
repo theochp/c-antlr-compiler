@@ -38,6 +38,10 @@ class AsmGenerator {
     string generate_not(Instruction& inst);
     string generate_je(Instruction& inst);
     string generate_jmp(Instruction& inst);
+    string generate_preincre(Instruction& inst);
+    string generate_postincre(Instruction& inst);
+    string generate_predecre(Instruction& inst);
+    string generate_postdecre(Instruction& inst);
 
     string getOffsetRegister(string symbolTable, string symbolName);
     string getOffset(string symbolTable, string symbolName);
