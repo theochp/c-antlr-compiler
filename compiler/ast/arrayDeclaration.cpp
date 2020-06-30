@@ -35,7 +35,7 @@ std::string ArrayDeclaration::print(){
 }
 
 void ArrayDeclaration::AddNames(std::vector<std::string> names){
-    for(auto it = names.begin(); it != names.end(); it++)
+    for(auto it = names.rbegin(); it != names.rend(); it++)
         this->names.push_back(*it);
 }
 
