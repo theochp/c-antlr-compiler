@@ -193,7 +193,7 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     } else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(expression)){
         return generateLogicalNot(el, block);
     }else if(auto el = dynamic_cast<const IncExpression *>(expression)) {
-        generateInc((IncExpression*)expression, block);
+        return generateInc((IncExpression*)expression, block);
     }
     else {
         assert("Need to handle new types");
@@ -408,7 +408,7 @@ const Instruction *IRGenerator::generateArrayValue(ArrayValue *variable, IRBlock
 const Instruction *IRGenerator::generateInc(IncExpression * expression, IRBlock *block){
     string var = expression->getVariable()->getName();
     string dest = expression->getDest();
-    cout <<"#ok"<<endl;
+    
     Instruction *inst;
     switch(expression->getOptype()) {
         case UnOpType::POSTINCRE:
