@@ -5,10 +5,15 @@
 #include "visitor.h"
 #include "ast/block.h"
 #include "ast/constant.h"
+#include "ast/char.h"
+#include "ast/declaration.h"
+#include "ir/instruction.h"
 #include "ast/operator.h"
 #include "ast/unoperator.h"
 #include "ast/assignement.h"
 #include "ast/unexpression.h"
+#include "ast/arrayDeclaration.h"
+#include "ast/arrayValue.h"
 #include "ast/return.h"
 #include "ast/logicalNot.h"
 #include "ast/ifelse.h"
@@ -97,7 +102,7 @@ antlrcpp::Any Visitor::visitExprStatement(ifccParser::ExprStatementContext *ctx)
 }
 
 antlrcpp::Any Visitor::visitDeclStatement(ifccParser::DeclStatementContext *ctx) {
-	return visit(ctx->declaration()).as<vector<Assignement*>>();
+	return visit(ctx->declaration()).as<Statement*>();
 }
 
 antlrcpp::Any Visitor::visitRetStatement(ifccParser::RetStatementContext *ctx) {
@@ -117,31 +122,37 @@ antlrcpp::Any Visitor::visitForStatement(ifccParser::ForStatementContext *ctx) {
 }
 
 antlrcpp::Any Visitor::visitDeclaration(ifccParser::DeclarationContext *ctx) {
+	Declaration *declaration = new Declaration();
 	vector<Assignement*> assignements;
 	for (int i = 0; i < ctx->individualDeclaration().size(); i++) {
-        pair<string, Expression*> symbol = visit(ctx->individualDeclaration(i)).as<pair<string, Expression*>>();
-		if (symbol.second != nullptr) {
-			assignements.push_back(new Assignement(new Variable(symbol.first), symbol.second));
-		}
+        tuple<string, Expression*, int> symbol = visit(ctx->individualDeclaration(i)).as<tuple<string, Expression*, int>>();
+        if (get<0>(symbol) != ""){
+            declaration->addSymbol(get<0>(symbol), get<1>(symbol), get<2>(symbol));
+        }
 	}
-	return assignements;
+	return (Statement*) declaration;
 }
 
-antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarationContext *ctx) {
+antlrcpp::Any Visitor::visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) {
 	string name = ctx->NAME()->getText();
 	pair<string, Expression*> declaration;
 	if (symbolTable().find(name) == symbolTable().end()) {
 		declaration.first = name;
-		int offset = incrementOffset(activeSymbolTable, 4);
-		symbolTable().emplace(name, offset);
-        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
-		countUseVar.push_back(make_tuple(name, 0, positionPair));
+		
+		int size = 4;
         if (ctx->expr() != nullptr) {
             Expression* stmnt = visit(ctx->expr()).as<Expression*>();
             declaration.second = stmnt;
+			if(Char* c = dynamic_cast<Char*>(declaration.second)){
+            	size = 1;
+			}
         } else {
             declaration.second = nullptr;
         }
+
+		symbolTable().emplace(name, incrementOffset(activeSymbolTable, size));
+        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		countUseVar.push_back(make_tuple(name, 0, positionPair));
 	} else {
 		errorCount++;
 		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
@@ -149,11 +160,15 @@ antlrcpp::Any Visitor::visitIndividualDeclaration(ifccParser::IndividualDeclarat
 		declaration.first = "";
 		declaration.second = nullptr;
 	}
-    return declaration;
+    return make_tuple(declaration.first, declaration.second, 1);
 }
 
 antlrcpp::Any Visitor::visitConstExpr(ifccParser::ConstExprContext *ctx) {
 	return (Expression*) new Constant(stoi(ctx->CONST()->getText()));
+}
+
+antlrcpp::Any Visitor::visitCharExpr(ifccParser::CharExprContext *ctx) {
+    return (Expression*) new Char((int) (ctx->CHAR()->getText().at(1)));
 }
 
 antlrcpp::Any Visitor::visitNameExpr(ifccParser::NameExprContext *ctx) {
@@ -293,6 +308,116 @@ antlrcpp::Any Visitor::visitCompExpr(ifccParser::CompExprContext *ctx){
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
 	return (Statement*) new Return(visit(ctx->expr()).as<Expression*>());
+}
+
+antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {
+	string name = ctx->NAME()->getText();
+	int size = atoi(ctx->CONST()->getText().c_str());
+
+	pair<string, Statement*> declaration;
+	if (symbolTable().find(name) == symbolTable().end()) {
+		
+		declaration.first = name;
+		pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		countUseVar.push_back(make_tuple(name, 0, positionPair));
+		int i = 0;
+
+		if (ctx->arrayAssignation() != nullptr) {
+			ArrayDeclaration* stmnt = visit(ctx->arrayAssignation()).as<ArrayDeclaration*>();
+			std::vector<std::string> names;
+
+			for(; i <size -1; i++)
+				names.push_back(allocateTempVar(4));
+
+			stmnt->SetFirstName(name);
+			stmnt->AddNames(names);
+			stmnt->SetSize(size);
+			declaration.second = stmnt;
+		} else {
+	    		declaration.second = new ArrayDeclaration(size);
+		}
+
+		int offset = incrementOffset(activeSymbolTable, 4*(size-i));
+		symbolTable().emplace(name, offset);
+	} else {
+		errorCount++;
+		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        	errors.push_back(error);
+		declaration.first = "";
+		declaration.second = nullptr;
+	}
+	
+	return make_tuple(declaration.first, declaration.second, size);
+}
+
+antlrcpp::Any Visitor::visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) {
+	ArrayDeclaration* stm = visit(ctx->arrayAssignation()).as<ArrayDeclaration*>();
+
+	int size = 0;
+	string name = ctx->NAME()->getText();
+
+	pair<string, Statement*> declaration;
+	if (symbolTable().find(name) == symbolTable().end()) {
+		
+		declaration.first = name;
+		stm->SetSize(stm->Expressions().size());
+		size = stm->Size();
+		std::vector<std::string> names;
+
+		for(int i = 0; i <size -1 ; i++)
+			names.push_back(allocateTempVar(4));
+		
+		stm->SetFirstName(name);
+		stm->AddNames(names);
+
+		int offset = incrementOffset(activeSymbolTable, 4);
+		symbolTable().emplace(name, offset);
+
+        pair<int, int> positionPair = make_pair(ctx->start->getLine(), ctx->start->getCharPositionInLine());
+		countUseVar.push_back(make_tuple(name, 0, positionPair));
+		declaration.second = stm;
+	} else {
+		errorCount++;
+		DoubleDeclaration* error = new DoubleDeclaration(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        errors.push_back(error);
+		declaration.first = "";
+		declaration.second = nullptr;
+	}
+	
+	return make_tuple(declaration.first, declaration.second, size);
+}
+
+antlrcpp::Any Visitor::visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) {
+	ArrayDeclaration* stm = new ArrayDeclaration();
+	
+	for (int i = 0; i < ctx->expr().size(); i++)
+		stm->AddExpression(visit(ctx->expr(i)).as<Expression *>());
+	
+	return stm;
+}
+
+antlrcpp::Any Visitor::visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) {
+	string name = ctx->NAME()->getText();
+
+	if (symbolTable().find(name) != symbolTable().end()) {
+		Expression * expr = (Expression*) new Assignement(
+			new Variable(name), 
+			visit(ctx->expr(1)).as<Expression*>(), 
+			visit(ctx->expr(0)).as<Expression*>()
+		);
+		return expr;
+	} else {
+		errorCount++;
+		UndeclaredVariable* error = new UndeclaredVariable(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        errors.push_back(error);
+		return (Expression*) nullptr;
+	}
+}
+
+antlrcpp::Any Visitor::visitArrayValue(ifccParser::ArrayValueContext *ctx) {
+		string name = ctx->NAME()->getText();
+		auto offset = visit(ctx->expr());
+		return (Expression *) new ArrayValue(new Variable(name), offset);
 }
 
 antlrcpp::Any Visitor::visitFuncall(ifccParser::FuncallContext *ctx) {

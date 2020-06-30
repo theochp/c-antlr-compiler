@@ -2,6 +2,8 @@
 #include <utility>
 
 #include "ir_generator.h"
+#include "../ast/func.h"
+#include "../ast/ifelse.h"
 
 IRGenerator::IRGenerator(vector<const Node *> ast, map<string, map<string, int>> symbolTables, map<string, int> symbolOffsets)
     : ast(std::move(ast)), symbolTables(std::move(symbolTables)), symbolOffsets(std::move(symbolOffsets)) {
@@ -48,6 +50,9 @@ IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *blo
     }
     else if (auto aFor = dynamic_cast<const For *>(statement)) {
         return generateFor(aFor, block);
+    }
+    else if(auto el = dynamic_cast<const Declaration *>(statement)) {
+        generateDeclaration(el, block);
     }
     else {
         assert("Need to handle new types");
@@ -159,6 +164,15 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     if (const Constant *el = dynamic_cast<const Constant *>(expression)) {
         return generateConstant(el, block);
     }
+    else if (const Char *el = dynamic_cast<const Char *>(expression)) {
+        return generateChar(el, block);
+    }
+    else if (const Declaration *el = dynamic_cast<const Declaration *>(expression)) {
+        return generateDeclaration(el, block);
+    }
+    else if (const Declaration *el = dynamic_cast<const Declaration *>(expression)) {
+        return generateDeclaration(el, block);
+    }
     else if (const Operator *el = dynamic_cast<const Operator *>(expression)) {
         return generateOperator(el, block);
     }
@@ -167,11 +181,15 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     }
     else if (const Variable *el = dynamic_cast<const Variable *>(expression)) {
         return generateVariable(el, block);
-    }
+    } 
     else if(const UnExpression *el = dynamic_cast<const UnExpression *>(expression)) {
         return generateUnExpression(el, block);
-    } else if(const FuncCall *el = dynamic_cast<const FuncCall *>(expression)) {
-           return generateCall(el, block);
+    } else if (const ArrayDeclaration *el = dynamic_cast<const ArrayDeclaration *>(expression)){
+        return generateArray((ArrayDeclaration *)el , block);
+    } else if(const ArrayValue *el = dynamic_cast<const ArrayValue *>(expression)){
+        return generateArrayValue((ArrayValue*)el, block);
+    } else if(const FuncCall *el = dynamic_cast<const FuncCall *>(expression)) { 
+           return generateCall(el, block); 
     } else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(expression)){
         return generateLogicalNot(el, block);
     }
@@ -188,14 +206,30 @@ const Instruction *IRGenerator::generateConstant(const Constant *constant, IRBlo
     return instr;
 }
 
+const Instruction *IRGenerator::generateChar(const Char *character, IRBlock *block) {
+    string dest = newTempVar(block->getFunc()->getName());
+    auto instr = new Instruction(IROp::ldcst, dest, {to_string(character->getValue())}, block);
+    block->addInstruction(instr);
+    return instr;
+}
+
 const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBlock *block) {
     if (pOperator->getOp() == OpType::ASSIGN) {
         if(const Variable *dest = dynamic_cast<const Variable *>(pOperator->getLeft())) {
-            string destName = dest->getName();
-            auto rightInstr = generateExpression(pOperator->getRight(), block);
-            auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()}, block);
-            block->addInstruction(instr);
-            return instr;
+            if(pOperator->getOffset() != nullptr){
+                string destName = dest->getName();
+                auto offset = generateExpression(pOperator->getOffset(), block);
+                auto rightInstr = generateExpression(pOperator->getRight(), block);
+                auto instr = new Instruction(IROp::storeT, rightInstr->dest(), {dest->getName(), offset->dest()}, block);
+                block->addInstruction(instr);
+                return instr;
+            } else {
+                string destName = dest->getName();
+                auto rightInstr = generateExpression(pOperator->getRight(), block);
+                auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()}, block);
+                block->addInstruction(instr);
+                return instr;
+            } 
         } else {
             static_assert("la partie droite d'une affectation doit toujours être une variable. La grammaire ne doit pas permettre d'arriver ici", "");
             return nullptr;
@@ -206,8 +240,8 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
         string op1 = leftInstr->dest();
         string op2 = rightInstr->dest();
         string dest = newTempVar(block->getFunc()->getName());
-
-        Instruction *inst = nullptr;
+        
+        Instruction *inst;
         switch(pOperator->getOp()) {
             case OpType::ADD:
                 inst = new Instruction(IROp::add, dest, {op1, op2}, block);
@@ -260,6 +294,27 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
 
         return inst;
     }
+}
+
+// TODO: changer la manière dont on gère les déclarations
+const Instruction *IRGenerator::generateDeclaration(const Declaration *declaration, IRBlock *block) {
+    string dest = newTempVar(block->getFunc()->getName());
+    Instruction *instr = nullptr;
+    for (auto it = declaration->getSymbols().begin(); it != declaration->getSymbols().end(); ++it) {
+        auto assignement = *it;
+        string name = (*it).first;
+        Expression *value = (*it).second.first;
+        if (value != nullptr) {
+            auto assignStmnt = generateExpression(value, block);
+            if(assignStmnt != nullptr){
+                string dest = newTempVar(block->getFunc()->getName());
+                instr = new Instruction(IROp::store, name, {assignStmnt->dest()}, block);
+                block->addInstruction(instr);
+            }
+        }
+    }
+
+    return instr;
 }
 
 const Instruction *IRGenerator::generateUnExpression(const UnExpression *expression, IRBlock *block) {
@@ -326,6 +381,25 @@ const Instruction *IRGenerator::generateLogicalNot(const LogicalNot *expr, IRBlo
     string dest = newTempVar(block->getFunc()->getName());
     auto instr = new Instruction(IROp::logicalNot, dest, {lastInstr->dest()}, block);
     block->addInstruction(instr);
+    return instr;
+}
+
+const Instruction *IRGenerator::generateArray(ArrayDeclaration *array, IRBlock *block) {
+    for(int i = 0; i < array->Size() && i < array->Expressions().size(); i++) {
+        auto instr = new Instruction(IROp::store, array->Names().at(i), {generateExpression(array->Expressions().at(i), block)->dest()}, block);
+        block->addInstruction(instr);
+    }
+    
+    return nullptr;
+}
+
+const Instruction *IRGenerator::generateArrayValue(ArrayValue *variable, IRBlock *block){
+    auto expr = generateExpression(variable->getOffset(), block);
+    string dest = newTempVar(block->getFunc()->getName());
+    auto instr = new Instruction(IROp::loadT, dest, {variable->getArrayBegin().getName(), expr->dest()}, block);
+    
+    block->addInstruction(instr);
+    
     return instr;
 }
 
