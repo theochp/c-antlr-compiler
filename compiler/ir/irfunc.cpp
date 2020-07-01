@@ -4,11 +4,11 @@ string IRFunc::getName() const {
     return name;
 }
 
-const vector<IRBlock *>& IRFunc::getBlocks() const {
+const vector<const IRBlock *>& IRFunc::getBlocks() const {
     return blocks;
 }
 
-void IRFunc::addBlock(IRBlock *block) {
+void IRFunc::addBlock(const IRBlock *block) {
     blocks.push_back(block);
 }
 
@@ -28,4 +28,12 @@ IRFunc::~IRFunc() {
     for (auto b : blocks) {
         delete b;
     }
+}
+
+const string &IRFunc::getReturnValueLoc() const {
+    return returnValueLoc;
+}
+
+void IRFunc::setReturnValueLoc(const string &returnValueLoc) {
+    IRFunc::returnValueLoc = returnValueLoc;
 }

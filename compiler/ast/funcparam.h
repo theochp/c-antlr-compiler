@@ -9,6 +9,6 @@ class FuncParam {
     string name;
 
 public:
-    FuncParam(string name);
+    explicit FuncParam(string name);
     string getName() const;
 };

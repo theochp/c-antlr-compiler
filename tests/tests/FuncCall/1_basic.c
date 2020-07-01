@@ -4,6 +4,6 @@ int toto(int a, int b) {
 }
 
 int main() {
-    int a = toto(1,2) + toto(1, 3);
+    int a = toto(1,2);
     return a;
 }

@@ -10,7 +10,7 @@ ArrayDeclaration::~ArrayDeclaration(){
     delete lvalue;
 }
 
-void ArrayDeclaration::AddExpression(Statement * expr){
+void ArrayDeclaration::AddExpression(Expression * expr){
     expressions.push_back(expr);
 }
 
@@ -35,7 +35,7 @@ std::string ArrayDeclaration::print(){
 }
 
 void ArrayDeclaration::AddNames(std::vector<std::string> names){
-    for(auto it = names.begin(); it != names.end(); it++)
+    for(auto it = names.rbegin(); it != names.rend(); it++)
         this->names.push_back(*it);
 }
 
@@ -46,7 +46,7 @@ void ArrayDeclaration::SetFirstName(std::string name){
     }
 }
 
-const std::vector<Statement *>& ArrayDeclaration::Expressions(){
+const std::vector<Expression *>& ArrayDeclaration::Expressions(){
     return expressions;
 }
 

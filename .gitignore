@@ -11,3 +11,6 @@ tests/pld-test-output
 .idea
 *.iml
 .gdb_history
+CMakeLists.txt
+cmake-build-debug
+compiler/test.c

@@ -3,19 +3,19 @@
 #include <string>
 #include <vector>
 
-#include "statement.h"
+#include "expression.h"
 
 using namespace std;
 
-class FuncCall : public Statement {
+class FuncCall : public Expression {
     string name;
-    vector<Statement*> paramStatements;
+    vector<Expression*> paramStatements;
 
 public:
     FuncCall(string name);
     ~FuncCall();
     string getName() const;
-    const vector<Statement*>& getParamStatements() const;
-    void addParamStatement(Statement *param);
-    void addParamStatements(const vector<Statement *>& statements);
+    const vector<Expression*>& getParamStatements() const;
+    void addParamStatement(Expression *param);
+    void addParamStatements(const vector<Expression *>& statements);
 };

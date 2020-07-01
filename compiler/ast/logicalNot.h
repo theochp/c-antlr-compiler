@@ -1,11 +1,11 @@
 #pragma once
-#include "statement.h"
+#include "expression.h"
 
-class LogicalNot : public Statement{
-    Statement *expr;
+class LogicalNot : public Expression {
+    Expression *expr;
 public:
-    LogicalNot(Statement *expr);
+    LogicalNot(Expression *expr);
     ~LogicalNot();
-    const Statement *getExpr() const;
+    const Expression *getExpr() const;
     virtual std::string print();
 };

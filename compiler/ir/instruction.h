@@ -19,6 +19,8 @@ using namespace std;
         loadT,
         storeT,
         call,
+        je,
+        jmp,
         equalcomp,
         diffcomp,
         infcomp,
@@ -29,6 +31,10 @@ using namespace std;
         bitwise_or,
         bitwise_xor,
         bitwise_not,
+        postincre,
+        postdecre,
+        preincre,
+        predecre,
         logicalNot
     } IROp;
 

@@ -18,70 +18,87 @@ using namespace std;
  */
 class  Visitor : public ifccVisitor {
 public:
-	virtual antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override;
+	antlrcpp::Any visitAxiom(ifccParser::AxiomContext *ctx) override;
     
-	virtual antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
+	antlrcpp::Any visitProg(ifccParser::ProgContext *ctx) override;
 
-    virtual antlrcpp::Any visitToplevel(ifccParser::ToplevelContext *ctx) override;
+    antlrcpp::Any visitToplevel(ifccParser::ToplevelContext *ctx) override;
 
-    virtual antlrcpp::Any visitFuncdecl(ifccParser::FuncdeclContext *ctx) override;
+    antlrcpp::Any visitFuncdecl(ifccParser::FuncdeclContext *ctx) override;
 
-    virtual antlrcpp::Any visitParamDecl(ifccParser::ParamDeclContext *ctx) override;
+    antlrcpp::Any visitParamDecl(ifccParser::ParamDeclContext *ctx) override;
 
-    virtual antlrcpp::Any visitBloc(ifccParser::BlocContext *ctx) override;
+    antlrcpp::Any visitBloc(ifccParser::BlocContext *ctx) override;
 
-	virtual antlrcpp::Any visitExprStatement(ifccParser::ExprStatementContext *ctx) override;
+	antlrcpp::Any visitExprStatement(ifccParser::ExprStatementContext *ctx) override;
 
-    virtual antlrcpp::Any visitDeclStatement(ifccParser::DeclStatementContext *ctx) override;
+    antlrcpp::Any visitDeclStatement(ifccParser::DeclStatementContext *ctx) override;
 
-    virtual antlrcpp::Any visitRetStatement(ifccParser::RetStatementContext *ctx) override;
+    antlrcpp::Any visitRetStatement(ifccParser::RetStatementContext *ctx) override;
 
-    virtual antlrcpp::Any visitDeclaration(ifccParser::DeclarationContext *ctx) override;
+    antlrcpp::Any visitWhileStatement(ifccParser::WhileStatementContext *ctx) override;
 
-	virtual antlrcpp::Any visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) override;
+    antlrcpp::Any visitForStatement(ifccParser::ForStatementContext *ctx) override;
 
-	virtual antlrcpp::Any visitNameExpr(ifccParser::NameExprContext *ctx) override;
+    antlrcpp::Any visitDeclaration(ifccParser::DeclarationContext *ctx) override;
 
-    virtual antlrcpp::Any visitConstExpr(ifccParser::ConstExprContext *ctx) override;
+	antlrcpp::Any visitValueDeclaration(ifccParser::ValueDeclarationContext *ctx) override;
 
-    virtual antlrcpp::Any visitCharExpr(ifccParser::CharExprContext *ctx) override;
+	antlrcpp::Any visitNameExpr(ifccParser::NameExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitMultExpr(ifccParser::MultExprContext *ctx) override;
+    antlrcpp::Any visitConstExpr(ifccParser::ConstExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitAddExpr(ifccParser::AddExprContext *ctx) override;
+    antlrcpp::Any visitCharExpr(ifccParser::CharExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitParExpr(ifccParser::ParExprContext *ctx) override;
+    antlrcpp::Any visitMultExpr(ifccParser::MultExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitBitwiseExpr(ifccParser::BitwiseExprContext *context) override;
+    antlrcpp::Any visitAddExpr(ifccParser::AddExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
+    antlrcpp::Any visitParExpr(ifccParser::ParExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx) override;
+    antlrcpp::Any visitBitwiseExpr(ifccParser::BitwiseExprContext *context) override;
 
-    virtual antlrcpp::Any visitCompExpr(ifccParser::CompExprContext *ctx) override;
-
-    virtual antlrcpp::Any visitUnOp(ifccParser::UnOpContext *ctx) override;
-
-    virtual antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
-
-    virtual antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) override;
-
-    virtual antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) override;
-
-    virtual antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) override;
+    antlrcpp::Any visitAffectExpr(ifccParser::AffectExprContext *ctx) override;
     
-    virtual antlrcpp::Any visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) override;
+    antlrcpp::Any visitCompPrioExpr(ifccParser::CompPrioExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitArrayValue(ifccParser::ArrayValueContext *ctx) override;
-    virtual antlrcpp::Any visitFuncall(ifccParser::FuncallContext *ctx) override;
+    antlrcpp::Any visitCompExpr(ifccParser::CompExprContext *ctx) override;
 
-    virtual antlrcpp::Any visitParamList(ifccParser::ParamListContext *ctx) override;
+    antlrcpp::Any visitUnOp(ifccParser::UnOpContext *ctx) override;
 
-    virtual antlrcpp::Any visitParam(ifccParser::ParamContext *ctx) override;
+    antlrcpp::Any visitRet(ifccParser::RetContext *ctx) override;
 
-    virtual antlrcpp::Any visitNotExpr(ifccParser::NotExprContext *ctx) override;
+    antlrcpp::Any visitFuncall(ifccParser::FuncallContext *ctx) override;
 
-    string allocateTempVar();
+    antlrcpp::Any visitParamList(ifccParser::ParamListContext *ctx) override;
+
+    antlrcpp::Any visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) override;
+
+    antlrcpp::Any visitArrayDeclarationAssignation(ifccParser::ArrayDeclarationAssignationContext *ctx) override;
+
+    antlrcpp::Any visitArrayAssignation(ifccParser::ArrayAssignationContext *ctx) override;
+    
+    antlrcpp::Any visitAffectArrayExpr(ifccParser::AffectArrayExprContext *ctx) override;
+
+    antlrcpp::Any visitArrayValue(ifccParser::ArrayValueContext *ctx) override;
+
+    antlrcpp::Any visitNotExpr(ifccParser::NotExprContext *ctx) override;
+
+    antlrcpp::Any visitIfElseStatement(ifccParser::IfElseStatementContext *ctx) override;
+
+    antlrcpp::Any visitIfElse(ifccParser::IfElseContext *ctx) override;
+
+    antlrcpp::Any visitElsePart(ifccParser::ElsePartContext *ctx) override;
+
+    antlrcpp::Any visitWhileStmnt(ifccParser::WhileStmntContext *ctx) override;
+
+    antlrcpp::Any visitForStmnt(ifccParser::ForStmntContext *ctx) override;
+
+    antlrcpp::Any visitBlocOrStatement(ifccParser::BlocOrStatementContext *ctx) override;
+
+    antlrcpp::Any visitPreInDecrExpr(ifccParser::PreInDecrExprContext *ctx) override;
+
+    antlrcpp::Any visitPostInDecrExpr(ifccParser::PostInDecrExprContext *ctx) override;
 
     int getErrCount() {
         return errorCount;
@@ -89,10 +106,6 @@ public:
 
     vector<Error*> getErrors(){
         return errors;
-    }
-
-    int getWarningCount() {
-        return warningCount;
     }
 
     vector<Warning*> getWarnings() {
@@ -103,12 +116,8 @@ public:
         return symbolTables;
     }
 
-    int getStackOffset() {
-        return stackOffset;
-    }
-
-    vector<Instruction *> getInstructions() {
-        return instructions;
+    map<string,int>& getSymbolOffsets() {
+        return symbolOffsets;
     }
 
     ~Visitor() {
@@ -118,10 +127,11 @@ public:
     }
 private:
     map<string, map<string, int>> symbolTables;
+    map<string, int> symbolOffsets;
     string activeSymbolTable; // function name or !global
+    int visitorCreatedSymbols = 0;
     vector<tuple<string, int, pair<int, int>>> countUseVar; // variable name, variable nb of use, variable declaration line and position
     vector<Instruction *> instructions;
-	int stackOffset = 0;
     int errorCount = 0;
     vector<Error *> errors;
     int warningCount = 0;
@@ -130,5 +140,19 @@ private:
     map<string, int>& symbolTable() {
         return symbolTables.at(activeSymbolTable);
     }
+
+    int incrementOffset(string func, int size) {
+        int newOffset = symbolOffsets.at(func) -= size;
+        symbolOffsets.emplace(func, newOffset);
+        return newOffset;
+    }
+
+    string allocateTempVar(int size) {
+        string name = "!vis_";
+        name.append(to_string(visitorCreatedSymbols++));
+        symbolTable().emplace(name, incrementOffset(activeSymbolTable, size));
+        return name;
+    }
+
 };
 

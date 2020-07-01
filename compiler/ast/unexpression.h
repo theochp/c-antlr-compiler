@@ -1,16 +1,16 @@
 #pragma once
 
-#include "statement.h"
+#include "expression.h"
 #include "unoperator.h"
 
-class UnExpression : public Statement {
-    Statement *expr;
+class UnExpression : public Expression {
+    Expression *expr;
     UnOperator op;
 
 public:
-    UnExpression(UnOperator op, Statement *expr);
+    UnExpression(UnOperator op, Expression *expr);
     ~UnExpression();
-    const Statement *getExpr() const;
+    const Expression *getExpr() const;
     const UnOperator& getOp() const;
     virtual std::string print();
 };

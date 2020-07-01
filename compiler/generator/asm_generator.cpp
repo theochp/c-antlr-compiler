@@ -13,19 +13,36 @@ void AsmGenerator::generate(ostream& os) {
     os << ".global main" << endl;
     
     for (auto func : funcs) {
+        int totalSymbolTableSize = 0;
+        for(auto block : func->getBlocks()) {
+            try {
+                totalSymbolTableSize += symbolTables.at(block->getLabel()).size() * 4;
+            } catch(std::out_of_range e) {
+
+            }
+        }
+        os << func->getName() << ":" << endl << TAB;
+        os << "pushq	%rbp" << endl << TAB;
+        os << "movq	%rsp, %rbp" << endl << TAB;
+        os << "subq $" << totalSymbolTableSize << ", %rsp" << endl;
         for (auto block : func->getBlocks()) {
             os << generate_block(*block) << endl;
         }   
+        os << TAB;
+        if (func->getReturnValueLoc() != "") {
+            os << "movl " << func->getReturnValueLoc() << ", %eax" << endl << TAB;
+        } else {
+            os << "movl $0, %eax" << endl << TAB;
+        }
+        os << "addq $" << totalSymbolTableSize << ", %rsp" << endl << TAB;
+        os << "popq %rbp" << endl << TAB;
+        os << "ret" << endl;
     }
 }
 
-string AsmGenerator::generate_block(IRBlock& block) {
+string AsmGenerator::generate_block(const IRBlock& block) {
     stringstream res;
-    res << block.getLabel() << ":" << endl << TAB;
-    res  << "pushq	%rbp" << endl << TAB;
-    res  << "movq	%rsp, %rbp" << endl << TAB;
-    res << "subq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl;
-
+    
     if (block.getLabel() == block.getFunc()->getName()) {
         int pNum = block.getFunc()->getParams().size();
         const int N_REGISTERS = 6; 
@@ -40,12 +57,13 @@ string AsmGenerator::generate_block(IRBlock& block) {
             } else {
                 res << "movl " << registers[i - 1] << ", " << getOffsetRegister(block.getFunc()->getName(), params[i-1]) << endl;
             }
-        }    
+        }
+        res << endl;
+    } else {
+        res << block.getLabel() << ":" << endl << TAB;
     }
-    bool hasRet = false;
-    for (auto it = block.getInstructions().begin(); it != block.getInstructions().end(); ++it) {
-        Instruction& inst = **it;
-
+    for (auto it : block.getInstructions()) {
+        Instruction& inst = *it;
         switch (inst.op()) {
             case IROp::ldcst:
                 res << TAB << generate_ldcst(inst) << endl;
@@ -54,8 +72,8 @@ string AsmGenerator::generate_block(IRBlock& block) {
                 res << TAB << generate_store(inst) << endl;
                 break;
             case IROp::ret:
+                // TODO: handle return inside other blocks
                 res << TAB << generate_ret(inst) << endl;
-                hasRet = true;
                 break;
             case IROp::add:
                 res << TAB << generate_add(inst) << endl;
@@ -114,17 +132,25 @@ string AsmGenerator::generate_block(IRBlock& block) {
             case IROp::logicalNot:
                 res << TAB << generate_not(inst) << endl;
                 break;
+            case IROp::je:
+                res << TAB << generate_je(inst) << endl;
+                break;
+            case IROp::jmp:
+                res << TAB << generate_jmp(inst) << endl;
+                break;
+            case IROp::preincre:
+                res << TAB << generate_preincre(inst) << endl;
+                break;
+            case IROp::postincre:
+                res << TAB << generate_postincre(inst) << endl;
+                break;
+            case IROp::predecre:
+                res << TAB << generate_predecre(inst) << endl;
+                break;
+            case IROp::postdecre:
+                res << TAB << generate_postdecre(inst) << endl;
+                break;
         }
-    }
-
-    if (block.getLabel() == block.getFunc()->getName()) {
-        res << TAB;
-        if (!hasRet) {
-            res << "movl $0, %eax" << endl << TAB;
-        }
-        res << "addq $" << symbolTables.at(block.getLabel()).size() * 4 << ", %rsp" << endl << TAB;
-        res << "popq %rbp" << endl << TAB;
-        res << "ret" << endl;
     }
 
     return res.str();
@@ -149,7 +175,7 @@ string AsmGenerator::generate_ret(Instruction& inst) {
     stringstream res;
     if (inst.operand(0) != "") {
         string source = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
-        res << "movl " + source + ", %eax" << endl;
+        inst.getBlock()->getFunc()->setReturnValueLoc(source);
     }
 
     return res.str();
@@ -423,6 +449,78 @@ string AsmGenerator::generate_not(Instruction& inst) {
     res << "cmpl $0," + op1 << endl << TAB;
     res << "sete %al" << endl << TAB;
     res << "movzbl %al, %eax" << endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_je(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    res << "cmpl $" << inst.operand(1) << ", " << op1 << endl << TAB;
+    res << "je " << inst.dest() << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_jmp(Instruction& inst) {
+    stringstream res;
+
+    res << "jmp " << inst.dest() << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_preincre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+
+    res << "addl $1," + op1 << endl << TAB;
+    res << "movl " + op1 + ", %eax"<< endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_predecre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+
+    res << "subl $1," + op1 << endl << TAB;
+    res << "movl " + op1 + ", %eax"<< endl << TAB;
+    res << "movl %eax, " << dest << endl;
+
+    return res.str();
+}
+
+string AsmGenerator::generate_postincre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+   
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "leal 1(%rax), %edx" << endl << TAB;
+    res << "movl %edx, " + op1 << endl<< TAB;
+    res << "movl %eax, " << dest << endl;
+    
+    return res.str();
+}
+
+string AsmGenerator::generate_postdecre(Instruction& inst) {
+    stringstream res;
+
+    string op1 = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
+    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
+
+    res << "movl " + op1 + ", %eax" << endl << TAB;
+    res << "leal -1(%rax), %edx" << endl << TAB;
+    res << "movl %edx, " + op1 << endl<< TAB;
     res << "movl %eax, " << dest << endl;
 
     return res.str();

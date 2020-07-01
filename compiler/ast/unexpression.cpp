@@ -1,12 +1,12 @@
 #include "unexpression.h"
 #include <string>
 
-UnExpression::UnExpression(UnOperator op, Statement *expr)
+UnExpression::UnExpression(UnOperator op, Expression *expr)
     : op(op), expr(expr) {
 
 }
 
-const Statement *UnExpression::getExpr() const {
+const Expression *UnExpression::getExpr() const {
     return expr;
 }
 

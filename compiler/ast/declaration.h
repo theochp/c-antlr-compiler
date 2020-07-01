@@ -3,16 +3,16 @@
 #include <map>
 
 #include "statement.h"
-#include "constant.h"
+#include "expression.h"
 
 using namespace std;
 
 class Declaration : public Statement {
-    map<string, pair<Statement *, int>> symbols;
+    map<string, pair<Expression *, int>> symbols;
 
 public:
-    void addSymbol(string, Statement *, int);
-    const map<string, pair<Statement *, int>>& getSymbols() const;
+    void addSymbol(string, Expression *, int);
+    const map<string, pair<Expression *, int>>& getSymbols() const;
     virtual ~Declaration();
     virtual std::string print();
 };

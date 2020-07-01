@@ -15,38 +15,50 @@ bloc: '{' statement* '}';
 
 statement: expr ';'         # exprStatement
          | declaration 	    # declStatement
+		 | ifElse			# ifElseStatement
+		 | whileStmnt		# whileStatement
+		 | forStmnt         # forStatement
          | ret         	    # retStatement
          ;
 
+whileStmnt: 'while' '(' expr ')' blocOrStatement;
+
+forStmnt: 'for' '(' expr ';' expr ';' expr ')' blocOrStatement;
 
 declaration: ('int'|'char') individualDeclaration? (',' individualDeclaration)* ';';
+
+ifElse : 'if' '(' expr ')' blocOrStatement elsePart?;
+elsePart: 'else' blocOrStatement;
+
+blocOrStatement: (bloc | statement);
 
 individualDeclaration: NAME ('=' expr)?		# valueDeclaration
 	| NAME'['CONST']' arrayAssignation?		# arrayDeclaration
 	| NAME'[]' arrayAssignation				# arrayDeclarationAssignation
 	;
 
-arrayAssignation: '=' '{'(expr(','expr)*)? '}';
-
-expr: NAME paramList				# funcall
-	| ADDMINUS expr					# unOp
-	| NOT expr						# notExpr
-	| expr MULTDIV expr				# multExpr
-	| expr ADDMINUS expr			# addExpr
-	| expr COMP_PRIO expr			# compPrioExpr
-	| expr COMP expr				# compExpr
-	| expr BITWISE expr				# bitwiseExpr
-	| NAME '=' expr					# affectExpr
+expr: NAME IN_DECREMENT  # postInDecrExpr
+	| NAME paramList     # funcall
+	| ADDMINUS expr 	 # unOp
+	| NOT expr 	  		 # notExpr
+    | IN_DECREMENT NAME  # preInDecrExpr
+	| expr MULTDIV expr  # multExpr
+	| expr ADDMINUS expr # addExpr
+    | expr COMP_PRIO expr # compPrioExpr
+	| expr COMP expr      # compExpr
+	| expr BITWISE expr  # bitwiseExpr
+	| NAME '=' expr		 # affectExpr
 	| NAME '[' expr ']' '=' expr	# affectArrayExpr
-	| LPAR expr RPAR				# parExpr
-	| NAME							# nameExpr
-	| CONST							# constExpr
+    | LPAR expr RPAR	 # parExpr
+	| NAME				 # nameExpr
+	| CONST				 # constExpr
 	| NAME '[' expr ']'				# arrayValue
-	| CHAR               			# charExpr
+	| CHAR               # charExpr
 	;
 
+arrayAssignation: '=' '{'(expr(','expr)*)? '}';
+
 paramList : LPAR expr (',' expr)* RPAR;
-param : 'int' NAME;
 
 ret: RETURN expr? ';';
 
@@ -55,6 +67,7 @@ NAME : [a-zA-Z_]+;
 NOT : ('!' | '~');
 MULTDIV : ('*'|'/');
 ADDMINUS : ('+'|'-');
+IN_DECREMENT : ('++' | '--');
 COMP_PRIO : ('<='|'<'|'>='|'>');
 COMP : ('=='|'!=');
 BITWISE : ('&' | '|' | '^');

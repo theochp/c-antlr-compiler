@@ -1,11 +1,11 @@
 #include "assignement.h"
 
-Assignement::Assignement(Variable *lvalue, Statement *rvalue, Statement * offset) 
-    : Expression(ASSIGN, lvalue, rvalue, offset) {
+Assignement::Assignement(Variable *lvalue, Expression *rvalue, Expression * offset) 
+    : Operator (ASSIGN, lvalue, rvalue, offset) {
 }
 
-Assignement::Assignement(Variable *lvalue, Statement *rvalue) 
-    : Expression(ASSIGN, lvalue, rvalue) {
+Assignement::Assignement(Variable *lvalue, Expression *rvalue) 
+    : Operator (ASSIGN, lvalue, rvalue, nullptr) {
 }
 
 Assignement::~Assignement() {
@@ -15,5 +15,5 @@ Assignement::~Assignement() {
 }
 
 std::string Assignement::print() {
-    return Expression::print();
+    return Operator::print();
 }

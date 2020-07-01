@@ -51,15 +51,14 @@ package ir{
 package ast{
 
     Statement --|> Node
-    Assignement --|> Expression
+    Assignement --|> Operator
     Block --|> Node
-    Constant --|> Statement
-    Declaration --|> Statement
-    Expression --|> Statement
-    Return --|> Statement
-    Variable --|> Statement
+    Constant --|> Expression
+    Operator --|> Expression
+    Return --|> Expression
+    Variable --|> Expression
 
-    Block *-- "*" Statement
+    Block *-- "*" Expression
     
     class Node{
         
@@ -67,24 +66,20 @@ package ast{
 
     class Assignement{
         -lvalue : Variable *
-        -rvalue : Statement *
+        -rvalue : Expression *
     }
     
     class Block{
-        -statement : Statement *
+        -statement : Expression *
     }
     
     class Constant{
         -value : int
     }
     
-    class Declaration{
-        -symbols : map<string, Statement *>
-    }
-    
-    class Expression{
-        -left : Statement *
-        -right : Statement *
+    class Operator{
+        -left : Expression *
+        -right : Expression *
         -op : Operator
     }
     
@@ -103,11 +98,11 @@ package ast{
 
     
     class Return{
-        -statement : Statement *
+        -statement : Expression *
     }
     
     class unExpression{
-        -expr : Statement *
+        -expr : Expression *
         -op : UnOperator
     }
     UnOperator --> UnOpType
@@ -120,7 +115,7 @@ package ast{
         UN_MINUS
     }
 
-    class Statement{
+    class Expression{
         
     }
     
