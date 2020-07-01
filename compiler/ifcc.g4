@@ -9,7 +9,7 @@ toplevel: funcdecl;
 
 funcdecl: 'int' NAME paramDecl bloc;
 
-paramDecl: LPAR ('int' NAME)? (',' 'int' NAME)* RPAR;
+paramDecl: '(' ('int' NAME (',' 'int' NAME)*)? ')';
 
 bloc: '{' statement* '}';
 
@@ -49,7 +49,7 @@ expr: NAME IN_DECREMENT  # postInDecrExpr
 	| expr BITWISE expr  # bitwiseExpr
 	| NAME '=' expr		 # affectExpr
 	| NAME '[' expr ']' '=' expr	# affectArrayExpr
-    | LPAR expr RPAR	 # parExpr
+    | '(' expr ')'	 # parExpr
 	| NAME				 # nameExpr
 	| CONST				 # constExpr
 	| NAME '[' expr ']'				# arrayValue
@@ -58,7 +58,7 @@ expr: NAME IN_DECREMENT  # postInDecrExpr
 
 arrayAssignation: '=' '{'(expr(','expr)*)? '}';
 
-paramList : LPAR (expr (',' expr)*)? RPAR;
+paramList : '(' (expr (',' expr)*)? ')';
 
 ret: RETURN expr? ';';
 
@@ -73,8 +73,6 @@ COMP : ('=='|'!=');
 BITWISE : ('&' | '|' | '^');
 CONST : [0-9]+ ;
 CHAR : '\'' [a-zA-Z] '\'';
-LPAR : '(';
-RPAR : ')';
 COMMENT : '/*' .*? '*/' -> skip ;
 SINGLECOMMENT : '//' .*? '\n' -> skip ;
 DIRECTIVE : '#' .*? '\n' -> skip ;

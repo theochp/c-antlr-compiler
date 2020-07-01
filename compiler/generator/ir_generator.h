@@ -58,7 +58,7 @@ class IRGenerator {
     const Instruction *generateInc(IncExpression * expression, IRBlock *block);
     string newTempVar(const string& symbolTable);
     string newLabel();
-    int incrementOffset(string func, int size) {
+    int incrementOffset(const string& func, int size) {
         int newOffset = symbolOffsets.at(func) -= size;
         symbolOffsets.emplace(func, newOffset);
         return newOffset;

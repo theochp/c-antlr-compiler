@@ -2,13 +2,13 @@
 
 #include "expression.h"
 
-class Return : public Expression {
+class Return : public Statement {
 
-    Expression *statement;
+    Expression *expression;
 public:
     Return();
-    Return(Expression* statement);
+    Return(Expression* expression);
     ~Return();
-    const Expression *getStatement() const;
+    const Expression *getExpression() const;
     virtual std::string print();
 };

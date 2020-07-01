@@ -2,8 +2,6 @@
 #include <utility>
 
 #include "ir_generator.h"
-#include "../ast/func.h"
-#include "../ast/ifelse.h"
 
 IRGenerator::IRGenerator(vector<const Node *> ast, map<string, map<string, int>> symbolTables, map<string, int> symbolOffsets)
     : ast(std::move(ast)), symbolTables(std::move(symbolTables)), symbolOffsets(std::move(symbolOffsets)) {
@@ -24,6 +22,7 @@ const IRFunc *IRGenerator::generateFunc(const Func *func) {
         irFunc->addParam(param->getName());
     }
     generateBlock(func->getBlock(), irFunc, irFunc->getName());
+    symbolTables.at(func->getName()).emplace("!funcRet", incrementOffset(func->getName(), 4));
     funcs.push_back(irFunc);
     return irFunc;
 }
@@ -51,8 +50,11 @@ IRBlock *IRGenerator::generateStatement(const Statement* statement, IRBlock *blo
     else if (auto aFor = dynamic_cast<const For *>(statement)) {
         return generateFor(aFor, block);
     }
-    else if(auto el = dynamic_cast<const Declaration *>(statement)) {
-        generateDeclaration(el, block);
+    else if(auto decl = dynamic_cast<const Declaration *>(statement)) {
+        generateDeclaration(decl, block);
+    }
+    else if(auto ret = dynamic_cast<const Return *>(statement)) {
+        generateReturn(ret, block);
     }
     else {
         assert("Need to handle new types");
@@ -175,9 +177,6 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     }
     else if (const Operator *el = dynamic_cast<const Operator *>(expression)) {
         return generateOperator(el, block);
-    }
-    else if (const Return *el = dynamic_cast<const Return *>(expression)) {
-        return generateReturn(el, block);
     }
     else if (const Variable *el = dynamic_cast<const Variable *>(expression)) {
         return generateVariable(el, block);
@@ -351,8 +350,16 @@ const Instruction *IRGenerator::generateUnExpression(const UnExpression *express
 }
 
 const Instruction *IRGenerator::generateReturn(const Return *ret, IRBlock *block) {
-    auto lastInstr = generateExpression(ret->getStatement(), block);
-    auto instr = new Instruction(IROp::ret, string(""), {lastInstr->dest()}, block);
+    if (ret->getExpression() != nullptr) {
+        auto lastInstr = generateExpression(ret->getExpression(), block);
+        auto instr = new Instruction(store, "!funcRet", {lastInstr->dest()}, block);
+        block->addInstruction(instr);
+    } else {
+        // return 0 by default
+        auto instr = new Instruction(ldcst, "!funcRet", {"0"}, block);
+        block->addInstruction(instr);
+    }
+    auto instr = new Instruction(IROp::jmp, ".RET" + block->getFunc()->getName(), block);
     block->addInstruction(instr);
     return instr;
 }
