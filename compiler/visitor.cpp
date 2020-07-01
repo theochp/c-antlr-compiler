@@ -213,12 +213,21 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
 
 	// optimization
 	if (auto l = dynamic_cast<Constant*>(leftExpr)) {
-	    if (opType == MULT && l->getValue() == 1) {
+        if (auto r = dynamic_cast<Constant*>(rightExpr)) {
+            Constant* c;
+            if (opType == MULT) {
+                c = new Constant(l->getValue()*r->getValue());
+            } else {
+                c = new Constant(l->getValue()/r->getValue());
+            }
+            delete l;
+            delete r;
+            return (Expression*) c;
+        } else if (opType == MULT && l->getValue() == 1) {
             delete l;
             return rightExpr;
 	    }
-	}
-    if (auto r = dynamic_cast<Constant*>(rightExpr)) {
+	} else if (auto r = dynamic_cast<Constant*>(rightExpr)) {
         if (r->getValue() == 1) {
             delete r;
             return leftExpr;
@@ -250,7 +259,7 @@ antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
             }
             delete l;
             delete r;
-            return c;
+            return (Expression*) c;
         }
     }
 

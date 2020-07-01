@@ -225,9 +225,15 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
                 block->addInstruction(instr);
                 return instr;
             } else {
-                string destName = dest->getName();
-                auto rightInstr = generateExpression(pOperator->getRight(), block);
-                auto instr = new Instruction(IROp::store, destName, {rightInstr->dest()}, block);
+                const string& destName = dest->getName();
+                Instruction *instr;
+                if (auto cst = dynamic_cast<const Constant *>(pOperator->getRight())) {
+                    instr = new Instruction(IROp::storecst, destName, {to_string(cst->getValue())}, block);
+                } else {
+                    auto rightInstr = generateExpression(pOperator->getRight(), block);
+                    instr = new Instruction(IROp::store, destName, {rightInstr->dest()}, block);
+                }
+
                 block->addInstruction(instr);
                 return instr;
             } 
@@ -236,10 +242,23 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
             return nullptr;
         }
     } else {
-        auto leftInstr = generateExpression(pOperator->getLeft(), block);
-        auto rightInstr = generateExpression(pOperator->getRight(), block);
-        string op1 = leftInstr->dest();
-        string op2 = rightInstr->dest();
+        string op1, op2;
+
+        auto leftVar = dynamic_cast<const Variable*>(pOperator->getLeft());
+        auto rightVar = dynamic_cast<const Variable*>(pOperator->getRight());
+
+        if (leftVar) {
+            op1 = leftVar->getName();
+        } else {
+            op1 = generateExpression(pOperator->getLeft(), block)->dest();
+        }
+
+        if (rightVar) {
+            op2 = rightVar->getName();
+        } else {
+            op2 = generateExpression(pOperator->getRight(), block)->dest();
+        }
+
         string dest = newTempVar(block->getFunc()->getName());
         
         Instruction *inst;
