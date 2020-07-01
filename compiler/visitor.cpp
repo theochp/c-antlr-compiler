@@ -208,8 +208,22 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
 	if (ctx->MULTDIV()->getText() == "/") {
 		opType = DIV;
 	}
-	auto leftExpr = visit(ctx->expr(0));
-	auto rightExpr = visit(ctx->expr(1));
+	auto leftExpr = visit(ctx->expr(0)).as<Expression*>();
+	auto rightExpr = visit(ctx->expr(1)).as<Expression*>();
+
+	// optimization
+	if (auto l = dynamic_cast<Constant*>(leftExpr)) {
+	    if (opType == MULT && l->getValue() == 1) {
+            delete l;
+            return rightExpr;
+	    }
+	}
+    if (auto r = dynamic_cast<Constant*>(rightExpr)) {
+        if (r->getValue() == 1) {
+            delete r;
+            return leftExpr;
+        }
+    }
 
 	return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
@@ -222,10 +236,25 @@ antlrcpp::Any Visitor::visitAddExpr(ifccParser::AddExprContext *ctx) {
 		opType = MINUS;
 	}
 
-	auto leftExpr = visit(ctx->expr(0));
-	auto rightExpr = visit(ctx->expr(1));
+	auto leftExpr = visit(ctx->expr(0)).as<Expression*>();
+	auto rightExpr = visit(ctx->expr(1)).as<Expression*>();
 
-	return (Expression*) new Operator(opType, leftExpr, rightExpr);
+    // optimization
+    if (auto l = dynamic_cast<Constant*>(leftExpr)) {
+        if (auto r = dynamic_cast<Constant*>(rightExpr)) {
+            Constant* c;
+            if (opType == ADD) {
+                c = new Constant(l->getValue()+r->getValue());
+            } else {
+                c = new Constant(l->getValue()-r->getValue());
+            }
+            delete l;
+            delete r;
+            return c;
+        }
+    }
+
+    return (Expression*) new Operator(opType, leftExpr, rightExpr);
 }
 
 antlrcpp::Any Visitor::visitUnOp(ifccParser::UnOpContext *ctx) {
