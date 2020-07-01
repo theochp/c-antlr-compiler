@@ -1,25 +1,27 @@
 #include "return.h"
 
-Return::Return() : statement(nullptr) {
+Return::Return() : expression(nullptr) {
 
 }
     
-Return::Return(Expression* statement)
-    : statement(statement) {
+Return::Return(Expression* expression)
+    : expression(expression) {
 
 }
 
 Return::~Return() {
-    delete statement;
+    if (expression != nullptr) {
+        delete expression;
+    }
 }
 
-const Expression *Return::getStatement() const {
-    return statement;
+const Expression *Return::getExpression() const {
+    return expression;
 }
 
 std::string Return::print() {
     std::string res("return(");
-    res.append(statement->print());
+    res.append(expression->print());
     res.append(")");
     return res;
 }
