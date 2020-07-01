@@ -9,7 +9,7 @@ toplevel: funcdecl;
 
 funcdecl: 'int' NAME paramDecl bloc;
 
-paramDecl: '(' ('int' NAME)? (',' 'int' NAME)* ')';
+paramDecl: '(' ('int' NAME (',' 'int' NAME)*)? ')';
 
 bloc: '{' statement* '}';
 
@@ -58,7 +58,7 @@ expr: NAME IN_DECREMENT  # postInDecrExpr
 
 arrayAssignation: '=' '{'(expr(','expr)*)? '}';
 
-paramList : '(' expr? (',' expr)* ')';
+paramList : '(' (expr (',' expr)*)? ')';
 
 ret: RETURN expr? ';';
 
