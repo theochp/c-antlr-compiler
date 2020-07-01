@@ -58,7 +58,7 @@ expr: NAME IN_DECREMENT  # postInDecrExpr
 
 arrayAssignation: '=' '{'(expr(','expr)*)? '}';
 
-paramList : LPAR expr (',' expr)* RPAR;
+paramList : LPAR (expr (',' expr)*)? RPAR;
 
 ret: RETURN expr? ';';
 
