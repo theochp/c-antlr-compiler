@@ -308,7 +308,11 @@ antlrcpp::Any Visitor::visitCompExpr(ifccParser::CompExprContext *ctx){
 }
 
 antlrcpp::Any Visitor::visitRet(ifccParser::RetContext *ctx) {
-	return (Statement*) new Return(visit(ctx->expr()).as<Expression*>());
+    if (ctx->expr()) {
+        return (Statement*) new Return(visit(ctx->expr()).as<Expression*>());
+    } else {
+        return (Statement*) new Return();
+    }
 }
 
 antlrcpp::Any Visitor::visitArrayDeclaration(ifccParser::ArrayDeclarationContext *ctx) {

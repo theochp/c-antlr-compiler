@@ -27,13 +27,9 @@ void AsmGenerator::generate(ostream& os) {
         os << "subq $" << totalSymbolTableSize << ", %rsp" << endl;
         for (auto block : func->getBlocks()) {
             os << generate_block(*block) << endl;
-        }   
-        os << TAB;
-        if (func->getReturnValueLoc() != "") {
-            os << "movl " << func->getReturnValueLoc() << ", %eax" << endl << TAB;
-        } else {
-            os << "movl $0, %eax" << endl << TAB;
         }
+        os << ".RET" << func->getName() << ":" << endl << TAB;
+        os << "movl " << getOffsetRegister(func->getName(), "!funcRet") << ", %eax" << endl << TAB;
         os << "addq $" << totalSymbolTableSize << ", %rsp" << endl << TAB;
         os << "popq %rbp" << endl << TAB;
         os << "ret" << endl;
