@@ -22,12 +22,13 @@ int main(){
     }
     // est-ce que le tri a fonctionne
     int i=0;
+    int tri_ok = 1;
     while (i<n-1){
         if (tab[i]>tab[i+1]){
-            return 0;
+            tri_ok = 0;
         }
         i++;
     }
-    return 1;
+    return tri_ok;
 }
 
