@@ -211,7 +211,8 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
 	auto leftExpr = visit(ctx->expr(0)).as<Expression*>();
 	auto rightExpr = visit(ctx->expr(1)).as<Expression*>();
 
-	// optimization
+	bool isLeftExprConstant = auto l = dynamic_cast<Constant*>(leftExpr);
+	bool isRightExprConstant = auto r = dynamic_cast<Constant*>(rightExpr);
 	if (auto l = dynamic_cast<Constant*>(leftExpr)) {
         if (auto r = dynamic_cast<Constant*>(rightExpr)) {
             Constant* c;
