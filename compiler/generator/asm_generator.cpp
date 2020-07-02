@@ -17,7 +17,7 @@ void AsmGenerator::generate(ostream& os) {
         for(auto block : func->getBlocks()) {
             try {
                 totalSymbolTableSize += symbolTables.at(block->getLabel()).size() * 4;
-            } catch(std::out_of_range e) {
+            } catch(std::out_of_range& e) {
 
             }
         }
@@ -157,7 +157,6 @@ string AsmGenerator::generate_ldcst(Instruction& inst) {
     return "movl $" + inst.operands()[0] + ", " + dest;
 }
 
-// Todo: refactor (same behavior twice)
 string AsmGenerator::generate_store(Instruction& inst) {
     string source = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
     string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
