@@ -223,12 +223,12 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
             delete l;
             delete r;
             return (Expression*) c;
-        } else if (opType == MULT && l->getValue() == 1) {
+        } else {
+         if (isLeftExprConstant && opType == MULT && l->getValue() == 1) {
             delete l;
             return rightExpr;
 	    }
-	} else if (auto r = dynamic_cast<Constant*>(rightExpr)) {
-        if (r->getValue() == 1) {
+	if (isRightExprConstant && r->getValue() == 1) {
             delete r;
             return leftExpr;
         }
@@ -573,4 +573,3 @@ antlrcpp::Any Visitor::visitPostInDecrExpr(ifccParser::PostInDecrExprContext *ct
     }
     return (Expression*) new IncExpression(opType, new Variable(name), temp);
 }
-
