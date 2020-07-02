@@ -35,7 +35,7 @@ using namespace std;
         postdecre,
         preincre,
         predecre,
-        logicalNot
+        logicalNot,
     } IROp;
 
 class IRBlock;

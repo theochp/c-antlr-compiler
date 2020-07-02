@@ -29,11 +29,3 @@ IRFunc::~IRFunc() {
         delete b;
     }
 }
-
-const string &IRFunc::getReturnValueLoc() const {
-    return returnValueLoc;
-}
-
-void IRFunc::setReturnValueLoc(const string &returnValueLoc) {
-    IRFunc::returnValueLoc = returnValueLoc;
-}
