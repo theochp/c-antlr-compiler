@@ -211,9 +211,9 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
 	auto leftExpr = visit(ctx->expr(0)).as<Expression*>();
 	auto rightExpr = visit(ctx->expr(1)).as<Expression*>();
 
-	bool isLeftExprConstant = auto l = dynamic_cast<Constant*>(leftExpr);
-	bool isRightExprConstant = auto r = dynamic_cast<Constant*>(rightExpr);
-	if (isLeftExprConstant && isRightExprConstant) {
+    auto l = dynamic_cast<Constant*>(leftExpr);
+    auto r = dynamic_cast<Constant*>(rightExpr);
+	if (l && r) {
             Constant* c;
             if (opType == MULT) {
                 c = new Constant(l->getValue()*r->getValue());
@@ -224,11 +224,11 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
             delete r;
             return (Expression*) c;
         } else {
-         if (isLeftExprConstant && opType == MULT && l->getValue() == 1) {
+         if (l && opType == MULT && l->getValue() == 1) {
             delete l;
             return rightExpr;
 	    }
-	if (isRightExprConstant && r->getValue() == 1) {
+	if (r && r->getValue() == 1) {
             delete r;
             return leftExpr;
         }
