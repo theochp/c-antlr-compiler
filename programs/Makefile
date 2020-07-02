@@ -1,5 +1,5 @@
-all: tri.c
-	../compiler/ifcc tri.c
-	gcc output.s -o tri
+all: calculateurBasique.c
+	../compiler/ifcc calculateurBasique.c
+	gcc -no-pie output.s -o calculateurBasique
 
 
