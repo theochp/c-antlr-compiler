@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-#include <time.h>
+#include <ctime>
 
 #include "antlr4-runtime.h"
 #include "antlr4-generated/ifccLexer.h"
@@ -10,7 +10,8 @@
 #include "antlr4-generated/ifccBaseVisitor.h"
 #include "visitor.h"
 #include "generator/ir_generator.h"
-#include "generator/asm_generator.h"
+#include "generator/x86_generator.h"
+#include "generator/msp430_generator.h"
 
 using namespace antlr4;
 using namespace std;
@@ -65,11 +66,15 @@ int main(int argn, const char **argv) {
         IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getSymbolOffsets());
         irGen.generate();
 
-        AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
+        X86Generator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
         asmGen.generate(cout);
-  
-        ofstream out("output.s");
+        ofstream out("x86output.s");
         asmGen.generate(out);
+        out.close();
+
+        MSP430Generator msp430Generator(irGen.getFuncs(), irGen.getSymbolTables());
+        out.open("msp430output.s");
+        msp430Generator.generate(out);
         out.close();
 
         return 0;
