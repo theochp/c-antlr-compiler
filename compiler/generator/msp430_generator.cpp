@@ -170,7 +170,6 @@ string MSP430Generator::generate_ret(Instruction& inst) {
     stringstream res;
     if (inst.operand(0) != "") {
         string source = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.operand(0));
-        inst.getBlock()->getFunc()->setReturnValueLoc(source);
     }
 
     return res.str();

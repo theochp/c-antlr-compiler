@@ -2,50 +2,105 @@
 skinparam classAttributeIconSize 0
 left to right direction
 
-package generator{
-
-    Asm_generator *-- "*" Instrcution
-
-    class Asm_generator{
-        -vector<Instruction *> instruction
-        -symbolTable : map<string, int>
-    }
-
-    
-    Ir_generator *-- "*" Instrcution
-
-    class Ir_generator{
-        -vector<Instruction *> instruction
-        -ast : Node *
-        -symbolTable : map<string, int>
-        -tempVarCount : int
-        -stackOffset : int
-    }
-
-}
 
 package ir{
 
     Instruction --> inst_type
 
     class Instruction{
-        -_op : inst_type
-        -_source : string
-        -_dest : string
-        -_operand : string
+        - op inst_type,
+        - dest string
+        - operands vector<string>
+        - block IRBlock*
     }
 
+    Instruction -- IRBlock
+
+
+    class IRFunc {
+        - name : string
+        - blocks : vector<IRBlock*>
+        - params: vector<string>
+    }
+
+    class IRBlock {
+        - label : string
+        - instructions : vector<Instruction*>
+        - func : IRFunc*
+        - exitTrue : IRBlock*
+        - exitFalse : IRBlock*
+        - testVarName : string
+    }
+
+    IRBlock *-- "*" Instruction
+    IRFunc *-- "*" IRBlock
+
+    IRBlock -- "exitTrue" IRBlock
+    IRBlock -- "exitFalse" IRBlock
+
     enum inst_type {
-        cst
+        ldcst
         store
-        load
         ret
         add
-        su
+        sub
         mul
         div
+        neg
+        loadT
+        storeT
+        call
+        je
+        jmp
+        equalcomp
+        diffcomp
+        infcomp
+        infeqcomp
+        supcomp
+        supeqcomp
+        bitwise_and
+        bitwise_or
+        bitwise_xor
+        bitwise_not
+        postincre
+        postdecre
+        preincre
+        predecre
+        logicalNot
     }
 }
+
+package generator{
+
+    ASMGenerator *-- "*" Instruction
+
+    class ASMGenerator {
+        -vector<Instruction *> instruction
+        -symbolTable : map<string, map<string,int>>
+
+        generate(ostream)
+
+    }
+
+    
+    IRGenerator *-- "*" IRFunc
+    class IRGenerator{
+        -vector<IRFunc *> instruction
+        -ast : vector<Node*>
+        -symbolTable : map<string, map<string,int>>
+        -tempVarCount : int
+        -symbolOffsets : map<string,int>
+
+        generate()
+
+    }
+
+
+    X86Generator --|> ASMGenerator
+    MSP30Generator --|> ASMGenerator
+
+}
+
 
 
 package ast{
@@ -57,12 +112,34 @@ package ast{
     Operator --|> Expression
     Return --|> Expression
     Variable --|> Expression
+    Char --|> Expression
+    Expression --|> Statement
+    Declaration --|> Statement
+    For --|> Statement
+    Func --|> Node
+    FuncCall --|> Expression
+    IfElse --|> Statement
+    ArrayValue --|> Expression
+    ArrayDeclaration --|> Expression
+    UnExpression --|> Expression
 
     Block *-- "*" Expression
     
     class Node{
         
     }
+
+    class FuncParam {
+        - name : string
+    }
+
+    class Func {
+        - name : string
+        - block : Block *
+        - params : vector<FuncParam*>
+    }
+
+    Func *-- "*" FuncParam
 
     class Assignement{
         -lvalue : Variable *
@@ -101,10 +178,11 @@ package ast{
         -statement : Expression *
     }
     
-    class unExpression{
+    class UnExpression{
         -expr : Expression *
         -op : UnOperator
     }
+    UnExpression --> UnOperator
     UnOperator --> UnOpType
     class UnOperator{
         -opType : UnOpType
