@@ -56,6 +56,7 @@ class IRGenerator {
     const Instruction *generateArrayValue(ArrayValue *variable, IRBlock *block);
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
     const Instruction *generateInc(IncExpression * expression, IRBlock *block);
+
     string newTempVar(const string& symbolTable);
     string newLabel();
     int incrementOffset(const string& func, int size) {

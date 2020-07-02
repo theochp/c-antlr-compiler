@@ -22,7 +22,7 @@ const vector<const FuncParam*>& Func::getParams() const {
 
 Func::Func(string name) 
     : name(name)
-    {
+{
 
 }
 

@@ -63,21 +63,21 @@ int main(int argn, const char **argv) {
     }
 
     if (visitor.getErrCount() == 0)  {
-        IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getSymbolOffsets());
-        irGen.generate();
+      IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getSymbolOffsets());
+      irGen.generate();
+      
+      X86Generator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
+      asmGen.generate(cout);
+      ofstream out("x86output.s");
+      asmGen.generate(out);
+      out.close();
 
-        X86Generator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
-        asmGen.generate(cout);
-        ofstream out("x86output.s");
-        asmGen.generate(out);
-        out.close();
+      MSP430Generator msp430Generator(irGen.getFuncs(), irGen.getSymbolTables());
+      out.open("msp430output.s");
+      msp430Generator.generate(out);
+      out.close();
 
-        MSP430Generator msp430Generator(irGen.getFuncs(), irGen.getSymbolTables());
-        out.open("msp430output.s");
-        msp430Generator.generate(out);
-        out.close();
-
-        return 0;
+      return 0;
     }
   for (auto it = ast.begin(); it != ast.end(); ++it) {
     delete *it;

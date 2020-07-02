@@ -7,19 +7,24 @@ prog : toplevel+ ;
 
 toplevel: funcdecl;
 
-funcdecl: 'int' NAME paramDecl bloc;
+funcdecl: 'int' NAME paramDecl bloc #intfuncdecl
+		| 'void' NAME paramDecl bloc #voidfuncdecl
+		;
 
 paramDecl: '(' ('int' NAME (',' 'int' NAME)*)? ')';
 
 bloc: '{' statement* '}';
 
-statement: expr ';'         # exprStatement
+statement: call	';'		# callStatement
+		 | expr ';'         # exprStatement
          | declaration 	    # declStatement
 		 | ifElse			# ifElseStatement
 		 | whileStmnt		# whileStatement
 		 | forStmnt         # forStatement
-         | ret         	    # retStatement
+         | ret         	    # retStatement 
          ;
+
+call : NAME paramList;
 
 whileStmnt: 'while' '(' expr ')' blocOrStatement;
 
@@ -38,7 +43,7 @@ individualDeclaration: NAME ('=' expr)?		# valueDeclaration
 	;
 
 expr: NAME IN_DECREMENT  # postInDecrExpr
-	| NAME paramList     # funcall
+	| NAME paramList    # funcall
 	| ADDMINUS expr 	 # unOp
 	| NOT expr 	  		 # notExpr
     | IN_DECREMENT NAME  # preInDecrExpr
@@ -55,6 +60,7 @@ expr: NAME IN_DECREMENT  # postInDecrExpr
 	| NAME '[' expr ']'				# arrayValue
 	| CHAR               # charExpr
 	;
+
 
 arrayAssignation: '=' '{'(expr(','expr)*)? '}';
 
