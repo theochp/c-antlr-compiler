@@ -36,7 +36,6 @@ class IRGenerator {
     vector<IRFunc*> funcs;
     int tempVarCount = 0;
     int labelCount = 0;
-    int errorCount = 0;
 
     const IRFunc *generateFunc(const Func *func);
     pair<IRBlock *, IRBlock *>generateBlock(const Block *block, IRFunc *irFunc, string name);
