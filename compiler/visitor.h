@@ -102,9 +102,9 @@ public:
     
     antlrcpp::Any visitVoidfuncdecl(ifccParser::VoidfuncdeclContext *ctx) override;
 
-    antlrcpp::Any visitCallVoidStatement(ifccParser::CallVoidStatementContext *ctx) override;
+    antlrcpp::Any visitCallStatement(ifccParser::CallStatementContext *ctx) override;
 
-    antlrcpp::Any visitCallVoid(ifccParser::CallVoidContext *ctx) override;
+    antlrcpp::Any visitCall(ifccParser::CallContext *ctx) override;
 
     int getErrCount() {
         return errorCount;

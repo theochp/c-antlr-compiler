@@ -613,11 +613,11 @@ string name = ctx->NAME()->getText();
 	return func;
 }
     
-antlrcpp::Any Visitor::visitCallVoidStatement(ifccParser::CallVoidStatementContext *ctx){
-	return visit(ctx->callVoid()).as<Statement*>();
+antlrcpp::Any Visitor::visitCallStatement(ifccParser::CallStatementContext *ctx){
+	return visit(ctx->call()).as<Statement*>();
 }
 
-antlrcpp::Any Visitor::visitCallVoid(ifccParser::CallVoidContext *ctx){
+antlrcpp::Any Visitor::visitCall(ifccParser::CallContext *ctx){
 		string name = ctx->NAME()->getText();
 		auto paramList = visit(ctx->paramList()).as<const vector<Expression*>&>();
 		FuncCall *vCall = new FuncCall(name);

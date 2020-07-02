@@ -15,7 +15,7 @@ paramDecl: '(' ('int' NAME (',' 'int' NAME)*)? ')';
 
 bloc: '{' statement* '}';
 
-statement: callVoid	';'		# callVoidStatement
+statement: call	';'		# callStatement
 		 | expr ';'         # exprStatement
          | declaration 	    # declStatement
 		 | ifElse			# ifElseStatement
@@ -24,7 +24,7 @@ statement: callVoid	';'		# callVoidStatement
          | ret         	    # retStatement 
          ;
 
-callVoid : NAME paramList;
+call : NAME paramList;
 
 whileStmnt: 'while' '(' expr ')' blocOrStatement;
 
@@ -43,7 +43,7 @@ individualDeclaration: NAME ('=' expr)?		# valueDeclaration
 	;
 
 expr: NAME IN_DECREMENT  # postInDecrExpr
-	| NAME paramList     # funcall
+	| NAME paramList    # funcall
 	| ADDMINUS expr 	 # unOp
 	| NOT expr 	  		 # notExpr
     | IN_DECREMENT NAME  # preInDecrExpr
@@ -60,6 +60,7 @@ expr: NAME IN_DECREMENT  # postInDecrExpr
 	| NAME '[' expr ']'				# arrayValue
 	| CHAR               # charExpr
 	;
+
 
 arrayAssignation: '=' '{'(expr(','expr)*)? '}';
 
