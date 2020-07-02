@@ -24,7 +24,7 @@ public:
 
     antlrcpp::Any visitToplevel(ifccParser::ToplevelContext *ctx) override;
 
-    antlrcpp::Any visitFuncdecl(ifccParser::FuncdeclContext *ctx) override;
+    antlrcpp::Any visitIntfuncdecl(ifccParser::IntfuncdeclContext *ctx) override;
 
     antlrcpp::Any visitParamDecl(ifccParser::ParamDeclContext *ctx) override;
 
@@ -99,6 +99,12 @@ public:
     antlrcpp::Any visitPreInDecrExpr(ifccParser::PreInDecrExprContext *ctx) override;
 
     antlrcpp::Any visitPostInDecrExpr(ifccParser::PostInDecrExprContext *ctx) override;
+    
+    antlrcpp::Any visitVoidfuncdecl(ifccParser::VoidfuncdeclContext *ctx) override;
+
+    antlrcpp::Any visitCallVoidStatement(ifccParser::CallVoidStatementContext *ctx) override;
+
+    antlrcpp::Any visitCallVoid(ifccParser::CallVoidContext *ctx) override;
 
     int getErrCount() {
         return errorCount;
@@ -120,6 +126,11 @@ public:
         return symbolOffsets;
     }
 
+    Visitor(){
+        funcType.emplace("putchar", "int");
+        funcType.emplace("getchar", "int");
+    }
+    
     ~Visitor() {
         for (auto it = instructions.begin(); it != instructions.end(); ++it) {
             delete *it;
@@ -128,6 +139,7 @@ public:
 private:
     map<string, map<string, int>> symbolTables;
     map<string, int> symbolOffsets;
+    map<string, string> funcType;
     string activeSymbolTable; // function name or !global
     int visitorCreatedSymbols = 0;
     vector<tuple<string, int, pair<int, int>>> countUseVar; // variable name, variable nb of use, variable declaration line and position

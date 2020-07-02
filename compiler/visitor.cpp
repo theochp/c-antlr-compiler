@@ -21,6 +21,8 @@
 #include "static-analysis/undeclaredVariable.h"
 #include "static-analysis/doubleDeclaration.h"
 #include "static-analysis/unusedVariable.h"
+#include "static-analysis/voidUsedAsRValue.h"
+#include "static-analysis/undeclaredFunction.h"
 #include "ast/func.h"
 #include "ast/funccall.h"
 #include "ast/while.h"
@@ -52,10 +54,11 @@ antlrcpp::Any Visitor::visitToplevel(ifccParser::ToplevelContext *ctx) {
 	return (Node*) visit(ctx->funcdecl()).as<Func*>();
 }
 
-antlrcpp::Any Visitor::visitFuncdecl(ifccParser::FuncdeclContext *ctx) {
+antlrcpp::Any Visitor::visitIntfuncdecl(ifccParser::IntfuncdeclContext *ctx) {
 	string name = ctx->NAME()->getText();
 	symbolTables.emplace(name, map<string, int>());
 	symbolOffsets.emplace(name, 0);
+	funcType.emplace(name, "int");
 	activeSymbolTable = name;
 	vector<const FuncParam*> params = visit(ctx->paramDecl()).as<vector<const FuncParam*>>();
 	auto func = new Func(name);
@@ -427,6 +430,21 @@ antlrcpp::Any Visitor::visitArrayValue(ifccParser::ArrayValueContext *ctx) {
 
 antlrcpp::Any Visitor::visitFuncall(ifccParser::FuncallContext *ctx) {
 	string name = ctx->NAME()->getText();
+	
+	if(funcType.find(name) == funcType.end()){
+		errorCount++;
+		UndeclaredFunction* error = new UndeclaredFunction(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        errors.push_back(error);
+		return (Expression*) nullptr;
+	}
+
+	if(funcType.at(name)=="void"){
+		errorCount++;
+		VoidUsedAsRValue* error = new VoidUsedAsRValue(name, ctx->start->getLine(), ctx->start->getCharPositionInLine());
+        errors.push_back(error);
+		return (Expression*) nullptr;
+	}
+
 	auto paramList = visit(ctx->paramList()).as<const vector<Expression*>&>();
 	FuncCall *fCall = new FuncCall(name);
 	fCall->addParamStatements(paramList);
@@ -536,3 +554,35 @@ antlrcpp::Any Visitor::visitPostInDecrExpr(ifccParser::PostInDecrExprContext *ct
     return (Expression*) new IncExpression(opType, new Variable(name), temp);
 }
 
+antlrcpp::Any Visitor::visitVoidfuncdecl(ifccParser::VoidfuncdeclContext *ctx){
+string name = ctx->NAME()->getText();
+	symbolTables.emplace(name, map<string, int>());
+	symbolOffsets.emplace(name, 0);
+	funcType.emplace(name, "void");
+	activeSymbolTable = name;
+	vector<const FuncParam*> params = visit(ctx->paramDecl()).as<vector<const FuncParam*>>();
+	auto func = new Func(name);
+	for (auto param : params) {
+		symbolTable().emplace(param->getName(), incrementOffset(func->getName(), 4));
+		func->addParam(param);
+	}
+	
+	Block *block = visit(ctx->bloc()).as<Block*>();
+	func->setBlock(block);
+
+	activeSymbolTable = "!global";
+
+	return func;
+}
+    
+antlrcpp::Any Visitor::visitCallVoidStatement(ifccParser::CallVoidStatementContext *ctx){
+	return visit(ctx->callVoid()).as<Statement*>();
+}
+
+antlrcpp::Any Visitor::visitCallVoid(ifccParser::CallVoidContext *ctx){
+		string name = ctx->NAME()->getText();
+		auto paramList = visit(ctx->paramList()).as<const vector<Expression*>&>();
+		FuncCall *vCall = new FuncCall(name);
+		vCall->addParamStatements(paramList);
+		return (Statement *) vCall;
+}

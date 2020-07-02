@@ -36,6 +36,7 @@ class IRGenerator {
     vector<IRFunc*> funcs;
     int tempVarCount = 0;
     int labelCount = 0;
+    int errorCount = 0;
 
     const IRFunc *generateFunc(const Func *func);
     pair<IRBlock *, IRBlock *>generateBlock(const Block *block, IRFunc *irFunc, string name);
@@ -56,6 +57,7 @@ class IRGenerator {
     const Instruction *generateArrayValue(ArrayValue *variable, IRBlock *block);
     const Instruction *generateCall(const FuncCall *call, IRBlock *block);
     const Instruction *generateInc(IncExpression * expression, IRBlock *block);
+
     string newTempVar(const string& symbolTable);
     string newLabel();
     int incrementOffset(const string& func, int size) {

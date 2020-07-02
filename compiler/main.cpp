@@ -62,17 +62,17 @@ int main(int argn, const char **argv) {
     }
 
     if (visitor.getErrCount() == 0)  {
-        IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getSymbolOffsets());
-        irGen.generate();
+      IRGenerator irGen(ast, visitor.getSymbolTables(), visitor.getSymbolOffsets());
+      irGen.generate();
+      
+      AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
+      asmGen.generate(cout);
 
-        AsmGenerator asmGen(irGen.getFuncs(), irGen.getSymbolTables());
-        asmGen.generate(cout);
-  
-        ofstream out("output.s");
-        asmGen.generate(out);
-        out.close();
+      ofstream out("output.s");
+      asmGen.generate(out);
+      out.close();
 
-        return 0;
+      return 0;
     }
   for (auto it = ast.begin(); it != ast.end(); ++it) {
     delete *it;

@@ -7,19 +7,24 @@ prog : toplevel+ ;
 
 toplevel: funcdecl;
 
-funcdecl: 'int' NAME paramDecl bloc;
+funcdecl: 'int' NAME paramDecl bloc #intfuncdecl
+		| 'void' NAME paramDecl bloc #voidfuncdecl
+		;
 
 paramDecl: '(' ('int' NAME (',' 'int' NAME)*)? ')';
 
 bloc: '{' statement* '}';
 
-statement: expr ';'         # exprStatement
+statement: callVoid	';'		# callVoidStatement
+		 | expr ';'         # exprStatement
          | declaration 	    # declStatement
 		 | ifElse			# ifElseStatement
 		 | whileStmnt		# whileStatement
 		 | forStmnt         # forStatement
-         | ret         	    # retStatement
+         | ret         	    # retStatement 
          ;
+
+callVoid : NAME paramList;
 
 whileStmnt: 'while' '(' expr ')' blocOrStatement;
 

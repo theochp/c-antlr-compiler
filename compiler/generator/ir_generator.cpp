@@ -188,7 +188,7 @@ const Instruction *IRGenerator::generateExpression(const Expression *expression,
     } else if(const ArrayValue *el = dynamic_cast<const ArrayValue *>(expression)){
         return generateArrayValue((ArrayValue*)el, block);
     } else if(const FuncCall *el = dynamic_cast<const FuncCall *>(expression)) { 
-           return generateCall(el, block); 
+        return generateCall(el, block); 
     } else if (const LogicalNot *el = dynamic_cast<const LogicalNot *>(expression)){
         return generateLogicalNot(el, block);
     }else if(auto el = dynamic_cast<const IncExpression *>(expression)) {
