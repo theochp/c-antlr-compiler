@@ -10,7 +10,6 @@ using namespace std;
     typedef enum {
         ldcst,
         store,
-        storecst,
         ret,
         add,
         sub,

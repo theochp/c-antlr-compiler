@@ -16,7 +16,6 @@ class AsmGenerator {
 
     string generate_ldcst(Instruction& inst);
     string generate_store(Instruction& inst);
-    string generate_storecst(Instruction& inst);
     string generate_ret(Instruction& inst);
     string generate_add(Instruction& inst);
     string generate_sub(Instruction& inst);

@@ -228,7 +228,7 @@ const Instruction *IRGenerator::generateOperator(const Operator *pOperator, IRBl
                 const string& destName = dest->getName();
                 Instruction *instr;
                 if (auto cst = dynamic_cast<const Constant *>(pOperator->getRight())) {
-                    instr = new Instruction(IROp::storecst, destName, {to_string(cst->getValue())}, block);
+                    instr = new Instruction(IROp::ldcst, destName, {to_string(cst->getValue())}, block);
                 } else {
                     auto rightInstr = generateExpression(pOperator->getRight(), block);
                     instr = new Instruction(IROp::store, destName, {rightInstr->dest()}, block);

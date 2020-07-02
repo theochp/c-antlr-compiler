@@ -67,9 +67,6 @@ string AsmGenerator::generate_block(const IRBlock& block) {
             case IROp::store:
                 res << TAB << generate_store(inst) << endl;
                 break;
-            case IROp::storecst:
-                res << TAB << generate_storecst(inst) << endl;
-                break;
             case IROp::ret:
                 // TODO: handle return inside other blocks
                 res << TAB << generate_ret(inst) << endl;
@@ -166,14 +163,6 @@ string AsmGenerator::generate_store(Instruction& inst) {
     stringstream res;
     res << "movl " + source + ", %eax" << endl;
     res << TAB << "movl %eax," + dest;
-    return res.str();
-}
-
-string AsmGenerator::generate_storecst(Instruction& inst) {
-    string source = inst.operand(0);
-    string dest = getOffsetRegister(inst.getBlock()->getFunc()->getName(), inst.dest());
-    stringstream res;
-    res << "movl $" + source + ", " << dest;
     return res.str();
 }
 
