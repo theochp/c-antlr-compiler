@@ -213,8 +213,7 @@ antlrcpp::Any Visitor::visitMultExpr(ifccParser::MultExprContext *ctx) {
 
 	bool isLeftExprConstant = auto l = dynamic_cast<Constant*>(leftExpr);
 	bool isRightExprConstant = auto r = dynamic_cast<Constant*>(rightExpr);
-	if (auto l = dynamic_cast<Constant*>(leftExpr)) {
-        if (auto r = dynamic_cast<Constant*>(rightExpr)) {
+	if (isLeftExprConstant && isRightExprConstant) {
             Constant* c;
             if (opType == MULT) {
                 c = new Constant(l->getValue()*r->getValue());
